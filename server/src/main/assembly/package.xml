@@ -1,0 +1,47 @@
+<assembly>  
+	<!-- mvn clean assembly:assembly -->
+    <id>release</id> 
+     
+    <!-- 打包成zip文件 -->  
+    <formats>
+        <format>zip</format>  
+    </formats>
+  	
+  	<!-- 文件复制 -->
+    <fileSets>
+        <fileSet>  
+            <directory>/</directory>    
+            <includes>  
+                <include>run.bat</include>
+            </includes> 
+            <outputDirectory>/</outputDirectory> 
+        </fileSet>
+        
+        <fileSet>  
+            <directory>/target</directory>    
+            <includes>  
+                <include>lottery.jar</include>
+            </includes> 
+            <outputDirectory>/</outputDirectory> 
+        </fileSet>
+        
+        <fileSet>
+            <directory>/src/main/resources</directory>  
+            <includes>
+                <include>application.properties</include>
+<!--                 <include>application-${profiles.active}.properties</include> -->
+                <include>*.xml</include>
+                <include>*.properties</include>
+            </includes>   
+            <outputDirectory>/config</outputDirectory> 
+        </fileSet>
+        
+        <fileSet>
+            <directory>config</directory>  
+            <includes>
+                <include>lottery.db</include>
+            </includes>   
+            <outputDirectory>/config</outputDirectory> 
+        </fileSet>
+    </fileSets>  
+</assembly>
