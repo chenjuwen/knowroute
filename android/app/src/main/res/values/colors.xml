@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="statusBarBG">#DC143C</color>
+    <color name="black_overlay">#66000000</color>
+
+    <!-- lottery -->
+    <color name="title_bg">#2F4F4F</color>
+    <color name="button_bg">#008080</color>
+</resources>

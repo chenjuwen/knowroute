@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<TITLE>login</TITLE>
+	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
+
+	<script src="js/jquery.min-1.11.3.js"></script>
+	<script src="js/JSConstants.js"></script>
+	<script src="js/JSBridge.js"></script>
+	<script src="js/JSBridgeExt.js"></script>
+	<script src="js/vue.min.js"></script>
+	<script src="js/mint.min.js"></script>
+
+	<style type="text/css">
+		body {
+			background-color: #fff;
+		}
+		.mint-header{
+			height: 50px;
+		}
+
+		.mint-header-title {
+			font-size: 25px;
+		}
+
+		.mint-cell{
+			min-height: 80px;
+		}
+
+		.mint-button{
+			margin-top: 20px;
+		}
+
+		.field-btton-container{
+			padding: 0 10px;
+		}
+
+		.login_title{
+			margin-top: 40px;
+			padding-left: 10px;
+			font-size: 20px;
+			font-weight: 600;
+		}
+	</style>
+</HEAD>
+<BODY>
+<div id="app" class="vue-mint-container">
+	<mt-header fixed title="潮洲堂"></mt-header>
+
+	<div class="login_title">系统登录</div>
+	<mt-field label="账号" v-model.trim="account"></mt-field>
+	<mt-field label="密码" v-model.trim="password" type="password"></mt-field>
+
+	<div class="field-btton-container">
+		<mt-button type="primary" size="large" :disabled="disabled" @click="_login">登录</mt-button>
+	</div>
+</div>
+
+<script type="text/javascript">
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				account: "",
+				password: "",
+				disabled: false
+			},
+			methods: {
+				_login: function(){
+					doLogin();
+				}
+			}
+		});
+
+		function pageFinishCallback(){
+
+		}
+
+		function contactCallback(userName, userNumber){
+			alert(userName + ", " + userNumber);
+		}
+
+		function doLogin(){
+			if(vm.account == ""){
+				vm.$toast({
+					message: '请输入登录账号！',
+					duration: 1500
+				});
+				return;
+			}
+
+			if(vm.password == ""){
+				vm.$toast({
+					message: '请输入登录密码！',
+					duration: 1500
+				});
+				return;
+			}
+
+			vm.disabled = true;
+			var obj = {"account":vm.account, "password":vm.password};
+			var msg = jsBridge.dispatchAction("LoginAction", JSON.stringify(obj), "login");
+
+			if(msg == "success"){
+				transferPage("main.html");
+			}else{
+				alert(msg);
+			}
+
+			vm.disabled = false;
+		}
+	</script>
+</BODY>
+</HTML>
