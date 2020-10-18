@@ -32,13 +32,20 @@ public class CommonService {
      * @param phoneNumber 手机号码
      * @param message 短信信息
      */
-    public static void sendSMS( String phoneNumber, String message) {
-        SmsManager smsManager = SmsManager.getDefault();
+    public static boolean sendSMS( String phoneNumber, String message) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
 
-        // 拆分短信内容（手机短信长度限制）
-        List<String> divideContents = smsManager.divideMessage(message);
-        for (String text : divideContents) {
-            smsManager.sendTextMessage(phoneNumber, null, text, null, null);
+            // 拆分短信内容（手机短信长度限制）
+            List<String> divideContents = smsManager.divideMessage(message);
+            for (String text : divideContents) {
+                smsManager.sendTextMessage(phoneNumber, null, text, null, null);
+            }
+
+            return true;
+        }catch (Exception ex){
+            logger.error("", ex);
+            return false;
         }
     }
 

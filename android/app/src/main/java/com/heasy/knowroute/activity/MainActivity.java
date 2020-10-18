@@ -1,4 +1,4 @@
-package com.heasy.knowroute;
+package com.heasy.knowroute.activity;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import com.heasy.knowroute.WebViewWrapperFactory;
 import com.heasy.knowroute.action.common.PageTransferAction;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyApplication;

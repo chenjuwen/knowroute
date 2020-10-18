@@ -25,4 +25,11 @@ public class StringUtil {
 		return UUID.randomUUID().toString().replaceAll("-", "");
 	}
 
+	/**
+	 * 获取四位随机数
+	 */
+	public static String getFourDigitRandomNumber(){
+		return String.valueOf((int)((Math.random()*9+1)*1000));
+	}
+
 }

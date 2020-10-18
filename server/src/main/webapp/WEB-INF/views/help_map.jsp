@@ -6,7 +6,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<!-- 适应移动端页面展示 -->
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-		<link rel="stylesheet" href="../css/map.css" />
+		<link rel="stylesheet" href="css/map.css" />
 		<style type="text/css" >
 			#container{
 				height:100%
@@ -43,7 +43,7 @@
 				font-size: 16px;
 			}
 		</style>
-		<script type="text/javascript" src="../js/map.js"></script>
+		<script type="text/javascript" src="js/map.js"></script>
 		<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=${ak}">
 		</script>
     </head>

@@ -145,7 +145,7 @@ public class OkHttpClientHelper {
     }
     
     /**
-     * post json格式内容
+     * 异步post json格式内容
      * @param url
      * @param jsonData
      * @param listener
@@ -156,7 +156,23 @@ public class OkHttpClientHelper {
         Request request = new Request.Builder().url(url).post(body).build();
         okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
     }
-    
+
+    /**
+     * 异步post
+     * @param request
+     * @param listener
+     */
+    public void post(Request request, HttpClientListener listener){
+        okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
+    }
+
+    /**
+     * 同步post json格式内容
+     * @param url
+     * @param jsonData
+     * @return
+     * @throws Exception
+     */
     public String postJSON(String url, String jsonData)throws Exception{
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     	RequestBody body = RequestBody.create(JSON, jsonData);
@@ -169,13 +185,9 @@ public class OkHttpClientHelper {
             return value;
         }else{
             response.close();
-            System.out.println(response.message());
+            logger.error(response.message());
             return "";
         }
-    }
-    
-    public void post(Request request, HttpClientListener listener){
-        okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
     }
     
     public void download(String url, final String destFilePath){

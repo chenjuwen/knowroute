@@ -9,6 +9,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.heasy.Main;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.service.UserService;
+import com.heasy.knowroute.utils.DatetimeUtil;
+import com.heasy.knowroute.utils.StringUtil;
 
 import net.sf.json.JSONObject;
 
@@ -20,30 +22,35 @@ public class UserServiceTest {
 
 	@Test
 	public void getUser(){
-		UserBean bean = userService.getUser("admin");
-		System.out.println(bean);
-		
+		UserBean bean = userService.getUser("13798189352");
 		if(bean != null) {
 			System.out.println(JSONObject.fromObject(bean).toString(2));
+		}else {
+			System.out.println("user not found");
+		}
+		
+		bean = userService.getUser(8);
+		if(bean != null) {
+			System.out.println(DatetimeUtil.formatDate(bean.getCreate_date()));
+			System.out.println(DatetimeUtil.formatDate(bean.getLast_login_date()));
+		}else {
+			System.out.println("user not found");
 		}
 	}
-
+	
 	@Test
-	public void changePassword(){
-		String result = userService.changePassword("admin1", "admin", "admin");
-		System.out.println(result);
-		
-		result = userService.changePassword("admin", "admin", "admin");
-		System.out.println(result);
-		
-		result = userService.changePassword("admin", "123456", "admin");
-		System.out.println(result);
-		
-		UserBean bean = userService.getUser("admin");
-		System.out.println(bean);
-		
+	public void insertUser() {
+		int id = userService.insert("13798189356", StringUtil.getUUIDString());
+		System.out.println(id);
+	}
+	
+	@Test
+	public void updateUser() {
+		UserBean bean = userService.getUser("13798189356");
 		if(bean != null) {
-			System.out.println(JSONObject.fromObject(bean).toString(2));
+			userService.updateNickname(bean.getId(), "张三");
+			userService.updateLastLoginDate(bean.getId());
+			userService.updatePositionInfo(bean.getId(), 1.123f, 2.456f, "address");
 		}
 	}
 }

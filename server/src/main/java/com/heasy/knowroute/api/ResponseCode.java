@@ -3,9 +3,13 @@ package com.heasy.knowroute.api;
 public enum ResponseCode {
 	SUCCESS(1, "成功"),
 	FAILURE(999, "失败"),
+	
 	PARAM_INVALID(1001, "参数无效"),
 	NO_DATA(1002, "查无数据"),
-	NO_ACCESS(2001, "无权访问");
+	PHONE_INVALID(1003, "手机号码无效"),
+	
+	NO_ACCESS(2001, "无权访问"),
+	LOGIN_ERROR(2002, "登录失败");
 	
 	private Integer code;
 	private String message;

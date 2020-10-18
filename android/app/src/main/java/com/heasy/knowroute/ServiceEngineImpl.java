@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by Administrator on 2017/12/29.
  */
-class ServiceEngineImpl implements ServiceEngine {
+public class ServiceEngineImpl implements ServiceEngine {
     private static Logger logger = LoggerFactory.getLogger(ServiceEngineImpl.class);
     private Context androidContext;
     private HeasyContext heasyContext;

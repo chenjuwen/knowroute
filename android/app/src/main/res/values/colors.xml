@@ -9,4 +9,10 @@
     <!-- lottery -->
     <color name="title_bg">#2F4F4F</color>
     <color name="button_bg">#008080</color>
+
+    <!-- knowroute -->
+    <color name="bgcolor1">#4682B4</color>
+    <color name="textColor1">#595959</color>
+    <color name="textColor2">#DC143C</color>
+    <color name="textColor3">#00008B</color>
 </resources>

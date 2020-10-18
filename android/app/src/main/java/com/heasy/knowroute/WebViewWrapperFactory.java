@@ -13,7 +13,7 @@ import com.heasy.knowroute.action.ActionScanner;
 /**
  * Created by Administrator on 2018/1/23.
  */
-class WebViewWrapperFactory {
+public class WebViewWrapperFactory {
     private static DefaultActionDispatcher actionDispatcher = null;
     private static WebViewWrapper webViewWrapper = null;
 

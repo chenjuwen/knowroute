@@ -5,8 +5,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/knowroute")
-public class KnowRouteController extends BaseController{
+public class QuickHelpController extends BaseController{
 	public static final String MAP_AK = "dznCIamw2fFeqGOxQGHKYAxACOYw143G";
 	
 	@RequestMapping("/help_map")

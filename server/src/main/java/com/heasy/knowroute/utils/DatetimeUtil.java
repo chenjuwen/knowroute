@@ -10,8 +10,19 @@ import java.util.Locale;
  * Created by Administrator on 2018/2/13.
  */
 public class DatetimeUtil {
+    /**
+     * 格式为 yyyy-MM-dd
+     */
     public static final String DEFAULT_PATTERN = "yyyy-MM-dd";
+    
+    /**
+     * 格式为 yyyy-MM-dd HH:mm:ss
+     */
     public static final String DEFAULT_PATTERN_DT = "yyyy-MM-dd HH:mm:ss";
+    
+    /**
+     * 格式为 yyyy-MM-dd HH:mm
+     */
     public static final String DEFAULT_PATTERN_DT2 = "yyyy-MM-dd HH:mm";
 
     public static Calendar getCalendar(){
@@ -47,6 +58,10 @@ public class DatetimeUtil {
         return today;
     }
 
+    public static String getToday(){
+    	return getToday(DEFAULT_PATTERN_DT);
+    }
+
     public static String changeDateFormat(String date, String fromPattern, String toPattern){
         try{
             SimpleDateFormat sdf1 = new SimpleDateFormat(fromPattern);
@@ -58,6 +73,10 @@ public class DatetimeUtil {
         }catch(Exception ex){
             return date;
         }
+    }
+    
+    public static String formatDate(Date date){
+    	return formatDate(date, DEFAULT_PATTERN_DT);
     }
 
     public static String formatDate(Date date, String pattern){
@@ -107,6 +126,10 @@ public class DatetimeUtil {
         }catch(Exception ex){
             return null;
         }
+    }
+    
+    public static Date toDate(String date){
+    	return toDate(date, DEFAULT_PATTERN_DT);
     }
 
     public static Date toDate(Timestamp timestamp){

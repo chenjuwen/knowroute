@@ -1,7 +1,11 @@
 package com.heasy.knowroute.service;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -9,11 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
 import com.heasy.knowroute.bean.UserBean;
-import com.heasy.knowroute.common.Constants;
+import com.heasy.knowroute.utils.DatetimeUtil;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,49 +28,15 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
     private JdbcTemplate jdbcTemplate;
-	
-    @Override
-    public String changePassword(String account, String oldPassword, String newPassword) {
-        try {
-            UserBean bean = getUser(account);
-            if(bean == null) {
-            	return "账号不存在！";
-            }
-            
-            String password = bean.getPassword();
-            if(!password.equals(oldPassword)) {
-            	return "旧密码错误！";
-            }
-            
-            String sql = "update users set password=? where id=?";
-            jdbcTemplate.update(sql, newPassword, bean.getId());
-            
-            return Constants.SUCCESS;
 
-        }catch (Exception ex){
-            logger.error("", ex);
-            return "修改密码出错！";
-        }
-    }
-
-    @Override
-    public UserBean getUser(String account) {
-        try {
-        	String sql = "select * from users where account=?";
-        	
-        	List<UserBean> list = jdbcTemplate.query(sql, new RowMapper<UserBean>() {
-        		@Override
-        		public UserBean mapRow(ResultSet rs, int rowNum) throws SQLException {
-        			int id = rs.getInt("id");
-        			String account = rs.getString("account");
-        			String password = rs.getString("password");
-        			String role = rs.getString("role");
-        			
-        			UserBean bean = new UserBean(id, account, password, role);
-        			return bean;
-        		}
-        	}, account);
-        	
+	/**
+	 * 根据id获取用户信息
+	 */
+	@Override
+	public UserBean getUser(int id) {
+		try {
+        	String sql = "select * from users where id=?";
+        	List<UserBean> list = jdbcTemplate.query(sql, new UserRowMapper(), id);
         	if(!CollectionUtils.isEmpty(list)) {
         		return list.get(0);
         	}
@@ -71,5 +44,141 @@ public class UserServiceImpl implements UserService {
             logger.error("", ex);
         }
         return null;
+	}
+	
+	/**
+	 * 根据手机号获取用户信息
+	 */
+    @Override
+    public UserBean getUser(String phone) {
+        try {
+        	String sql = "select * from users where phone=?";
+        	List<UserBean> list = jdbcTemplate.query(sql, new UserRowMapper(), phone);
+        	if(!CollectionUtils.isEmpty(list)) {
+        		return list.get(0);
+        	}
+        }catch (Exception ex){
+            logger.error("", ex);
+        }
+        return null;
+    }
+   
+    /**
+     * 添加用户记录，并返回记录的id值
+     * 
+     * @param phone 手机号
+     * @param inviteCode 邀请码
+     * 
+     * @return 记录的id值，0表示错误，大于0表示真实的id值
+     */
+    @Override
+    public int insert(String phone, String inviteCode) {
+    	UserBean bean = getUser(phone);
+    	if(bean != null) {
+    		logger.warn("用户 " + phone + " 已存在");
+    		return 0;
+    	}
+    	
+    	try {
+    		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    		
+    		final String sql = "insert into users(phone,nickname,invite_code,create_date,last_login_date) values(?,?,?,?,?)";
+    		
+    		KeyHolder keyHolder = new GeneratedKeyHolder(); 
+    		
+    		jdbcTemplate.update(new PreparedStatementCreator() {
+				@Override
+				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+					PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+					ps.setString(1, phone);
+					ps.setString(2, phone);
+					ps.setString(3, inviteCode);
+					ps.setString(4, date);
+					ps.setString(5, date);
+					return ps;
+				}
+			}, keyHolder);
+    		
+    		int id = keyHolder.getKey().intValue();
+    		logger.info("新用户的id为 " + id);
+        	return id;
+    	}catch(Exception ex) {
+    		logger.error("", ex);
+    		return 0;
+    	}
+    }
+    
+    /**
+     * 更新用户的昵称
+     */
+    @Override
+    public boolean updateNickname(int id, String newNickname) {
+    	try {
+	    	String sql = "update users set nickname=? where id=?";
+	    	int count = jdbcTemplate.update(sql, newNickname, id);
+	    	return count > 0;
+    	}catch(Exception ex) {
+    		logger.error("", ex);
+    		return false;
+    	}
+    }
+    
+    /**
+     * 更新用户的最后登录时间
+     */
+    @Override
+    public boolean updateLastLoginDate(int id) {
+    	try {
+    		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+	    	String sql = "update users set last_login_date=? where id=?";
+	    	int count = jdbcTemplate.update(sql, date, id);
+	    	return count > 0;
+    	}catch(Exception ex) {
+    		logger.error("", ex);
+    		return false;
+    	}
+    }
+    
+    /**
+     * 更新用户的位置信息
+     */
+    @Override
+    public boolean updatePositionInfo(int id, Float longitude, Float latitude, String address) {
+    	try {
+	    	String sql = "update users set longitude=?,latitude=?,address=? where id=?";
+	    	int count = jdbcTemplate.update(sql, longitude, latitude, address, id);
+	    	return count > 0;
+		}catch(Exception ex) {
+			logger.error("", ex);
+			return false;
+		}
+    }
+    
+    class UserRowMapper implements RowMapper<UserBean>{
+    	@Override
+    	public UserBean mapRow(ResultSet rs, int rowNum) throws SQLException {
+    		int id = rs.getInt("id");
+			String phone = rs.getString("phone");
+			String nickname = rs.getString("nickname");
+			Float longitude = rs.getFloat("longitude");
+			Float latitude = rs.getFloat("latitude");
+			String address = rs.getString("address");
+			String invite_code = rs.getString("invite_code");
+			Date create_date = DatetimeUtil.toDate(rs.getString("create_date"));
+			Date last_login_date = DatetimeUtil.toDate(rs.getString("last_login_date"));
+			
+			UserBean bean = new UserBean();
+			bean.setId(id);
+			bean.setPhone(phone);
+			bean.setNickname(nickname);
+			bean.setLongitude(longitude);
+			bean.setLatitude(latitude);
+			bean.setAddress(address);
+			bean.setInvite_code(invite_code);
+			bean.setCreate_date(create_date);
+			bean.setLast_login_date(last_login_date);
+			
+			return bean;
+    	}
     }
 }

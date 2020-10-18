@@ -16,15 +16,9 @@ public class LoginServiceTest {
     private LoginService loginService;
 
 	@Test
-	public void checkLogin(){
-		String result = loginService.checkLogin("admin1", "123456");
-		System.out.println(result);
-		
-		result = loginService.checkLogin("admin", "1234567");
-		System.out.println(result);
-		
-		result = loginService.checkLogin("admin", "123456");
-		System.out.println(result);
+	public void login(){
+		int id = loginService.login("13798189352");
+		System.out.println(id);
 	}
 	
 }

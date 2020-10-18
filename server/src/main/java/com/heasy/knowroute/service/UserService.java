@@ -6,6 +6,10 @@ import com.heasy.knowroute.bean.UserBean;
  * Created by Administrator on 2020/9/26.
  */
 public interface UserService{
-    UserBean getUser(String account);
-    String changePassword(String account, String oldPassword, String newPassword);
+    UserBean getUser(int id);
+    UserBean getUser(String phone);
+    int insert(String phone, String invite_code);
+    boolean updateNickname(int id, String newNickname);
+    boolean updateLastLoginDate(int id);
+    boolean updatePositionInfo(int id, Float longitude, Float latitude, String address);
 }

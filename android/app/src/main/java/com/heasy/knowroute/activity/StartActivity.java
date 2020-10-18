@@ -1,4 +1,4 @@
-package com.heasy.knowroute;
+package com.heasy.knowroute.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -9,11 +9,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.heasy.knowroute.R;
+import com.heasy.knowroute.ServiceEngineImpl;
+import com.heasy.knowroute.WebViewWrapperFactory;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.VersionUtil;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends BaseActivity {
     private static final Logger logger = LoggerFactory.getLogger(StartActivity.class);
     private final int SDK_PERMISSION_REQUEST = 127;
     private Thread thread = null;
@@ -33,30 +33,22 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //logger.info(">>>>>" + getApplicationContext().getCacheDir().getPath());
-        //logger.info(">>>>>" + getApplicationContext().getFilesDir().getPath());
-        //logger.info(">>>>>" + getApplicationContext().getDir("lottery", Context.MODE_PRIVATE).getPath());
-
-        //隐藏状态栏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-
+        hideStatusBar();
         setContentView(R.layout.activity_start);
+        hideActionBar();
 
-        //os version release
         TextView textView = (TextView) findViewById(R.id.versionRelease);
-        textView.setText(VersionUtil.getVersionRelease());
-
-        //隐藏actionBar
-        getSupportActionBar().hide();
+        textView.setText("版本：" + VersionUtil.getVersionName(getApplicationContext()));
 
         handler = new Handler(){
             @Override
             public void handleMessage(Message message) {
                 if(message.what == 1) {
                     logger.debug("start MainActivity...");
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    //startActivity(intent);
+
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                     startActivity(intent);
                 }
 
@@ -137,7 +129,7 @@ public class StartActivity extends AppCompatActivity {
                 initServiceEngine();
                 initActionDispatcher();
 
-                TimeUnit.MILLISECONDS.sleep(2000);
+                TimeUnit.MILLISECONDS.sleep(5000);
 
                 handler.sendEmptyMessage(1);
             } catch (Exception ex) {
