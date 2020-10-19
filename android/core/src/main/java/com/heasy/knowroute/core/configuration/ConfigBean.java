@@ -11,13 +11,7 @@ public class ConfigBean {
     private String actionBasePackage = "com.heasy.app.action";
     private String serviceBasePackage = "com.heasy.app";
     private String webviewLoadBasePath = "file:///android_asset/html/";
-
-    //主页面
     private String mainPage = "main.html";
-
-    //登陆页面
-    private String loginPage = "login.html";
-
     private String apiAddress;
 
     public String getSdcardRootPath() {
@@ -58,14 +52,6 @@ public class ConfigBean {
 
     public void setMainPage(String mainPage) {
         this.mainPage = mainPage;
-    }
-
-    public String getLoginPage() {
-        return loginPage;
-    }
-
-    public void setLoginPage(String loginPage) {
-        this.loginPage = loginPage;
     }
 
     public String getApiAddress() {

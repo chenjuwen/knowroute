@@ -20,10 +20,8 @@ public class DefaultConfigLoader extends AbstractConfigLoader<ConfigBean> {
             ConfigBean configBean = new ConfigBean();
 
             configBean.setSdcardRootPath(Dom4jUtil.getNodeText(document, ROOT_PATH + "sdcardRootPath"));
-
             configBean.setActionBasePackage(Dom4jUtil.getNodeText(document, ROOT_PATH + "actionBasePackage"));
             configBean.setServiceBasePackage(Dom4jUtil.getNodeText(document, ROOT_PATH + "serviceBasePackage"));
-
             configBean.setWebviewLoadBasePath(Dom4jUtil.getNodeText(document, ROOT_PATH + "webviewLoadBasePath"));
             configBean.setMainPage(Dom4jUtil.getNodeText(document, ROOT_PATH + "mainPage"));
             configBean.setApiAddress(Dom4jUtil.getNodeText(document, ROOT_PATH + "apiAddress"));

@@ -15,7 +15,7 @@ public class HttpTest {
         OkHttpClientHelper okHttpClientHelper = new OkHttpClientHelper();
         okHttpClientHelper.build();
 
-        String content = okHttpClientHelper.synGet("http://10.1.43.6:8888/boot/test");
+        String content = okHttpClientHelper.synGet("http://180.215.209.100/knowroute/index");
         System.out.println(content);
     }
 
@@ -24,7 +24,7 @@ public class HttpTest {
         OkHttpClientHelper okHttpClientHelper = new OkHttpClientHelper();
         okHttpClientHelper.build();
 
-        okHttpClientHelper.asynGet("http://10.1.43.6:8888/boot/test", new HttpClientListener() {
+        okHttpClientHelper.asynGet("http://www.knowroute.cn/knowroute/index", new HttpClientListener() {
             @Override
             public void onReponse(Response response) {
                 try {
@@ -56,27 +56,29 @@ public class HttpTest {
     }
 
     @Test
-    public void post() throws Exception {
-        Request request = new RequestBuilder()
-                .url("http://10.1.43.6:8888/boot/saveUser3")
-                .addHeader("token", "123456")
-                .addFormParam("username", "cjm")
-                .addFormParam("password", "123中文")
-                .build();
+    public void post(){
+        try {
+            Request request = new RequestBuilder()
+                    .url("http://www.knowroute.cn/knowroute/login")
+                    .addFormParam("phone", "13798189352")
+                    .build();
 
-        OkHttpClientHelper okHttpClientHelper = new OkHttpClientHelper();
-        okHttpClientHelper.build();
+            OkHttpClientHelper okHttpClientHelper = new OkHttpClientHelper();
+            okHttpClientHelper.build();
 
-        okHttpClientHelper.post(request, new HttpClientListener() {
-            @Override
-            public void onReponse(Response response) {
-                try {
-                    System.out.println(response.body().string());
-                } catch (IOException e) {
-                    e.printStackTrace();
+            okHttpClientHelper.post(request, new HttpClientListener() {
+                @Override
+                public void onReponse(Response response) {
+                    try {
+                        System.out.println(response.body().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Test

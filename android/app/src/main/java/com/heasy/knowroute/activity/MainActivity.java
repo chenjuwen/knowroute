@@ -1,14 +1,11 @@
 package com.heasy.knowroute.activity;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.heasy.knowroute.WebViewWrapperFactory;
-import com.heasy.knowroute.action.common.PageTransferAction;
-import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyApplication;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.event.ExitAppEvent;
@@ -19,8 +16,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 public class MainActivity extends AppCompatActivity{
     private static final Logger logger = LoggerFactory.getLogger(MainActivity.class);
@@ -60,22 +55,7 @@ public class MainActivity extends AppCompatActivity{
         webViewWrapper = WebViewWrapperFactory.getWebViewWrapper();
 
         String mainPage = ServiceEngineFactory.getServiceEngine().getConfigurationService().getConfigBean().getMainPage();
-
-        //check login
-        //  /data/user/0/com.heasy.lottery/app_lottery
-        String accessFilePath = getApplicationContext().getDir(Constants.AUTH_DIR, Context.MODE_PRIVATE).getPath();
-        accessFilePath += File.separator + Constants.AUTH_DATA_FILE_NAME;
-
-        File file = new File(accessFilePath);
-        if(!file.exists()){
-            mainPage = ServiceEngineFactory.getServiceEngine().getConfigurationService().getConfigBean().getLoginPage();
-        }
-
-        if(mainPage.toLowerCase().startsWith(PageTransferAction.PROTOCOL_HTTP) || mainPage.toLowerCase().startsWith(PageTransferAction.PROTOCOL_HTTPS)){ //公网页面地址
-            webViewWrapper.loadUrl(mainPage);
-        }else{
-            webViewWrapper.loadUrlFromAsset(mainPage);
-        }
+        webViewWrapper.loadUrlFromAsset(mainPage);
         //webViewWrapper.loadUrl("file:///sdcard/sdcard_file.html");
     }
 

@@ -10,6 +10,8 @@ import com.heasy.knowroute.http.OkHttpClientHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import okhttp3.Request;
+
 /**
  * Created by Administrator on 2020/10/5.
  */
@@ -26,9 +28,10 @@ public class HttpService {
         return okHttpClientHelper;
     }
 
-    private static String getApiAddress(HeasyContext heasyContext) {
+    public static String getApiAddress(HeasyContext heasyContext) {
         if(StringUtil.isEmpty(apiAddress)){
             apiAddress = heasyContext.getServiceEngine().getConfigurationService().getConfigBean().getApiAddress();
+            logger.debug("apiAddress=" + apiAddress);
         }
         return apiAddress;
     }
@@ -44,6 +47,22 @@ public class HttpService {
         ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
         logger.debug(FastjsonUtil.object2String(responseBean));
         return responseBean;
+    }
+
+    public static ResponseBean httpPost(Request request){
+        try {
+            String result = getOkHttpClientHelper().post(request);
+            logger.debug("httpPost response:" + result);
+
+            if(StringUtil.isNotEmpty(result)){
+                ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
+                return responseBean;
+            }
+
+        }catch (Exception ex){
+            logger.error("", ex);
+        }
+        return ResponseBean.failure(ResponseCode.SERVICE_CALL_ERROR);
     }
 
     public static String getFailureMessage(ResponseBean responseBean){

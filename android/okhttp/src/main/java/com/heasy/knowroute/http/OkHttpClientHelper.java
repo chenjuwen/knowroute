@@ -166,6 +166,19 @@ public class OkHttpClientHelper {
         okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
     }
 
+    public String post(Request request)throws Exception{
+        Response response = okHttpClient.newCall(request).execute();
+        if(response.isSuccessful()){
+            String value = response.body().string();
+            response.close();
+            return value;
+        }else{
+            response.close();
+            logger.error(response.message());
+            return "";
+        }
+    }
+
     /**
      * 同步post json格式内容
      * @param url

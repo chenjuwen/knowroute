@@ -9,6 +9,7 @@ import com.heasy.knowroute.core.webview.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class ActionScanner extends AbstractComponentScanner<Map<String, Action>>
 
         if(StringUtil.isNotEmpty(getBasePackages())){
             String[] packagesArray = getBasePackages().split(";");
-            logger.info("packagesArray = " + packagesArray);
+            logger.info("packagesArray = " + Arrays.toString(packagesArray));
 
             try {
                 PathClassLoader classLoader = (PathClassLoader) Thread.currentThread().getContextClassLoader();

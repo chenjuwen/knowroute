@@ -5,29 +5,40 @@ import android.support.annotation.NonNull;
 
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
-import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.service.AbstractService;
+import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.FileUtil;
+import com.heasy.knowroute.core.utils.StringUtil;
+import com.heasy.knowroute.http.RequestBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+import okhttp3.Request;
+
 /**
  * Created by Administrator on 2020/9/26.
  */
 public class LoginServiceImpl extends AbstractService implements LoginService {
     private static final Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
-    private String userRole = "";
+    private String userPhone = "";
+    private int userId = 0;
 
     @Override
     public void init() {
         try {
             //read authority file
             String accessFilePath = getAccessFilePath();
-            userRole = FileUtil.readTextFile(accessFilePath);
+            String text = FileUtil.readTextFile(accessFilePath);
+            if(StringUtil.isNotEmpty(text)) {
+                String[] arr = text.split(",");
+                this.userId = Integer.parseInt(arr[0]);
+                this.userPhone = arr[1];
+                logger.debug("userId=" + this.userId + ", userPhone=" + this.userPhone);
+            }
 
             successInit = true;
         }catch(Exception ex){
@@ -38,31 +49,29 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     @Override
     public void unInit() {
         super.unInit();
-        userRole = "";
+        userPhone = "";
+        userId = 0;
     }
 
     @Override
-    public String checkLogin(String account, String password) {
+    public String doLogin(String _phone) {
         try {
-            userRole = "";
+            Request request = new RequestBuilder()
+                    .url(HttpService.getApiAddress(getHeasyContext()) + "login")
+                    .addFormParam("phone", _phone)
+                    .build();
 
-            String requestUrl = "/login/checkLogin?account=" + account + "&password=" + password;
-            ResponseBean responseBean = HttpService.httpGet(getHeasyContext(), requestUrl);
+            ResponseBean responseBean = HttpService.httpPost(request);
 
             if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
-                UserService userService = getHeasyContext().getServiceEngine().getService(UserServiceImpl.class);
-                UserBean userBean = userService.getUser(account);
-                if(userBean != null){
-                    userRole = userBean.getRole();
+                this.userPhone = _phone;
+                this.userId = FastjsonUtil.string2JSONObject((String)responseBean.getData()).getIntValue("id");
 
-                    //write authority file
-                    String accessFilePath = getAccessFilePath();
-                    FileUtil.writeFile(userRole, accessFilePath);
+                //write authority file
+                String accessFilePath = getAccessFilePath();
+                FileUtil.writeFile(this.userId + "," + this.userPhone, accessFilePath);
 
-                    return Constants.SUCCESS;
-                }else{
-                    throw new RuntimeException();
-                }
+                return Constants.SUCCESS;
             }else{
                 return HttpService.getFailureMessage(responseBean);
             }
@@ -73,8 +82,13 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     }
 
     @Override
-    public boolean isAdministrator() {
-        return "admin".equalsIgnoreCase(userRole);
+    public int getUserId() {
+        return this.userId;
+    }
+
+    @Override
+    public String getPhone() {
+        return this.userPhone;
     }
 
     @Override

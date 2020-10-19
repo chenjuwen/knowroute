@@ -2,6 +2,7 @@ package com.heasy.knowroute.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.heasy.knowroute.R;
 import com.heasy.knowroute.ServiceEngineImpl;
 import com.heasy.knowroute.WebViewWrapperFactory;
+import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.VersionUtil;
@@ -21,6 +23,7 @@ import com.heasy.knowroute.core.utils.VersionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -44,12 +47,19 @@ public class StartActivity extends BaseActivity {
             @Override
             public void handleMessage(Message message) {
                 if(message.what == 1) {
-                    logger.debug("start MainActivity...");
-                    //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    //startActivity(intent);
+                    String accessFilePath = getApplicationContext().getDir(Constants.AUTH_DIR, Context.MODE_PRIVATE).getPath();
+                    accessFilePath += File.separator + Constants.AUTH_DATA_FILE_NAME;
 
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivity(intent);
+                    File file = new File(accessFilePath);
+                    if(!file.exists()){
+                        logger.debug("start LoginActivity...");
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        startActivity(intent);
+                    }else{
+                        logger.debug("start MainActivity...");
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                    }
                 }
 
                 finish();
@@ -77,6 +87,13 @@ public class StartActivity extends BaseActivity {
             if(checkSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.ACCESS_NETWORK_STATE);
             }
+            if(checkSelfPermission(Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED){
+                permissions.add(Manifest.permission.ACCESS_WIFI_STATE);
+            }
+            if(checkSelfPermission(Manifest.permission.CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED){
+                permissions.add(Manifest.permission.CHANGE_WIFI_STATE);
+            }
+
             if(checkSelfPermission(Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS);
             }

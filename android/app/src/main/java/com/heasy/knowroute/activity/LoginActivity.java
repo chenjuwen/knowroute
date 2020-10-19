@@ -1,23 +1,30 @@
 package com.heasy.knowroute.activity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.heasy.knowroute.R;
+import com.heasy.knowroute.core.Constants;
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.service.CommonService;
+import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.LoginServiceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener{
-    private static final Logger logger = LoggerFactory.getLogger(StartActivity.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginActivity.class);
 
     private EditText phone;
     private EditText captcha;
@@ -28,7 +35,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
     private ProgressDialog progressDialog;
 
-    private String loginCaptcha = "";
+    private String loginCaptcha = ""; //登录验证码
+    private Handler handler = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +44,23 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         hideStatusBar();
         setContentView(R.layout.activity_login);
         hideActionBar();
+
+        handler = new Handler(){
+            @Override
+            public void handleMessage(Message message) {
+                String result = (String)message.obj;
+
+                progressDialog.dismiss();
+
+                if(Constants.SUCCESS.equalsIgnoreCase(result)){
+                    logger.debug("start MainActivity...");
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                }else{
+                    AndroidUtil.showToast(getApplicationContext(), result);
+                }
+            }
+        };
 
         initComponent();
     }
@@ -74,7 +99,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     }
 
     private void doLogin(){
-        String s_phone = StringUtil.trimToEmpty(phone.getText().toString());
+        final String s_phone = StringUtil.trimToEmpty(phone.getText().toString());
         if(s_phone.length() != 11){
             AndroidUtil.showToast(getApplicationContext(), "请输入11位手机号码");
             return;
@@ -95,6 +120,24 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             AndroidUtil.showToast(getApplicationContext(), "验证码错误");
             return;
         }
+
+        loginCaptcha = "";
+        progressDialog = AndroidUtil.showLoadingDialog(this, "登录中...");
+
+        //登录处理
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                logger.debug("start login...");
+                LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+                String result = loginService.doLogin(s_phone);
+                logger.debug("result=" + result);
+
+                Message message = new Message();
+                message.obj = result;
+                handler.sendMessage(message);
+            }
+        }).start();
     }
 
     /**

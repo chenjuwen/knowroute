@@ -8,6 +8,10 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import com.heasy.knowroute.utils.JsonUtil;
+
+import net.sf.json.JSONObject;
+
 /**
  * 使用@ControllerAdvice和ResponseBodyAdvice接口拦截Controller方法默认返回参数，统一处理返回值/响应体
  */
@@ -22,13 +26,11 @@ public class MyResponseBodyAdvice implements ResponseBodyAdvice<Object>{
 	public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
 			Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
 			ServerHttpResponse response) {
-		System.out.println("------------------");
-		System.out.println("MyResponseBodyAdvice >> beforeBodyWrite");
-		System.out.println("------------------");
-		
 		if(body instanceof WebResponse) {
+			System.out.println(JSONObject.fromObject(body).toString(2));
 			return (WebResponse)body;
 		}else {
+			System.out.println(body);
 			return body;
 		}
 	}
