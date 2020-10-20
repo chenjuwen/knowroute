@@ -1,7 +1,23 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.neenbedankt.android-apt'
 
+repositories {
+    flatDir {
+        dir 'libs'
+    }
+}
+
 android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+    defaultConfig {
+        applicationId "com.heasy.knowroute"
+        multiDexEnabled true
+        //multiDexKeepProguard file('multidex-config.pro')
+        minSdkVersion 23
+        targetSdkVersion 25
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
     signingConfigs {
         release {
             try {
@@ -14,16 +30,6 @@ android {
             }
         }
     }
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
-    defaultConfig {
-        applicationId "com.heasy.knowroute"
-        multiDexEnabled true
-        //multiDexKeepProguard file('multidex-config.pro')
-        minSdkVersion 23
-        targetSdkVersion 25
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    }
     buildTypes {
         release {
             //混淆开关
@@ -32,9 +38,17 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDir 'libs'
+        }
+    }
+
     dexOptions {
         javaMaxHeapSize "2g"
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
@@ -57,7 +71,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:multidex:1.0.1'
     testCompile 'junit:junit:4.12'
     compile files('../libs/fastjson-1.2.40.jar')
@@ -68,8 +81,10 @@ dependencies {
     compile files('../libs/dom4j-1.6.jar')
     compile files('../libs/jaxen-1.1.4.jar')
     compile files('../libs/eventbus-3.1.1.jar')
+    compile files('../libs/BaiduLBS_Android.jar')
     compile project(':core')
     compile project(':action')
     compile project(':okhttp')
+    compile project(':map')
 }
 

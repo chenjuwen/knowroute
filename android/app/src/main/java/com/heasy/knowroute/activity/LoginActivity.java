@@ -122,7 +122,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         }
 
         loginCaptcha = "";
-        progressDialog = AndroidUtil.showLoadingDialog(this, "登录中...");
+        progressDialog = AndroidUtil.showLoadingDialog(this, "正在登录中...");
 
         //登录处理
         new Thread(new Runnable() {

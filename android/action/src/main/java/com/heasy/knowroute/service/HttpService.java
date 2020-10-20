@@ -38,7 +38,6 @@ public class HttpService {
 
     public static ResponseBean httpGet(HeasyContext heasyContext, String requestUrl){
         String result = getOkHttpClientHelper().synGet(getApiAddress(heasyContext) + requestUrl);
-        logger.debug(result);
 
         if(StringUtil.isEmpty(result)){
             return ResponseBean.failure(ResponseCode.SERVICE_CALL_ERROR);
