@@ -2,7 +2,6 @@ package com.heasy.knowroute.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -15,15 +14,15 @@ import android.widget.TextView;
 import com.heasy.knowroute.R;
 import com.heasy.knowroute.ServiceEngineImpl;
 import com.heasy.knowroute.WebViewWrapperFactory;
-import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.VersionUtil;
+import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.LoginServiceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -47,17 +46,14 @@ public class StartActivity extends BaseActivity {
             @Override
             public void handleMessage(Message message) {
                 if(message.what == 1) {
-                    String accessFilePath = getApplicationContext().getDir(Constants.AUTH_DIR, Context.MODE_PRIVATE).getPath();
-                    accessFilePath += File.separator + Constants.AUTH_DATA_FILE_NAME;
-
-                    File file = new File(accessFilePath);
-                    if(!file.exists()){
-                        logger.debug("start LoginActivity...");
-                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                        startActivity(intent);
-                    }else{
+                    LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+                    if(loginService.isLogin()){
                         logger.debug("start MainActivity...");
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                    }else{
+                        logger.debug("start LoginActivity...");
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(intent);
                     }
                 }

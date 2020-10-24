@@ -16,7 +16,7 @@ import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
-import com.heasy.knowroute.service.CommonService;
+import com.heasy.knowroute.service.AndroidBuiltinService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
 
@@ -157,7 +157,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
             //发送短信
             String message = "【知途】验证码" + loginCaptcha + "，您正在登录，若非本人操作，请勿泄露。";
-            boolean b = CommonService.sendSMS(s_phone, message);
+            boolean b = AndroidBuiltinService.sendSMS(s_phone, message);
 
             if(!b){
                 progressDialog.dismiss();

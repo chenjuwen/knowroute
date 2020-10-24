@@ -2,7 +2,7 @@ package com.heasy.knowroute.controller;
 
 import net.sf.json.JSONObject;
 
-public class BaseController {
+public abstract class BaseController {
 	protected String getSuccessResultJsonString(){
 		return getResultJsonString("0", "成功");
 	}

@@ -4,17 +4,13 @@ body {
 }
 
 .vue-mint-container {
-    padding-top: 45px;
-}
-
-.picker-toolbar {
-    padding-top: 4px;
-    border-bottom: 1px solid #CCC;
+    padding-top: 50px;
 }
 
 /* header */
 .mint-header {
 	background-color: #607d8b;
+	height: 50px;
 }
 
 .mint-header .mint-button-text{
@@ -26,32 +22,20 @@ body {
 	font-size: 18px;
 }
 
-/* form */
-.form-phase {
-    background-color: #CCC;
-    margin-top: 10px;
-    border-bottom: 1px solid #d9d9d9;
+/** tabbar **/
+.tabbar{
+    table-layout: fixed;
+    position: fixed;
+    bottom: 0;
+    border-top:1px solid #d9d9d9;
+    background-color: #FFF;
 }
 
-.form-phase-title {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 5px 5px 5px 5px;
+.tabbar-item{
+    font-size: 14px;
 }
 
-/* tabbar */
-.mint-tabbar {
-	border-top: 1px solid #d9d9d9;
-	background-image: none;
-	background-color: #FFF;
-}
-
-.mint-tabbar>.mint-tab-item.is-selected {
-	background-color: #FFF;
-	font-weight: 600;
-	color: red;
-}
-
-.mint-tab-item-label {
-	font-size: 13px;
+.tabbar-item-selected{
+    color:#FF4500;
+    font-weight:600;
 }

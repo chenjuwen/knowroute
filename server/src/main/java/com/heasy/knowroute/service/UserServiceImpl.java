@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.utils.DatetimeUtil;
+import com.heasy.knowroute.utils.StringUtil;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,6 +30,30 @@ public class UserServiceImpl implements UserService {
 	@Autowired
     private JdbcTemplate jdbcTemplate;
 
+    
+    /**
+     * 登录处理：
+     * 	手机号对应的用户记录不存在，则添加新用户
+     * 	返回用户记录的id值
+     */
+    @Override
+    public int login(String phone) {
+        try {
+        	UserBean userBean = getUser(phone);
+        	if(userBean == null) {
+        		String inviteCode = StringUtil.getUUIDString();
+        		int id = insert(phone, inviteCode);
+        		return id;
+        	}
+            
+        	return userBean.getId();
+        	
+        }catch(Exception ex){
+            logger.error("", ex);
+            return 0;
+        }
+    }
+    
 	/**
 	 * 根据id获取用户信息
 	 */
@@ -174,9 +199,9 @@ public class UserServiceImpl implements UserService {
 			bean.setLongitude(longitude);
 			bean.setLatitude(latitude);
 			bean.setAddress(address);
-			bean.setInvite_code(invite_code);
-			bean.setCreate_date(create_date);
-			bean.setLast_login_date(last_login_date);
+			bean.setInviteCode(invite_code);
+			bean.setCreateDate(create_date);
+			bean.setLastLoginDate(last_login_date);
 			
 			return bean;
     	}

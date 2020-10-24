@@ -1,225 +1,337 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<TITLE>main</TITLE>
+	<TITLE>知途</TITLE>
 	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-toast.all.css" />
+	<link rel="stylesheet" type="text/css" href="css/material-icons.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-loading.all.css" />
 	<link rel="stylesheet" type="text/css" href="css/common.css" />
 
 	<script src="js/jquery.min-1.11.3.js"></script>
 	<script src="js/JSConstants.js"></script>
 	<script src="js/JSBridge.js"></script>
 	<script src="js/JSBridgeExt.js"></script>
+	<script src="js/common.js"></script>
 	<script src="js/vue.min.js"></script>
 	<script src="js/mint.min.js"></script>
+	<script src="js/muse-ui.js"></script>
+	<script src="js/muse-ui-toast.js"></script>
+	<script src="js/muse-ui-loading.js"></script>
 
 	<style type="text/css">
-		body{
-			overflow:-Scroll;
-			overflow-y:hidden;
+		.contact-item{
+			background-color: #F5F5DC;
+			height: 40px;
+			border-bottom: 5px solid #FFF;
+			font-size: 15px;
 		}
 
-		.title{
-			padding: 10px 0;
-			font-family: 隶书;
-			font-size: 65px;
-			font-weight: 600;
-			background-color: #B8860B;
-			position: relative;
+		/** dialog **/
+		.mu-dialog-body{
+			padding: 0;
 		}
 
-		.title .menu{
-			position:absolute;
-			right:0;
-			bottom:0;
-			font-size: 30px;
-			padding-right: 5px;
-			padding-bottom: 5px;
-			color: white;
+		.mu-appbar{
+			height: 45px;
 		}
 
-		.data_left{
-			width: 110px;
+		.mu-appbar-title{
+			font-size: 16px;
 		}
 
-		.data_left table{
-			border:1px solid #ddd;
-			border-collapse:collapse;
+		.dialog-form-container{
+			width: 100%;
 		}
 
-		.data_left td{
-			border:1px solid #ddd;
-			padding: 20px 0;
-			cursor: pointer;
+		.dialog-form-container input{
+			border: 0;
+			border-bottom: 1px solid #ccc;
 		}
 
-		.data_left .issue{
-			font-family:隶书;
-			font-size:25px;
-			width: 80px;
-			padding: 70px 0;
-			font-weight: 600;
-			background-color: #FAFAD2;
-		}
-
-		.data_left .zdys{
-			font-family:隶书;
-			font-size:25px;
-			width: 110px;
-			padding: 55px 0;
-			font-weight: 600;
-			background-color: #EEE8AA;
-		}
-
-
-		.data_right{
-			border:1px solid #ddd;
-			padding: 25px 0 0 0;
-			vertical-align: top;
-		}
-
-		.zodiac{
-			padding: 5px;
-			background-color: #FFFFE0;
-		}
-
-		.data_right .circle{
-			width: 80px;
-			height: 90px;
-			text-align: center;
-			padding-top: 6px;
-			font-size: 80px;
-			font-weight: 600;
+		.dialog-form-item{
+			height: 60px;
 		}
 	</style>
 </HEAD>
 <BODY>
-	<div id="app">
-		<table width="100%">
-			<tr>
-				<td class="title" align="center">
-					<span style="color:red;">潮</span>
-					<span style="color:blue;">洲</span>
-					<span style="color:green;">堂</span>
-					<div class="menu" v-show="isShowMenu" @click="showActionSheet">…</div>
-				</td>
-			</tr>
-		</table>
+	<div id="app" class="vue-mint-container">
+		<mt-header fixed title="紧急求助"></mt-header>
+
+		<div style="font-size:15px; color:#777; font-weight:normal; text-indent:30px; line-height:25px; padding:0 5px">
+			当您遇到紧急情况使用求助功能时，系统会发送求助信息给您的紧急联系人。您的联系人将会收到短信以及app消息。
+		</div>
 
 		<table width="100%">
 			<tr>
-				<td class="data_left" valign="top">
-					<table width="100%">
-						<tr v-for="item in dataArray">
-							<td align="center" class="issue" @click.stop="_selectPeriod(item.dataList)">{{ item.period }}期</td>
+				<td align="center" valign="top" style="height:120px;">
+					<table width="90%" style="border-collapse:collapse;">
+						<tr class="contact-item" v-if="contactList.length > 0" v-for="item in contactList" @click.stop="editContact(item)">
+							<td>{{ item.contactName }}</td>
+							<td>{{ item.contactPhone }}</td>
+							<td width="30">&gt;</td>
 						</tr>
-						<tr>
-							<td align="center" class="zdys" @click.stop="_showResults()">
-								<img src="images/zdys.jpg" width="30" height="30"/><br>
-								自動運算
-							</td>
+						<tr v-if="contactList.length <= 0">
+							<td colspan="3" align="center" style="height:120px">暂无紧急联系人</td>
 						</tr>
 					</table>
 				</td>
-				<td class="data_right zodiac">&nbsp;</td>
 			</tr>
 		</table>
 
-		<mt-actionsheet :actions="actionsheetData1" v-model="sheetVisible1"> </mt-actionsheet>
-	</div>
+		<table width="100%">
+			<tr>
+				<td align="center">
+					<mt-button type="primary" size="normal" @click="addContact" style="width:250px; height:50px;">添加紧急联系人</mt-button>
+					<div style="color:#555; margin-top:5px; font-size:14px;">最多只能添加3位</div>
+				</td>
+			</tr>
+		</table>
 
+		<table width="100%" style="position:fixed; bottom:90px; ">
+			<tr>
+				<td align="center" style="padding-top:30px;">
+					<mt-button type="danger" size="normal" @click="sendHelp" style="width:250px; height:50px;">发出求助</mt-button>
+					<div style="color:#555; margin-top:5px; font-size:14px;">发送求助信息给紧急联系人</div>
+				</td>
+			</tr>
+		</table>
+
+		<table class="tabbar" width="100%">
+			<tr>
+				<td width="25%" align="center" class="tabbar-item">
+					<img src="images/heart.jpg">
+					<div>关心</div>
+				</td>
+				<td width="25%" align="center" class="tabbar-item">
+					<img src="images/alert.jpg">
+					<div class="tabbar-item-selected">紧急</div>
+				</td>
+				<td width="25%" align="center" class="tabbar-item">
+					<img style="position:absolute; top:-15px; left:50%; margin-left:-25;" src="images/location.png">
+					<div>&nbsp;</div>
+				</td>
+				<td width="25%" align="center" class="tabbar-item">
+					<img src="images/message.jpg">
+					<div>消息</div>
+				</td>
+				<td width="25%" align="center" class="tabbar-item">
+					<img src="images/person.jpg">
+					<div>我的</div>
+				</td>
+			</tr>
+		</table>
+
+		<mu-dialog transition="slide-left" width="260"
+				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openAddContactDialog">
+			<mu-appbar color="primary" title="添加紧急联系人">
+				<mu-button slot="right" flat  @click="closeAddContactDialog">关闭</mu-button>
+			</mu-appbar>
+
+			<table class="dialog-form-container">
+				<tr class="dialog-form-item">
+					<td width="70" align="right">姓名：</td>
+					<td>
+						<input type="text" size="15" maxlength="20" v-model.trim="contact_name"/>
+						<img src="images/contact.jpg" @click="selectContact"/>
+					</td>
+				</tr>
+				<tr class="dialog-form-item">
+					<td width="70" align="right">手机号：</td>
+					<td>
+						<input type="text" size="15" maxlength="11" v-model.trim="contact_phone"
+							   onkeyup="this.value=this.value.replace(/\D/g,'')"
+							   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+						       oninput="this.value=this.value.replace(/\D/g,'')" />
+					</td>
+				</tr>
+				<tr class="dialog-form-item">
+					<td colspan="2" align="center">
+						<mt-button type="primary" id="btnSaveContact" size="small" @click="saveContact">保存</mt-button>
+					</td>
+				</tr>
+			</table>
+		</mu-dialog>
+
+
+		<mu-dialog transition="slide-left" width="260"
+				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openEditContactDialog">
+			<mu-appbar color="primary" title="修改紧急联系人">
+				<mu-button slot="right" flat  @click="closeEditContactDialog">关闭</mu-button>
+			</mu-appbar>
+
+			<table class="dialog-form-container">
+				<tr class="dialog-form-item">
+					<td width="70" align="right">姓名：</td>
+					<td>
+						<input type="text" size="15" maxlength="20" v-model.trim="contact_name2"/>
+						<img src="images/contact.jpg" @click="selectContact"/>
+					</td>
+				</tr>
+				<tr class="dialog-form-item">
+					<td width="70" align="right">手机号：</td>
+					<td>
+						<input type="text" size="15" maxlength="11" v-model.trim="contact_phone2"
+							   onkeyup="this.value=this.value.replace(/\D/g,'')"
+							   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+							   oninput="this.value=this.value.replace(/\D/g,'')" />
+					</td>
+				</tr>
+				<tr class="dialog-form-item">
+					<td colspan="2" align="center">
+						<mt-button type="primary" id="btnUpdateContact" size="small" @click="updateContact">保存</mt-button>
+						<mt-button type="danger" id="btnDeleteContact" size="small" @click="deleteContact">删除联系人</mt-button>
+					</td>
+				</tr>
+			</table>
+		</mu-dialog>
+	</div>
 
 	<script>
 		var vm = new Vue({
 			el: '#app',
 			data: {
-				isShowMenu: false,
-				position:["90", "10", "140", "40"],
-				colors:["#E63F00", "#4400CC", "#C71585", "#32CD32"],
-				dataArray:[
-					//{year:"2020", period:"007", data:"牛,虎,兔,龍", dataList:["牛","虎","兔","龍"], times:"2020-09-02 01:01:01"},
-					//{year:"2020", period:"008", data:"鼠,牛,虎,兔", dataList:["鼠","牛","虎","兔"], times:"2020-09-03 01:01:01"}
+				contactList:[
+					//{id:1, userId:5, contactName:"张三风", contactPhone:"13798178123"},
+					//{id:2, userId:5, contactName:"李四", contactPhone:"13798178124"},
+					//{id:3, userId:5, contactName:"王春华", contactPhone:"13798178125"}
 				],
-				selectedData: [],
 
-				actionsheetData1: [
-					{name:"数据管理", method: manageData},
-					{name:"修改密码", method: changePassword},
-					{name:"清空缓存", method: cleanCache},
-					{name:"刷新页面", method: refreshPage},
-					{name:"退出应用", method: exitApp}
-				],
-				sheetVisible1: false
+				openAddContactDialog: false,
+				contact_name: "",
+				contact_phone: "",
+
+				openEditContactDialog: false,
+				selectedItemId: "",
+				contact_name2: "",
+				contact_phone2: ""
 			},
 			methods: {
-				_selectPeriod: function(dataList){
-					jQuery(".zodiac").empty();
-					this.selectedData = dataList;
+				addContact: function(){
+					this.contact_name = "";
+					this.contact_phone = "";
+					this.openAddContactDialog = true;
 				},
-				_showResults: function(){
-					jQuery(".zodiac").empty();
+				closeAddContactDialog: function(){
+					this.contact_name = "";
+					this.contact_phone = "";
+					this.openAddContactDialog = false;
+				},
+				selectContact: function(){
+					jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({}), "getContactInfo");
+				},
+				saveContact: function(){
+					if(this.contact_name == ""){
+						this.$toast.message('请输入联系人的姓名');
+						return;
+					}
 
-					if(this.selectedData != null && this.selectedData.length > 0){
-						this.$indicator.open({
-							spinnerType: 'fading-circle'
-						});
+					if(!isMobile(this.contact_phone)){
+						this.$toast.message('请输入11位的手机号');
+						return;
+					}
 
-						setTimeout(function(){closeIndicator();}, 500);
+					const loading = this.$loading({
+        				target: document.getElementById("btnSaveContact"),
+        				size: 15
+      				});
+
+					var obj = {"contact_name":vm.contact_name, "contact_phone":vm.contact_phone};
+					var msg = jsBridge.dispatchAction("ContactsAction", JSON.stringify(obj), "save");
+					loading.close();
+
+					if(msg == "success"){
+						this.$toast.message('保存成功');
+						this.closeAddContactDialog();
+						pageFinishCallback();
 					}else{
-						jQuery(".zodiac").append("&nbsp;");
+						this.$toast.message(msg);
 					}
 				},
-				showActionSheet: function(){
-					this.sheetVisible1 = true;
+				editContact: function(item){
+					this.selectedItemId = item.id;
+					this.contact_name2 = item.contactName;
+					this.contact_phone2 = item.contactPhone;
+					this.openEditContactDialog = true;
+				},
+				closeEditContactDialog: function(){
+					this.selectedItemId = "";
+					this.contact_name2 = "";
+					this.contact_phone2 = "";
+					this.openEditContactDialog = false;
+				},
+				updateContact: function(){
+					if(this.contact_name2 == ""){
+						this.$toast.message('请输入联系人的姓名');
+						return;
+					}
+
+					if(!isMobile(this.contact_phone2)){
+						this.$toast.message('请输入11位的手机号');
+						return;
+					}
+
+					const loading = this.$loading({
+        				target: document.getElementById("btnUpdateContact"),
+        				size: 15
+      				});
+
+					var obj = {"id":vm.selectedItemId, "contact_name":vm.contact_name2, "contact_phone":vm.contact_phone2};
+					var msg = jsBridge.dispatchAction("ContactsAction", JSON.stringify(obj), "update");
+					loading.close();
+
+					if(msg == "success"){
+						this.$toast.message('修改成功');
+						this.closeEditContactDialog();
+						pageFinishCallback();
+					}else{
+						this.$toast.message(msg);
+					}
+				},
+				deleteContact: function(){
+					if(confirm("确定要删除该紧急联系人？")){
+						const loading = this.$loading({
+							target: document.getElementById("btnDeleteContact"),
+							size: 15
+						});
+
+						var obj = {"id":vm.selectedItemId};
+						var msg = jsBridge.dispatchAction("ContactsAction", JSON.stringify(obj), "delete");
+						loading.close();
+
+						if(msg == "success"){
+							this.$toast.message('删除成功');
+							this.closeEditContactDialog();
+							pageFinishCallback();
+						}else{
+							this.$toast.message(msg);
+						}
+					}
+				},
+				sendHelp: function(){
+					if(this.contactList.length <= 0){
+						this.$toast.message("没有紧急联系人，请先添加");
+						return;
+					}
 				}
 			}
 		})
-
-		function closeIndicator(){
-			for(var i=0; i<vm.selectedData.length; i++){
-				jQuery(".zodiac").append("<div class='circle' style='margin-left:" + vm.position[i] + "px;color:" + vm.colors[i] + "'>" + vm.selectedData[i] + "</div>");
-			}
-			vm.$indicator.close();
-		}
-
-		function pageFinishCallback(){
-			//检查是否是管理员，是则开放功能菜单
-			var obj = {};
-			var isAdmin = jsBridge.dispatchAction("LoginAction", JSON.stringify(obj), "checkAdmin");
-			vm.isShowMenu = ((isAdmin || '').toLowerCase() === 'true');
-
-			//加载数据
-			obj = {"maxRecordCount": 2};
-			var dataArr = jsBridge.dispatchAction("DataAction", JSON.stringify(obj), "list");
-			vm.dataArray = jQuery.parseJSON(dataArr); //字符串转对象
-		}
-
-		function manageData(){
-			transferPage("data_list.html");
-		}
-
-		function changePassword(){
-			transferPage("change_password.html");
-		}
-
-		function cleanCache(){
-			var obj = {};
-			jsBridge.dispatchAction("LoginAction", JSON.stringify(obj), "cleanCache");
-
-			vm.$toast({
-				message: '缓存已清空！',
-				duration: 1500
-			});
-		}
-
-		function refreshPage(){
-			transferPage("main.html");
-		}
-
-		function exitApp(){
-			if(confirm("确定要退出应用？")){
-				jsBridge.dispatchAction(actionNames.ExitApp, "", "");
-			}
-		}
 	</script>
+
+	<script type="text/javascript">
+        function pageFinishCallback(){
+			var dataArr = jsBridge.dispatchAction("ContactsAction", JSON.stringify({}), "getAll");
+			vm.contactList = jQuery.parseJSON(dataArr);
+        }
+
+        function getContactInfo_callback(userName, userNumber){
+			vm.contact_name = userName;
+			vm.contact_phone = userNumber;
+
+			vm.contact_name2 = userName;
+			vm.contact_phone2 = userNumber;
+        }
+    </script>
 </BODY>
 </HTML>

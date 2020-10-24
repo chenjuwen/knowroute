@@ -21,6 +21,12 @@ public class UserServiceTest {
     private UserService userService;
 
 	@Test
+	public void login(){
+		int id = userService.login("13798189352");
+		System.out.println(id);
+	}
+
+	@Test
 	public void getUser(){
 		UserBean bean = userService.getUser("13798189352");
 		if(bean != null) {
@@ -31,8 +37,8 @@ public class UserServiceTest {
 		
 		bean = userService.getUser(8);
 		if(bean != null) {
-			System.out.println(DatetimeUtil.formatDate(bean.getCreate_date()));
-			System.out.println(DatetimeUtil.formatDate(bean.getLast_login_date()));
+			System.out.println(DatetimeUtil.formatDate(bean.getCreateDate()));
+			System.out.println(DatetimeUtil.formatDate(bean.getLastLoginDate()));
 		}else {
 			System.out.println("user not found");
 		}

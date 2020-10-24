@@ -92,6 +92,11 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     }
 
     @Override
+    public boolean isLogin() {
+        return this.userId > 0;
+    }
+
+    @Override
     public boolean cleanCache() {
         try {
             //delete authority file

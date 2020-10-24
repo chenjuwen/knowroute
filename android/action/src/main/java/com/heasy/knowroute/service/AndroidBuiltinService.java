@@ -24,8 +24,8 @@ import rx.functions.Action1;
 /**
  * Created by Administrator on 2020/10/7.
  */
-public class CommonService {
-    private static final Logger logger = LoggerFactory.getLogger(CommonService.class);
+public class AndroidBuiltinService {
+    private static final Logger logger = LoggerFactory.getLogger(AndroidBuiltinService.class);
 
     /**
      * 发送短信
@@ -104,7 +104,7 @@ public class CommonService {
 
     private static void contactCallback(HeasyContext heasyContext, String userName, String userNumber){
         try {
-            String script = "javascript: try{ contactCallback(\"" + userName + "\",\"" + userNumber + "\"); }catch(e){ }";
+            String script = "javascript: try{ getContactInfo_callback(\"" + userName + "\",\"" + userNumber + "\"); }catch(e){ }";
             heasyContext.getJsInterface().loadUrl(script);
         } catch (Exception ex) {
             logger.error("", ex);

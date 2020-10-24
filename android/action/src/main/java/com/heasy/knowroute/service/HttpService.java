@@ -28,6 +28,11 @@ public class HttpService {
         return okHttpClientHelper;
     }
 
+    /**
+     * 获取服务端的API根地址
+     * @param heasyContext
+     * @return
+     */
     public static String getApiAddress(HeasyContext heasyContext) {
         if(StringUtil.isEmpty(apiAddress)){
             apiAddress = heasyContext.getServiceEngine().getConfigurationService().getConfigBean().getApiAddress();
@@ -51,6 +56,22 @@ public class HttpService {
     public static ResponseBean httpPost(Request request){
         try {
             String result = getOkHttpClientHelper().post(request);
+            logger.debug("httpPost response:" + result);
+
+            if(StringUtil.isNotEmpty(result)){
+                ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
+                return responseBean;
+            }
+
+        }catch (Exception ex){
+            logger.error("", ex);
+        }
+        return ResponseBean.failure(ResponseCode.SERVICE_CALL_ERROR);
+    }
+
+    public static ResponseBean httpPost(HeasyContext heasyContext, String requestUrl, String jsonData){
+        try {
+            String result = getOkHttpClientHelper().postJSON(getApiAddress(heasyContext) + requestUrl, jsonData);
             logger.debug("httpPost response:" + result);
 
             if(StringUtil.isNotEmpty(result)){

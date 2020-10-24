@@ -9,5 +9,6 @@ public interface LoginService extends Service{
     String doLogin(String phone);
     int getUserId();
     String getPhone();
+    boolean isLogin();
     boolean cleanCache();
 }

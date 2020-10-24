@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.api.ResponseCode;
 import com.heasy.knowroute.api.WebResponse;
-import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
 
 @RestController
 public class UserController extends BaseController{
 	@Autowired
-	private LoginService loginService;
+	private UserService userService;
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public WebResponse login(HttpServletRequest request){
@@ -25,7 +25,7 @@ public class UserController extends BaseController{
 			return WebResponse.failure(ResponseCode.PHONE_INVALID);
 		}
 		
-		int id = loginService.login(phone);
+		int id = userService.login(phone);
 		if(id > 0) {
 			return WebResponse.success(JsonUtil.toJSONString("id", String.valueOf(id)));
 		}else {

@@ -2,7 +2,7 @@ package com.heasy.knowroute.api;
 
 public enum ResponseCode {
 	SUCCESS(1, "成功"),
-	FAILURE(999, "失败"),
+	FAILURE(999, "操作失败"),
 	
 	PARAM_INVALID(1001, "参数无效"),
 	NO_DATA(1002, "查无数据"),

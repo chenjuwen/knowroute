@@ -12,9 +12,9 @@ public class UserBean {
     private Float longitude;
     private Float latitude;
     private String address;
-    private String invite_code;
-    private Date create_date;
-    private Date last_login_date;
+    private String inviteCode;
+    private Date createDate;
+    private Date lastLoginDate;
     
 	public int getId() {
 		return id;
@@ -63,29 +63,29 @@ public class UserBean {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
-	public String getInvite_code() {
-		return invite_code;
+
+	public String getInviteCode() {
+		return inviteCode;
+	}
+
+	public void setInviteCode(String inviteCode) {
+		this.inviteCode = inviteCode;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public Date getLastLoginDate() {
+		return lastLoginDate;
+	}
+
+	public void setLastLoginDate(Date lastLoginDate) {
+		this.lastLoginDate = lastLoginDate;
 	}
 	
-	public void setInvite_code(String invite_code) {
-		this.invite_code = invite_code;
-	}
-	
-	public Date getCreate_date() {
-		return create_date;
-	}
-	
-	public void setCreate_date(Date create_date) {
-		this.create_date = create_date;
-	}
-	
-	public Date getLast_login_date() {
-		return last_login_date;
-	}
-	
-	public void setLast_login_date(Date last_login_date) {
-		this.last_login_date = last_login_date;
-	}
-    
 }

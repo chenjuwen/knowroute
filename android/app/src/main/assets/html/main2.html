@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<TITLE>知途</TITLE>
+	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
+
+	<script src="js/jquery.min-1.11.3.js"></script>
+	<script src="js/JSConstants.js"></script>
+	<script src="js/JSBridge.js"></script>
+	<script src="js/JSBridgeExt.js"></script>
+	<script src="js/vue.min.js"></script>
+	<script src="js/mint.min.js"></script>
+
+	<style type="text/css">
+		body{
+			overflow:-Scroll;
+			overflow-y:hidden;
+		}
+
+		.title{
+			padding: 10px 0;
+			font-family: 隶书;
+			font-size: 65px;
+			font-weight: 600;
+			background-color: #B8860B;
+			position: relative;
+		}
+
+		.title .menu{
+			position:absolute;
+			right:0;
+			bottom:0;
+			font-size: 30px;
+			padding-right: 5px;
+			padding-bottom: 5px;
+			color: white;
+		}
+
+		.data_left{
+			width: 110px;
+		}
+
+		.data_left table{
+			border:1px solid #ddd;
+			border-collapse:collapse;
+		}
+
+		.data_left td{
+			border:1px solid #ddd;
+			padding: 20px 0;
+			cursor: pointer;
+		}
+
+		.data_left .issue{
+			font-family:隶书;
+			font-size:25px;
+			width: 80px;
+			padding: 70px 0;
+			font-weight: 600;
+			background-color: #FAFAD2;
+		}
+
+		.data_left .zdys{
+			font-family:隶书;
+			font-size:25px;
+			width: 110px;
+			padding: 55px 0;
+			font-weight: 600;
+			background-color: #EEE8AA;
+		}
+
+
+		.data_right{
+			border:1px solid #ddd;
+			padding: 25px 0 0 0;
+			vertical-align: top;
+		}
+
+		.zodiac{
+			padding: 5px;
+			background-color: #FFFFE0;
+		}
+
+		.data_right .circle{
+			width: 80px;
+			height: 90px;
+			text-align: center;
+			padding-top: 6px;
+			font-size: 80px;
+			font-weight: 600;
+		}
+	</style>
+</HEAD>
+<BODY>
+	<div id="app">
+		<table width="100%">
+			<tr>
+				<td class="title" align="center">
+					<span style="color:red;">潮</span>
+					<span style="color:blue;">洲</span>
+					<span style="color:green;">堂</span>
+					<div class="menu" v-show="isShowMenu" @click="showActionSheet">…</div>
+				</td>
+			</tr>
+		</table>
+
+		<table width="100%">
+			<tr>
+				<td class="data_left" valign="top">
+					<table width="100%">
+						<tr v-for="item in dataArray">
+							<td align="center" class="issue" @click.stop="_selectPeriod(item.dataList)">{{ item.period }}期</td>
+						</tr>
+						<tr>
+							<td align="center" class="zdys" @click.stop="_showResults()">
+								<img src="images/zdys.jpg" width="30" height="30"/><br>
+								自動運算
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td class="data_right zodiac">&nbsp;</td>
+			</tr>
+		</table>
+
+		<mt-actionsheet :actions="actionsheetData1" v-model="sheetVisible1"> </mt-actionsheet>
+	</div>
+
+
+	<script>
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				isShowMenu: false,
+				position:["90", "10", "140", "40"],
+				colors:["#E63F00", "#4400CC", "#C71585", "#32CD32"],
+				dataArray:[
+					//{year:"2020", period:"007", data:"牛,虎,兔,龍", dataList:["牛","虎","兔","龍"], times:"2020-09-02 01:01:01"},
+					//{year:"2020", period:"008", data:"鼠,牛,虎,兔", dataList:["鼠","牛","虎","兔"], times:"2020-09-03 01:01:01"}
+				],
+				selectedData: [],
+
+				actionsheetData1: [
+					{name:"数据管理", method: manageData},
+					{name:"修改密码", method: changePassword},
+					{name:"清空缓存", method: cleanCache},
+					{name:"刷新页面", method: refreshPage},
+					{name:"退出应用", method: exitApp}
+				],
+				sheetVisible1: false
+			},
+			methods: {
+				_selectPeriod: function(dataList){
+					jQuery(".zodiac").empty();
+					this.selectedData = dataList;
+				},
+				_showResults: function(){
+					jQuery(".zodiac").empty();
+
+					if(this.selectedData != null && this.selectedData.length > 0){
+						this.$indicator.open({
+							spinnerType: 'fading-circle'
+						});
+
+						setTimeout(function(){closeIndicator();}, 500);
+					}else{
+						jQuery(".zodiac").append("&nbsp;");
+					}
+				},
+				showActionSheet: function(){
+					this.sheetVisible1 = true;
+				}
+			}
+		})
+
+		function closeIndicator(){
+			for(var i=0; i<vm.selectedData.length; i++){
+				jQuery(".zodiac").append("<div class='circle' style='margin-left:" + vm.position[i] + "px;color:" + vm.colors[i] + "'>" + vm.selectedData[i] + "</div>");
+			}
+			vm.$indicator.close();
+		}
+
+		function pageFinishCallback(){
+			//检查是否是管理员，是则开放功能菜单
+			var obj = {};
+			var isAdmin = jsBridge.dispatchAction("LoginAction", JSON.stringify(obj), "checkAdmin");
+			vm.isShowMenu = ((isAdmin || '').toLowerCase() === 'true');
+
+			//加载数据
+			obj = {"maxRecordCount": 2};
+			var dataArr = jsBridge.dispatchAction("DataAction", JSON.stringify(obj), "list");
+			vm.dataArray = jQuery.parseJSON(dataArr); //字符串转对象
+		}
+
+		function manageData(){
+			transferPage("data_list.html");
+		}
+
+		function changePassword(){
+			transferPage("change_password.html");
+		}
+
+		function cleanCache(){
+			var obj = {};
+			jsBridge.dispatchAction("LoginAction", JSON.stringify(obj), "cleanCache");
+
+			vm.$toast({
+				message: '缓存已清空！',
+				duration: 1500
+			});
+		}
+
+		function refreshPage(){
+			transferPage("main.html");
+		}
+
+		function exitApp(){
+			if(confirm("确定要退出应用？")){
+				jsBridge.dispatchAction(actionNames.ExitApp, "", "");
+			}
+		}
+	</script>
+</BODY>
+</HTML>
