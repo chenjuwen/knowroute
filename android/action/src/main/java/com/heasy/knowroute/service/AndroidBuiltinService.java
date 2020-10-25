@@ -1,6 +1,7 @@
 package com.heasy.knowroute.service;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,7 +18,7 @@ import com.heasy.knowroute.core.HeasyContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import rx.functions.Action1;
 
@@ -37,10 +38,20 @@ public class AndroidBuiltinService {
             SmsManager smsManager = SmsManager.getDefault();
 
             // 拆分短信内容（手机短信长度限制）
-            List<String> divideContents = smsManager.divideMessage(message);
-            for (String text : divideContents) {
-                smsManager.sendTextMessage(phoneNumber, null, text, null, null);
+            ArrayList<String> divideContents = smsManager.divideMessage(message);
+
+            ArrayList<PendingIntent> sentIntents =  new ArrayList<>();
+            for(int i=0; i<divideContents.size(); i++){
+                sentIntents.add(null);
             }
+
+            //sendMultipartTextMessage 发送多条短信，用户收到后合并成一条
+            smsManager.sendMultipartTextMessage(phoneNumber, null, divideContents, sentIntents, null);
+
+            //sendTextMessage 发送多条短信，用户也收到多条
+            //for (String text : divideContents) {
+            //    smsManager.sendTextMessage(phoneNumber, null, text, null, null);
+            //}
 
             return true;
         }catch (Exception ex){

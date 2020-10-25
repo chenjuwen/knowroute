@@ -1,12 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<TITLE>知途</TITLE>
+	<TITLE>知途 > 紧急求助</TITLE>
 	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
 	<link rel="stylesheet" type="text/css" href="css/muse-ui.css" />
 	<link rel="stylesheet" type="text/css" href="css/muse-ui-toast.all.css" />
 	<link rel="stylesheet" type="text/css" href="css/material-icons.css" />
 	<link rel="stylesheet" type="text/css" href="css/muse-ui-loading.all.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-message.all.css" />
 	<link rel="stylesheet" type="text/css" href="css/common.css" />
 
 	<script src="js/jquery.min-1.11.3.js"></script>
@@ -19,6 +20,7 @@
 	<script src="js/muse-ui.js"></script>
 	<script src="js/muse-ui-toast.js"></script>
 	<script src="js/muse-ui-loading.js"></script>
+	<script src="js/muse-ui-message.js"></script>
 
 	<style type="text/css">
 		.contact-item{
@@ -52,6 +54,14 @@
 
 		.dialog-form-item{
 			height: 60px;
+		}
+
+		.sendConfirm{
+			padding: 0 10px;
+		}
+
+		.mu-dialog-title{
+			font-size: 20px;
 		}
 	</style>
 </HEAD>
@@ -314,6 +324,35 @@
 						this.$toast.message("没有紧急联系人，请先添加");
 						return;
 					}
+
+					var names = "";
+					var phones = "";
+					for(i=0; i<this.contactList.length; i++){
+						if(i > 0){
+							names += ",";
+							phones += ",";
+						}
+						names += this.contactList[i].contactName;
+						phones += this.contactList[i].contactPhone;
+					}
+
+					this.$confirm('我们将会短信联系"' + names + '"', '发送求助信息', {
+						type: "info",
+						className: "sendConfirm",
+						okLabel: "立即发送"
+					}).then(({ result }) => {
+						if(result){
+							const loading = this.$loading();
+							var result = jsBridge.dispatchAction("ContactsAction", JSON.stringify({"phones":phones}), "sendHelp");
+						  	loading.close();
+
+							if(result == "success"){
+						  		this.$toast.success('求助信息已发送');
+							}else{
+								this.$toast.success(result);
+							}
+						}
+      				});
 				}
 			}
 		})

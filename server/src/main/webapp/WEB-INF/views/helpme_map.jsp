@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>知途 —— 一键求助 —— 地图定位</title>
+        <title>知途 > 紧急求助</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<!-- 适应移动端页面展示 -->
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />

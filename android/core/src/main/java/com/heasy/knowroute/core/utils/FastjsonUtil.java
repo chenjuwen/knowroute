@@ -1,5 +1,6 @@
 package com.heasy.knowroute.core.utils;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -14,6 +15,13 @@ public class FastjsonUtil {
     public static JSONObject string2JSONObject(String jsonData){
         if(StringUtil.isNotEmpty(jsonData)) {
             return JSONObject.parseObject(jsonData);
+        }
+        return null;
+    }
+
+    public static JSONArray string2JSONArray(String jsonData){
+        if(StringUtil.isNotEmpty(jsonData)){
+            return JSONArray.parseArray(jsonData);
         }
         return null;
     }
