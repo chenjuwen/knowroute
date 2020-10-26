@@ -59,4 +59,5 @@ public class UserServiceTest {
 			userService.updatePositionInfo(bean.getId(), 1.123f, 2.456f, "address");
 		}
 	}
+	
 }

@@ -16,16 +16,15 @@ import com.baidu.mapapi.model.LatLng;
  * 百度地图定位服务
  */
 public abstract class AbstractMapLocationService extends BDAbstractLocationListener{
-    public static final String TAG = AbstractMapLocationService.class.getName();
     public static float DEFAULT_ZOOM =  16.0f;
 
     LocationClient mLocationClient;
     boolean isFirstLocation = true; // 是否首次定位
     boolean realtimeLocation = false; //是否实时定位
 
-    float radius;
-    double latitude = 0.0; //纬度
+    float radius; //定位精度
     double longitude = 0.0; //经度
+    double latitude = 0.0; //纬度
     String city = "";
     String address;
     int direction = 0;
@@ -67,8 +66,8 @@ public abstract class AbstractMapLocationService extends BDAbstractLocationListe
         MyLocationData locationData = new MyLocationData.Builder()
                 .accuracy(radius)
                 .direction(direction)  // 方向信息，顺时针0-360
-                .latitude(latitude)
                 .longitude(longitude)
+                .latitude(latitude)
                 .build();
         return locationData;
     }
@@ -80,8 +79,8 @@ public abstract class AbstractMapLocationService extends BDAbstractLocationListe
         }
 
         radius = location.getRadius(); //定位精度
-        latitude = location.getLatitude(); //纬度坐标
         longitude = location.getLongitude(); //经度坐标
+        latitude = location.getLatitude(); //纬度坐标
         //Log.i(TAG, radius + " : " + latitude +" : " + longitude);
 
         //Log.i(TAG, "1. " + location.getProvince()); //省

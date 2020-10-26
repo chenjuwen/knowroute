@@ -111,13 +111,15 @@ public class ContactsAction implements Action {
             try {
                 String phones = FastjsonUtil.getString(jsonObject, "phones");
 
-                String message = "【知途】您好，您的朋友" + loginService.getPhone() + "向您发起了紧急求助！点击详情查看TA的位置 http://www.knowroute.cn/knowroute/helpme?p=" + loginService.getUserId();
+                String message = "【知途】您好，您的朋友" + loginService.getPhone() + "向您发起了紧急求助！";
+                message += "点击详情查看TA的位置 http://www.knowroute.cn/knowroute/helpme?u=" + loginService.getUserId();
+                message += "&p=" + loginService.getPhone();
 
                 if (StringUtil.isNotEmpty(phones)) {
                     String[] arr = phones.split(",");
                     for (int i = 0; i < arr.length; i++) {
                         String phone = arr[i];
-                        AndroidBuiltinService.sendSMS(phone, message.replaceAll("#PHONE", phone));
+                        AndroidBuiltinService.sendSMS(phone, message);
                     }
                     return Constants.SUCCESS;
                 } else {

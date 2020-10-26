@@ -42,9 +42,17 @@
 				color: #ccc;
 				font-size: 16px;
 			}
+			
+			.show_true{
+				display: block;
+			}
+			
+			.show_false{
+				display: none;
+			}
 		</style>
 		<script type="text/javascript" src="js/map.js"></script>
-		<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=${ak}">
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=dznCIamw2fFeqGOxQGHKYAxACOYw143G">
 		</script>
     </head>
     <body>    	
@@ -69,7 +77,7 @@
 		    addMarker(map, point, null, label, false, false);
 		</script>
 		
-    	<div class="divMessageContainer">
+    	<div class="divMessageContainer show_${address != ''}">
     		<div class="phone">${phone}</div>
     		<div class="address">我的位置：${address}</div>
     		<div class="position">经度：${longitude}</div>

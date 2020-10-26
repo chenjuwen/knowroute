@@ -16,6 +16,7 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
+
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <!-- 发送短信 -->
@@ -23,8 +24,11 @@
     <!-- 读通讯录 -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <!-- 定位 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <!--
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -73,10 +77,20 @@
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
             android:theme="@style/FullscreenTheme" />
 
+        <receiver
+            android:name=".map.NotificationReceiver"
+            android:process=":push" />
+
+        <!-- Service -->
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote" />
+
+        <service
+            android:name=".map.HeasyLocationService"
+            android:enabled="true"
+            android:exported="false" />
 
         <activity android:name=".map.activity.CompassActivity" />
         <activity android:name=".map.activity.SettingsActivity" />

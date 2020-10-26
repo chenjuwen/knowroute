@@ -1,20 +1,40 @@
 package com.heasy.knowroute.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.heasy.knowroute.bean.UserBean;
+import com.heasy.knowroute.service.UserService;
 
 @Controller
 public class QuickHelpController extends BaseController{
-	public static final String MAP_AK = "dznCIamw2fFeqGOxQGHKYAxACOYw143G";
+	@Autowired
+	private UserService userService;
 	
-	@RequestMapping("/helpme")
-	public String map(ModelMap modelMap) {
-		modelMap.put("longitude", new Float(111.556564)); //经度
-		modelMap.put("latitude", new Float(22.611926)); //纬度
-		modelMap.put("phone", "13798189352"); //手机号
-		modelMap.put("address", "广东省云浮市罗定市897乡道靠近大路口"); //地址
-		modelMap.put("ak", MAP_AK);
+	@RequestMapping(value="/helpme", method=RequestMethod.GET)
+	public String map(ModelMap modelMap, @RequestParam(value="u") String userId, 
+			@RequestParam(value="p") String phone) {
+		Float longitude = null;
+		Float latitude = null;
+		String address = "";
+		
+		UserBean userBean = userService.getUser(Integer.parseInt(userId));
+		if(userBean != null) {
+			if(userBean.getPhone().equals(phone)) {
+				longitude = userBean.getLongitude();
+				latitude = userBean.getLatitude();
+				address = userBean.getAddress();
+			}
+		}
+		
+		modelMap.put("longitude", longitude); //经度
+		modelMap.put("latitude", latitude); //纬度
+		modelMap.put("phone", phone); //手机号
+		modelMap.put("address", address); //地址
 		
 		return "helpme_map";
 	}

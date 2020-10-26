@@ -1,5 +1,9 @@
 package com.heasy.knowroute.bean;
 
+/**
+ * 用户紧急联系人
+ * @author Administrator
+ */
 public class ContactBean {
 	private int id;
 	private int userId;

@@ -8,19 +8,14 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import com.heasy.knowroute.bean.ContactBean;
 
 @Service
-public class ContactServiceImpl implements ContactService {
+public class ContactServiceImpl extends BaseService implements ContactService {
     private static final Logger logger = LoggerFactory.getLogger(ContactServiceImpl.class);
-
-	@Autowired
-    private JdbcTemplate jdbcTemplate;
 
 	@Override
 	public boolean save(ContactBean bean) {

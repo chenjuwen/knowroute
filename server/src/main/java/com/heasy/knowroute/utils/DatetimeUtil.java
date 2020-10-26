@@ -152,7 +152,7 @@ public class DatetimeUtil {
      * 为指定日期增加若干日期数，可正可负
      *
      * @param sDate 日期字符串，格式为：yyyyMMdd or yyyyMM
-     * @param datepart 日期字段，如年、月、日、时、分、秒等
+     * @param datepart 日期类型字段，如年、月、日、时、分、秒等
      * @param value 要增加的日期数
      * @param outPattern 日期的返回格式
      */
@@ -180,6 +180,17 @@ public class DatetimeUtil {
 
         ret = formatDate(cal.getTime(), outPattern);
         return ret;
+    }
+    
+    /**
+     * 当前日期增加若干日期数，可正可负
+     * 
+     * @param datepart 日期类型字段，如年、月、日、时、分、秒等
+     * @param value 要增加的日期数
+     * @return 返回yyyy-MM-dd HH:mm:ss格式的日期字符串 
+     */
+    public static String add(int datepart, int value) {
+    	return add(getToday(), datepart, value, DEFAULT_PATTERN_DT);
     }
 
     public static String getSimpleWeekName(){

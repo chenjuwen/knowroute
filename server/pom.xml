@@ -168,6 +168,19 @@
                 </execution>
            	</executions>
        	</plugin>
+       	
+       	<!-- DerInputStream.getLength(): lengthTag=111, too big -->
+       	<plugin>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-resources-plugin</artifactId>
+		    <configuration>
+		    	<encoding>UTF-8</encoding>
+		        <nonFilteredFileExtensions>
+		            <nonFilteredFileExtension>p12</nonFilteredFileExtension>
+		            <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+		        </nonFilteredFileExtensions>
+		    </configuration>
+		</plugin>
 	</plugins>
 	
 	<resources>
@@ -187,6 +200,7 @@
             <includes>
                 <include>**/*.xml</include>
                 <include>**/*.properties</include>
+                <include>**/*.p12</include>
             </includes>
         </resource>
     </resources>

@@ -90,15 +90,16 @@ public class StartActivity extends BaseActivity {
                 permissions.add(Manifest.permission.CHANGE_WIFI_STATE);
             }
 
-            if(checkSelfPermission(Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS) != PackageManager.PERMISSION_GRANTED){
-                permissions.add(Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS);
-            }
             if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
             }
             if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
+            if(checkSelfPermission(Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS) != PackageManager.PERMISSION_GRANTED){
+                permissions.add(Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS);
+            }
+
             if(checkSelfPermission(Manifest.permission.SYSTEM_ALERT_WINDOW) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.SYSTEM_ALERT_WINDOW);
             }
@@ -111,6 +112,13 @@ public class StartActivity extends BaseActivity {
             }
             if(checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.READ_CONTACTS);
+            }
+
+            if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+            }
+            if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
             }
 
             if (permissions.size() > 0) {

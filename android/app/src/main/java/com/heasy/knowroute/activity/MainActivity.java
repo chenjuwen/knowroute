@@ -1,5 +1,8 @@
 package com.heasy.knowroute.activity;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -11,11 +14,14 @@ import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.event.ExitAppEvent;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.webview.WebViewWrapper;
+import com.heasy.knowroute.map.HeasyLocationService;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
     private static final Logger logger = LoggerFactory.getLogger(MainActivity.class);
@@ -45,9 +51,36 @@ public class MainActivity extends AppCompatActivity{
         initWebViewWrapper();
 
         setContentView(webViewWrapper.getWebView());
+
+        //启动定位服务
+        if(!serviceRunning()) {
+            logger.info("start HeasyLocationService...");
+            Intent serviceIntent = new Intent(MainActivity.this, HeasyLocationService.class);
+            startService(serviceIntent);
+        }
+    }
+
+    /**
+     * 查看服务是否正在运行
+     */
+    private boolean serviceRunning(){
+        boolean result = false;
+        ActivityManager am = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> list = am.getRunningServices(100);
+        if(list != null && list.size() > 0){
+            for(ActivityManager.RunningServiceInfo info : list){
+                String className = info.service.getClassName().toString();
+                if(className.equalsIgnoreCase(HeasyLocationService.class.getName())){
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     private void initWebViewWrapper(){
+        logger.info("init WebViewWrapper...");
         HeasyContext heasyContext = ServiceEngineFactory.getServiceEngine().getHeasyContext();
         WebViewWrapperFactory.build(heasyContext);
 
@@ -84,6 +117,8 @@ public class MainActivity extends AppCompatActivity{
         super.onDestroy();
 
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
+
+        _destroy();
 
         HeasyApplication heasyApplication = (HeasyApplication)getApplication();
         heasyApplication.finishActivity(this);

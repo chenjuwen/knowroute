@@ -3,6 +3,7 @@ package com.heasy.knowroute.bean;
 import java.util.Date;
 
 /**
+ * 用户
  * Created by Administrator on 2020/9/27.
  */
 public class UserBean {

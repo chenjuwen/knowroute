@@ -11,8 +11,6 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -24,12 +22,8 @@ import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.StringUtil;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends BaseService implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
-	@Autowired
-    private JdbcTemplate jdbcTemplate;
-
     
     /**
      * 登录处理：
@@ -44,6 +38,8 @@ public class UserServiceImpl implements UserService {
         		String inviteCode = StringUtil.getUUIDString();
         		int id = insert(phone, inviteCode);
         		return id;
+        	}else {
+        		updateLastLoginDate(userBean.getId());
         	}
             
         	return userBean.getId();

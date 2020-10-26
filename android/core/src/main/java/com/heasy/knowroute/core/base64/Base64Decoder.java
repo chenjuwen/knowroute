@@ -1,6 +1,6 @@
 package com.heasy.knowroute.core.base64;
 
-import android.text.TextUtils;
+import com.heasy.knowroute.core.utils.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -140,7 +140,7 @@ public class Base64Decoder extends FilterInputStream {
      * @return the decoded form of the encoded string
      */
     public static String decode(String encoded) {
-        if (TextUtils.isEmpty(encoded)) {
+        if (StringUtil.isEmpty(encoded)) {
             return "";
         }
         return new String(decodeToBytes(encoded));
