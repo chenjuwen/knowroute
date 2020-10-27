@@ -3,7 +3,7 @@ package com.heasy.knowroute.core.webview;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.heasy.knowroute.core.service.ServiceEngineFactory;
+import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.utils.StringUtil;
 
 import org.slf4j.Logger;
@@ -17,6 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultWebViewClient extends WebViewClient {
     private static final Logger logger = LoggerFactory.getLogger(DefaultWebViewClient.class);
     private static ConcurrentHashMap<String, String> pageParameters = new ConcurrentHashMap<String, String>(); //用于存放页面跳转时附带的参数信息
+    private HeasyContext heasyContext;
+
+    public DefaultWebViewClient(HeasyContext heasyContext){
+        this.heasyContext = heasyContext;
+    }
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -28,7 +33,7 @@ public class DefaultWebViewClient extends WebViewClient {
     public void onPageFinished(WebView webView, String url) {
         logger.debug("访问URL： " + url);
 
-        String htmlLoadBasePath = ServiceEngineFactory.getServiceEngine().getConfigurationService().getConfigBean().getWebviewLoadBasePath();
+        String htmlLoadBasePath = heasyContext.getServiceEngine().getConfigurationService().getConfigBean().getWebviewLoadBasePath();
 
         //将页面参数值推送到页面
         String parameters = "";

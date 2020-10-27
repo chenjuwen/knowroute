@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
-import android.widget.Toast;
 
+import com.heasy.knowroute.HeasyApplication;
+import com.heasy.knowroute.ServiceEngineFactory;
 import com.heasy.knowroute.WebViewWrapperFactory;
-import com.heasy.knowroute.core.HeasyApplication;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.event.ExitAppEvent;
-import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.webview.WebViewWrapper;
 import com.heasy.knowroute.map.HeasyLocationService;
 
@@ -92,6 +90,7 @@ public class MainActivity extends AppCompatActivity{
         //webViewWrapper.loadUrl("file:///sdcard/sdcard_file.html");
     }
 
+    /*
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -111,6 +110,7 @@ public class MainActivity extends AppCompatActivity{
             return super.onKeyDown(keyCode, event);
         }
     }
+    */
 
     @Override
     protected void onDestroy() {

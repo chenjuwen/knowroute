@@ -1,6 +1,6 @@
 package com.heasy.knowroute;
 
-import com.heasy.knowroute.core.HeasyApplication;
+import com.heasy.knowroute.action.ActionScanner;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.configuration.AbstractComponentScanner;
 import com.heasy.knowroute.core.webview.DefaultActionDispatcher;
@@ -8,7 +8,6 @@ import com.heasy.knowroute.core.webview.DefaultWebChromeClient;
 import com.heasy.knowroute.core.webview.DefaultWebViewClient;
 import com.heasy.knowroute.core.webview.JSInterfaceImpl;
 import com.heasy.knowroute.core.webview.WebViewWrapper;
-import com.heasy.knowroute.action.ActionScanner;
 
 /**
  * Created by Administrator on 2018/1/23.
@@ -43,14 +42,17 @@ public class WebViewWrapperFactory {
         jsInterface.setHeasyContext(heasyContext);
 
         //DefaultWebViewClient
-        DefaultWebViewClient webViewClient = new DefaultWebViewClient();
+        DefaultWebViewClient webViewClient = new DefaultWebViewClient(heasyContext);
+
+        String htmlLoadBasePath = heasyContext.getServiceEngine().getConfigurationService().getConfigBean().getWebviewLoadBasePath();
 
         //保证select控件能弹出下拉框
         HeasyApplication app = (HeasyApplication)heasyContext.getServiceEngine().getAndroidContext();
         webViewWrapper = new WebViewWrapper.Builder(app.getMainActivity())
                 .setWebViewClient(webViewClient)
-                .setWebChromeClient(new DefaultWebChromeClient())
+                .setWebChromeClient(new DefaultWebChromeClient(app.getMainActivity()))
                 .setJSInterface(jsInterface)
+                .setHtmlBasePath(htmlLoadBasePath)
                 .build();
 
         heasyContext.setJsInterface(jsInterface);

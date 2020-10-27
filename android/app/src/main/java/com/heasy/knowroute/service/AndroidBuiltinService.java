@@ -12,7 +12,7 @@ import android.telephony.SmsManager;
 
 import com.example.library.ActivityBackWrapper;
 import com.example.library.RxActivity;
-import com.heasy.knowroute.core.HeasyApplication;
+import com.heasy.knowroute.HeasyApplication;
 import com.heasy.knowroute.core.HeasyContext;
 
 import org.slf4j.Logger;
@@ -66,8 +66,8 @@ public class AndroidBuiltinService {
      */
     public static void getContactInfo(final HeasyContext heasyContext) {
         Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-        HeasyApplication heasyApplication = (HeasyApplication) heasyContext.getServiceEngine().getAndroidContext();
-        final FragmentActivity activity = (FragmentActivity) heasyApplication.getMainActivity();
+        HeasyApplication heasyApplication = (HeasyApplication)heasyContext.getServiceEngine().getAndroidContext();
+        final FragmentActivity activity = (FragmentActivity)heasyApplication.getMainActivity();
         final Intent tmpIntent = intent;
 
         activity.runOnUiThread(new Runnable() {

@@ -12,5 +12,5 @@ public interface UserService{
     int insert(String phone, String invite_code);
     boolean updateNickname(int id, String newNickname);
     boolean updateLastLoginDate(int id);
-    boolean updatePositionInfo(int id, Float longitude, Float latitude, String address);
+    boolean updatePositionInfo(int id, double longitude, double latitude, String address);
 }

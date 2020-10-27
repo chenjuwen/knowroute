@@ -8,22 +8,22 @@ import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
-import com.heasy.knowroute.core.HeasyApplication;
-import com.heasy.knowroute.core.service.ServiceEngineFactory;
-
 /**
  * Created by Administrator on 2017/12/17.
  */
 public class DefaultWebChromeClient extends WebChromeClient {
+    private Activity activity;
+
+    public DefaultWebChromeClient(Activity activity){
+        this.activity = activity;
+    }
+
     /**
      * 显示Alert对话框
      */
     @Override
     public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
-        HeasyApplication heasyApplication = (HeasyApplication) ServiceEngineFactory.getServiceEngine().getAndroidContext();
-        Activity activity = heasyApplication.getMainActivity();
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
         builder.setTitle("提示");
         builder.setMessage(message);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -39,10 +39,8 @@ public class DefaultWebChromeClient extends WebChromeClient {
 
     @Override
     public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
-        HeasyApplication heasyApplication = (HeasyApplication) ServiceEngineFactory.getServiceEngine().getAndroidContext();
-        Activity activity = heasyApplication.getMainActivity();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.activity);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         //builder.setTitle("提示");
         builder.setMessage(message);
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {

@@ -1,7 +1,6 @@
 package com.heasy.knowroute.core.webview;
 
 import com.heasy.knowroute.core.HeasyContext;
-import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 
@@ -69,7 +68,7 @@ public class JSInterfaceImpl implements JSInterface {
 
     @Override
     public void loadUrlFromAsset(String url){
-        String htmlLoadBasePath = ServiceEngineFactory.getServiceEngine().getConfigurationService().getConfigBean().getWebviewLoadBasePath();
+        String htmlLoadBasePath = heasyContext.getServiceEngine().getConfigurationService().getConfigBean().getWebviewLoadBasePath();
         doLoad(htmlLoadBasePath + url);
     }
 

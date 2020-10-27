@@ -38,7 +38,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
     -->
     <application
-        android:name=".core.HeasyApplication"
+        android:name=".HeasyApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/logo"

@@ -1,4 +1,6 @@
-package com.heasy.knowroute.core.service;
+package com.heasy.knowroute;
+
+import com.heasy.knowroute.core.service.ServiceEngine;
 
 /**
  * Created by Administrator on 2018/11/11.
@@ -12,7 +14,6 @@ public class ServiceEngineFactory {
 
     public static void setServiceEngine(ServiceEngine serviceEngine) {
         ServiceEngineFactory.serviceEngine = serviceEngine;
-
     }
 
 }

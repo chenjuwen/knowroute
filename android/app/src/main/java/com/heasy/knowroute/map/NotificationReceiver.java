@@ -27,15 +27,14 @@ public class NotificationReceiver extends BroadcastReceiver {
             logger.debug("在BroadcastReceiver中启动MainActivity");
             //app存活，但可能不在Task栈中，需要启动主Activity
             Intent mainIntent = new Intent(context, MainActivity.class);
-            mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            //mainIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             context.startActivity(mainIntent);
 
         }else{
             logger.debug("在BroadcastReceiver中启动app");
             //app没启动，则启动app
             Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.heasy.knowroute");
-            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                    | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK  | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
             context.startActivity(launchIntent);
         }
     }

@@ -108,4 +108,15 @@ public class FastjsonUtil {
         return JSONObject.toJSONString(object);
     }
 
+    public static String toJSONString(String key1, String value1, String key2, String value2, String key3, String value3, String key4, String value4, String key5, String value5, String key6, String value6){
+        JSONObject object = new JSONObject();
+        object.put(key1, value1);
+        object.put(key2, value2);
+        object.put(key3, value3);
+        object.put(key4, value4);
+        object.put(key5, value5);
+        object.put(key6, value6);
+        return JSONObject.toJSONString(object);
+    }
+
 }

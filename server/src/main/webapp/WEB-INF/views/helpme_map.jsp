@@ -79,7 +79,7 @@
 		
     	<div class="divMessageContainer show_${address != ''}">
     		<div class="phone">${phone}</div>
-    		<div class="address">我的位置：${address}</div>
+    		<div class="address">位置：${address}</div>
     		<div class="position">经度：${longitude}</div>
     		<div class="position">纬度：${latitude}</div>
     	</div>

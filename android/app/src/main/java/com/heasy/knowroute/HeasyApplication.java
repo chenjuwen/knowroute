@@ -1,4 +1,4 @@
-package com.heasy.knowroute.core;
+package com.heasy.knowroute;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.support.multidex.MultiDexApplication;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
-import com.heasy.knowroute.core.service.ServiceEngineFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,6 +48,8 @@ public class HeasyApplication extends MultiDexApplication {
         }catch (Exception ex){
             ex.printStackTrace();
         }
+
+        instance = null;
 
         System.exit(0);
     }

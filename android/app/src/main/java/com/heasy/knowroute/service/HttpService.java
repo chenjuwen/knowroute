@@ -49,7 +49,7 @@ public class HttpService {
         }
 
         ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
-        logger.debug(FastjsonUtil.object2String(responseBean));
+        logger.debug("httpGet response:" + FastjsonUtil.object2String(responseBean));
         return responseBean;
     }
 

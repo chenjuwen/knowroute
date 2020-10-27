@@ -10,7 +10,7 @@ public class TaskMemberBean {
     /**
      * 用户
      */
-    private UserBean userBean;
+    private int userId;
 
     /**
      * 任务路径

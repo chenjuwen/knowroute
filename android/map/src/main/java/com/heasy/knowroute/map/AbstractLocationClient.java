@@ -6,6 +6,8 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.utils.DistanceUtil;
+import com.heasy.knowroute.map.bean.LocationBean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +21,11 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
     private LocationClient mLocationClient = null;
     private Context context;
 
-    //定位相关属性
-    private double longitude;
-    private double latitude;
-    private String address;
-    private String time;
+    private LocationBean currentLocation;
 
-    private int scanSpanMillSeconds = 10000; //获取定位信息的间隔毫秒
+    private int scanSpanMillSeconds = 10 * 1000; //获取定位信息的间隔毫秒
     private boolean needLocationPoiList = false; //是否需要返回POI列表
+    private long minDistance = 5; //最少距离，单位为米
 
     public AbstractLocationClient(Context context){
         this.context = context;
@@ -65,67 +64,56 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
     }
 
     @Override
-    public void onReceiveLocation(BDLocation location) {
-        if (location == null) {
+    public void onReceiveLocation(BDLocation dbLocation) {
+        if (dbLocation == null) {
             return;
         }
 
-        longitude = location.getLongitude(); //经度
-        latitude = location.getLatitude(); //纬度
+        double longitude = dbLocation.getLongitude(); //经度
+        double latitude = dbLocation.getLatitude(); //纬度
 
         //地址
-        address = location.getAddrStr();
+        String address = dbLocation.getAddrStr();
         if(address != null){
             address = address.replaceFirst("中国", "");
 
-            String locationDescribe = location.getLocationDescribe();
+            String locationDescribe = dbLocation.getLocationDescribe();
             if(locationDescribe != null){
                 locationDescribe = locationDescribe.replaceFirst("在", "");
                 address += locationDescribe;
             }
         }
 
-        time = location.getTime();
+        String time = dbLocation.getTime();
 
-        logger.info(longitude + ", " + latitude);
-        logger.info(address);
-        logger.info(time);
+        LocationBean locationBean = new LocationBean();
+        locationBean.setLongitude(longitude);
+        locationBean.setLatitude(latitude);
+        locationBean.setAddress(address);
+        locationBean.setTime(time);
 
-        handleReceiveLocation(location);
+        if(getCurrentLocation() == null) {
+            setCurrentLocation(locationBean);
+            handleReceiveLocation(dbLocation, locationBean);
+        }else{
+            //计算两点之间的距离，单位为 米
+            long distance = new Double(DistanceUtil.getDistance(getCurrentLocation().getLatLng(), locationBean.getLatLng())).longValue();
+            //logger.debug("distance=" + distance);
+            if(distance >= minDistance){
+                setCurrentLocation(locationBean);
+                handleReceiveLocation(dbLocation, locationBean);
+            }
+        }
     }
 
-    public abstract void handleReceiveLocation(BDLocation location);
+    public abstract void handleReceiveLocation(BDLocation dbLocation, LocationBean bean);
 
-    public double getLongitude() {
-        return longitude;
+    public LocationBean getCurrentLocation() {
+        return currentLocation;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
+    public void setCurrentLocation(LocationBean currentLocation) {
+        this.currentLocation = currentLocation;
     }
 
     public int getScanSpanMillSeconds() {

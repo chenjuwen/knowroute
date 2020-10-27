@@ -8,8 +8,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.heasy.knowroute.core.service.ServiceEngineFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +17,11 @@ import org.slf4j.LoggerFactory;
 public class WebViewWrapper {
     private static final Logger logger = LoggerFactory.getLogger(WebViewWrapper.class);
     private WebView webView;
+    private String htmlBasePath;
 
-    private WebViewWrapper(WebView webView){
+    private WebViewWrapper(WebView webView, String htmlBasePath){
         this.webView = webView;
+        this.htmlBasePath = htmlBasePath;
     }
 
     public WebView getWebView() {
@@ -33,8 +33,7 @@ public class WebViewWrapper {
     }
 
     public void loadUrlFromAsset(String url){
-        String htmlLoadBasePath = ServiceEngineFactory.getServiceEngine().getConfigurationService().getConfigBean().getWebviewLoadBasePath();
-        webView.loadUrl(htmlLoadBasePath + url);
+        webView.loadUrl(this.htmlBasePath + url);
     }
 
     public void post(Runnable action){
@@ -81,8 +80,8 @@ public class WebViewWrapper {
 
     public static class Builder{
         private WebView webView;
-        private WebViewClient webViewClient;
         private JSInterface jsInterface;
+        private String htmlBasePath;
 
         public Builder(Context context){
             this.webView = new WebView(context);
@@ -91,8 +90,7 @@ public class WebViewWrapper {
         public WebViewWrapper build(){
             initWebSettings(webView);
 
-            WebViewWrapper webViewWrapper = new WebViewWrapper(webView);
-
+            WebViewWrapper webViewWrapper = new WebViewWrapper(webView, this.htmlBasePath);
             ((JSInterfaceImpl)jsInterface).setWebViewWrapper(webViewWrapper);
 
             return webViewWrapper;
@@ -129,7 +127,6 @@ public class WebViewWrapper {
         }
 
         public Builder setWebViewClient(WebViewClient webViewClient){
-            this.webViewClient = webViewClient;
             webView.setWebViewClient(webViewClient);
             return this;
         }
@@ -142,6 +139,11 @@ public class WebViewWrapper {
         public Builder setJSInterface(JSInterface jsInterface){
             this.jsInterface = jsInterface;
             webView.addJavascriptInterface((JSInterfaceImpl)jsInterface, jsInterface.getName());
+            return this;
+        }
+
+        public Builder setHtmlBasePath(String htmlBasePath){
+            this.htmlBasePath = htmlBasePath;
             return this;
         }
     }

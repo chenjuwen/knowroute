@@ -1,4 +1,4 @@
-package com.heasy.knowroute.action.lottery;
+package com.heasy.knowroute.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.heasy.knowroute.core.Constants;

@@ -164,7 +164,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      * 更新用户的位置信息
      */
     @Override
-    public boolean updatePositionInfo(int id, Float longitude, Float latitude, String address) {
+    public boolean updatePositionInfo(int id, double longitude, double latitude, String address) {
     	try {
 	    	String sql = "update users set longitude=?,latitude=?,address=? where id=?";
 	    	int count = jdbcTemplate.update(sql, longitude, latitude, address, id);
