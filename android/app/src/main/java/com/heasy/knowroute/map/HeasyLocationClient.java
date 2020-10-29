@@ -69,6 +69,9 @@ public class HeasyLocationClient extends AbstractLocationClient {
         }
     }
 
+    /**
+     * 定位信息上传
+     */
     class Sender extends Thread{
         @Override
         public void run() {
@@ -79,7 +82,7 @@ public class HeasyLocationClient extends AbstractLocationClient {
                     LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
 
                     //位置信息实时传输到后台
-                    String url = "position/insert";
+                    String requestUrl = "position/insert";
                     String jsonData = FastjsonUtil.toJSONString(
                             "id", StringUtil.getUUIDString(),
                             "userId", String.valueOf(loginService.getUserId()),
@@ -88,14 +91,14 @@ public class HeasyLocationClient extends AbstractLocationClient {
                             "address", locationBean.getAddress(),
                             "times", locationBean.getTime());
 
-                    ResponseBean responseBean = HttpService.httpPost(ServiceEngineFactory.getServiceEngine().getHeasyContext(), url, jsonData);
+                    ResponseBean responseBean = HttpService.httpPost(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl, jsonData);
                     if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
                         logger.debug("位置信息已上传：" + FastjsonUtil.object2String(locationBean));
                     }else{
                         logger.error(HttpService.getFailureMessage(responseBean));
                     }
                 }catch (Exception ex){
-                    logger.error("", ex);
+                    logger.error("", ex.toString());
                 }
             }
         }

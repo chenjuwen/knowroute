@@ -8,6 +8,7 @@ import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
+import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.map.bean.LocationBean;
 
 import org.slf4j.Logger;
@@ -70,9 +71,6 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
             return;
         }
 
-        double longitude = dbLocation.getLongitude(); //经度
-        double latitude = dbLocation.getLatitude(); //纬度
-
         //地址
         String address = dbLocation.getAddrStr();
         if(address != null){
@@ -85,7 +83,13 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
             }
         }
 
-        String time = dbLocation.getTime();
+        if(StringUtil.isEmpty(address)){
+            return;
+        }
+
+        double longitude = dbLocation.getLongitude(); //经度
+        double latitude = dbLocation.getLatitude(); //纬度
+        String time = dbLocation.getTime(); //时间
 
         LocationBean locationBean = new LocationBean();
         locationBean.setLongitude(longitude);
@@ -93,10 +97,11 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
         locationBean.setAddress(address);
         locationBean.setTime(time);
 
-        if(getCurrentLocation() == null) {
+        if(getCurrentLocation() == null) { //首次定位
             setCurrentLocation(locationBean);
             handleReceiveLocation(dbLocation, locationBean);
         }else{
+            //两点间隔一定距离才处理
             //计算两点之间的距离，单位为 米
             long distance = new Double(DistanceUtil.getDistance(getCurrentLocation().getLatLng(), locationBean.getLatLng())).longValue();
             logger.debug("distance=" + distance);

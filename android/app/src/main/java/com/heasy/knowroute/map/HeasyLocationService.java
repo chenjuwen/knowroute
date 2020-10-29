@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by Administrator on 2020/10/26.
+ * 定位服务
  */
 public class HeasyLocationService extends Service {
     private static final Logger logger = LoggerFactory.getLogger(HeasyLocationService.class);
@@ -43,8 +43,8 @@ public class HeasyLocationService extends Service {
 
         Notification notification = builder.build();
 
-        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(999, notification);
+        //NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+        //notificationManager.notify(999, notification);
 
         startForeground(999, notification);
 
