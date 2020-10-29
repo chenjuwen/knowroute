@@ -7,9 +7,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.datetime.DateFormatter;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,14 +35,6 @@ public class PositionController extends BaseController{
     @Autowired
     private UserService userService;
     
-    /**
-     * 处理以form-data格式提交的日期字段
-     */
-//    @InitBinder
-//    public void initDateFormate(WebDataBinder dataBinder) {
-//        dataBinder.addCustomFormatter(new DateFormatter(DatetimeUtil.DEFAULT_PATTERN_DT));
-//    }
-    
 	@RequestMapping(value="/insert", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse insert(@RequestBody PositionBean positionBean){
 		try {
@@ -66,8 +56,8 @@ public class PositionController extends BaseController{
 	
 	@RequestMapping(value="/getPoints", method=RequestMethod.GET)
     public WebResponse getPoints(@RequestParam(value="userId") Integer userId,
-    		@RequestParam(value="fromDate") Date fromDate,
-    		@RequestParam(value="toDate") Date toDate) {
+    		@RequestParam(value="fromDate") @DateTimeFormat(pattern = DatetimeUtil.DEFAULT_PATTERN_DT2)  Date fromDate,
+    		@RequestParam(value="toDate") @DateTimeFormat(pattern = DatetimeUtil.DEFAULT_PATTERN_DT2)  Date toDate) {
 		try {
 			List<PointBean> list = positionService.getPoints(userId, fromDate, toDate);
 			if(!CollectionUtils.isEmpty(list)) {

@@ -27,7 +27,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             logger.debug("在BroadcastReceiver中启动MainActivity");
             //app存活，但可能不在Task栈中，需要启动主Activity
             Intent mainIntent = new Intent(context, MainActivity.class);
-            //mainIntent.setFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+            mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             context.startActivity(mainIntent);
 
         }else{

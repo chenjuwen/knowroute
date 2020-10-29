@@ -3,6 +3,7 @@ package com.heasy.knowroute.service;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.alibaba.fastjson.JSONObject;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.core.Constants;
@@ -54,17 +55,36 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     }
 
     @Override
-    public String doLogin(String _phone) {
+    public String getCaptche(String phone) {
+        try {
+            String requestUrl = "user/getCaptche?phone=" + phone;
+
+            ResponseBean responseBean = HttpService.httpGet(getHeasyContext(), requestUrl);
+            if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
+                JSONObject obj = FastjsonUtil.string2JSONObject((String)responseBean.getData());
+                return FastjsonUtil.getString(obj, "captche");
+            }else{
+                logger.error(HttpService.getFailureMessage(responseBean));
+            }
+        }catch(Exception ex){
+            logger.error("", ex);
+        }
+        return "";
+    }
+
+    @Override
+    public String doLogin(String phone, String captche) {
         try {
             Request request = new RequestBuilder()
-                    .url(HttpService.getApiAddress(getHeasyContext()) + "login")
-                    .addFormParam("phone", _phone)
+                    .url(HttpService.getApiAddress(getHeasyContext()) + "user/login")
+                    .addFormParam("phone", phone)
+                    .addFormParam("captche", captche)
                     .build();
 
             ResponseBean responseBean = HttpService.httpPost(request);
 
             if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
-                this.userPhone = _phone;
+                this.userPhone = phone;
                 this.userId = FastjsonUtil.string2JSONObject((String)responseBean.getData()).getIntValue("id");
 
                 //write authority file

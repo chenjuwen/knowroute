@@ -1,5 +1,6 @@
 package com.heasy.knowroute.map.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baidu.mapapi.model.LatLng;
 
 /**
@@ -43,6 +44,7 @@ public class LocationBean {
         this.time = time;
     }
 
+    @JSONField(serialize = false)
     public LatLng getLatLng(){
         LatLng latLng = new LatLng(this.latitude, this.longitude);
         return latLng;

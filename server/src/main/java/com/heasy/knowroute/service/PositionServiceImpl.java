@@ -2,6 +2,7 @@ package com.heasy.knowroute.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -37,16 +38,18 @@ public class PositionServiceImpl extends BaseService implements PositionService 
 	public List<PointBean> getPoints(int userId, Date fromDate, Date toDate) {
 		try{
 			String fromDateStr = DatetimeUtil.formatDate(fromDate);
-			String toDateStr = DatetimeUtil.formatDate(toDate);
+			String toDateStr = DatetimeUtil.formatDate(DatetimeUtil.add(toDate, Calendar.MINUTE, 1));
 			
-        	String sql = "select * from positions where user_id=? and times>=? and times<=? order by times asc";
+        	String sql = "select * from positions where user_id=? and times>=? and times<? order by times asc";
         	
         	List<PointBean> list = jdbcTemplate.query(sql, new RowMapper<PointBean>() {
         		@Override
         		public PointBean mapRow(ResultSet rs, int rowNum) throws SQLException {
         			double longitude = rs.getDouble("longitude");
         			double latitude = rs.getDouble("latitude");
-        			PointBean bean = new PointBean(longitude, latitude);
+        			String times = rs.getString("times");
+        			
+        			PointBean bean = new PointBean(longitude, latitude, times);
         			return bean;
         		}
         	}, userId, fromDateStr, toDateStr);

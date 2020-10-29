@@ -6,6 +6,7 @@ import com.heasy.knowroute.bean.UserBean;
  * Created by Administrator on 2020/9/26.
  */
 public interface UserService{
+	String getCaptche(String phone);
 	int login(String phone);
     UserBean getUser(int id);
     UserBean getUser(String phone);

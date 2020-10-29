@@ -7,6 +7,7 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.utils.DistanceUtil;
+import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.map.bean.LocationBean;
 
 import org.slf4j.Logger;
@@ -98,7 +99,7 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
         }else{
             //计算两点之间的距离，单位为 米
             long distance = new Double(DistanceUtil.getDistance(getCurrentLocation().getLatLng(), locationBean.getLatLng())).longValue();
-            //logger.debug("distance=" + distance);
+            logger.debug("distance=" + distance);
             if(distance >= minDistance){
                 setCurrentLocation(locationBean);
                 handleReceiveLocation(dbLocation, locationBean);

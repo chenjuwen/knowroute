@@ -29,9 +29,16 @@ public class StringUtil {
 	 * 验证是否是手机号码
 	 */
 	public static boolean isMobile(String phone) {
-		Pattern p = Pattern.compile("^[1][3,4,5,8][0-9]{9}$");
+		Pattern p = Pattern.compile("^[1][3-9][0-9]{9}$");
 		Matcher m = p.matcher(phone);
 		boolean b = m.matches();
 		return b;
+	}
+	
+	/**
+	 * 获取四位随机数
+	 */
+	public static String getFourDigitRandomNumber(){
+		return String.valueOf((int)((Math.random()*9+1)*1000));
 	}
 }

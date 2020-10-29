@@ -12,10 +12,14 @@ import android.support.v7.app.NotificationCompat;
 
 import com.heasy.knowroute.R;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Created by Administrator on 2020/10/26.
  */
 public class HeasyLocationService extends Service {
+    private static final Logger logger = LoggerFactory.getLogger(HeasyLocationService.class);
     private HeasyLocationClient heasyLocationClient;
 
     @Override
@@ -43,6 +47,8 @@ public class HeasyLocationService extends Service {
         notificationManager.notify(999, notification);
 
         startForeground(999, notification);
+
+        logger.info("HeasyLocationService created");
     }
 
     @Nullable
@@ -61,6 +67,8 @@ public class HeasyLocationService extends Service {
 
         //停止前台Service
         stopForeground(true);
+
+        logger.info("HeasyLocationService destroy");
     }
 
 }

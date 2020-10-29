@@ -35,6 +35,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
     private ProgressDialog progressDialog;
 
+    private String mobilephone = "";
     private String loginCaptcha = ""; //登录验证码
     private Handler handler = null;
 
@@ -48,16 +49,58 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         handler = new Handler(){
             @Override
             public void handleMessage(Message message) {
+                int type = message.what;
                 String result = (String)message.obj;
 
                 progressDialog.dismiss();
 
-                if(Constants.SUCCESS.equalsIgnoreCase(result)){
-                    logger.debug("start MainActivity...");
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                }else{
-                    AndroidUtil.showToast(getApplicationContext(), result);
+                if(type == 1){ //获取验证码
+                    if(StringUtil.isEmpty(result)){
+                        AndroidUtil.showToast(getApplicationContext(), "获取验证码失败");
+                        return;
+                    }
+
+                    loginCaptcha = result;
+
+                    //发送短信
+                    String smsMessage = "【知途】验证码" + loginCaptcha + "，您正在登录，若非本人操作，请勿泄露。";
+                    boolean b = AndroidBuiltinService.sendSMS(mobilephone, smsMessage);
+
+                    if(!b){
+                        AndroidUtil.showToast(getApplicationContext(), "获取验证码失败");
+                        return;
+                    }
+
+                    AndroidUtil.showToast(getApplicationContext(), "获取验证码成功");
+
+                    final String oldText = btnGetCaptcha.getText().toString();
+                    int seconds = 60;
+
+                    //倒计时
+                    new CountDownTimer(seconds * 1000 + 1050, 1000) {
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            btnGetCaptcha.setEnabled(false);
+                            btnGetCaptcha.setText((millisUntilFinished / 1000 - 1) + "秒后重试"); //剩余时间
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            btnGetCaptcha.setEnabled(true);
+                            btnGetCaptcha.setText(oldText);
+
+                        }
+                    }.start();
+
+                }else if(type == 2){ //登录
+                    if(Constants.SUCCESS.equalsIgnoreCase(result)){
+                        logger.debug("start MainActivity...");
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        AndroidUtil.showToast(getApplicationContext(), result);
+                    }
                 }
             }
         };
@@ -99,8 +142,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     }
 
     private void doLogin(){
-        final String s_phone = StringUtil.trimToEmpty(phone.getText().toString());
-        if(s_phone.length() != 11){
+        mobilephone = StringUtil.trimToEmpty(phone.getText().toString());
+        if(mobilephone.length() != 11){
             AndroidUtil.showToast(getApplicationContext(), "请输入11位手机号码");
             return;
         }
@@ -110,18 +153,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             return;
         }
 
-        String s_captcha = StringUtil.trimToEmpty(captcha.getText().toString());
+        final String s_captcha = StringUtil.trimToEmpty(captcha.getText().toString());
         if(s_captcha.length() <= 0){
             AndroidUtil.showToast(getApplicationContext(), "请输入验证码");
             return;
         }
 
-        if(!loginCaptcha.equalsIgnoreCase(s_captcha)){
-            AndroidUtil.showToast(getApplicationContext(), "验证码错误");
-            return;
-        }
-
-        loginCaptcha = "";
         progressDialog = AndroidUtil.showLoadingDialog(this, "正在登录中...");
 
         //登录处理
@@ -130,10 +167,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             public void run() {
                 logger.debug("start login...");
                 LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
-                String result = loginService.doLogin(s_phone);
+                String result = loginService.doLogin(mobilephone, s_captcha);
                 logger.debug("result=" + result);
 
                 Message message = new Message();
+                message.what = 2;
                 message.obj = result;
                 handler.sendMessage(message);
             }
@@ -144,53 +182,27 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
      * 获取验证码
      */
     private void getCaptche(){
-        String s_phone = StringUtil.trimToEmpty(phone.getText().toString());
-        if(s_phone.length() != 11){
+        mobilephone = StringUtil.trimToEmpty(phone.getText().toString());
+        if(mobilephone.length() != 11){
             AndroidUtil.showToast(getApplicationContext(), "请输入11位手机号码");
             return;
         }
 
-        try {
-            progressDialog = AndroidUtil.showLoadingDialog(this, "正在获取验证码");
+        progressDialog = AndroidUtil.showLoadingDialog(this, "正在获取验证码");
 
-            loginCaptcha = StringUtil.getFourDigitRandomNumber(); //四位随机码
+        //获取验证码
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+                String captcha = loginService.getCaptche(mobilephone);
 
-            //发送短信
-            String message = "【知途】验证码" + loginCaptcha + "，您正在登录，若非本人操作，请勿泄露。";
-            boolean b = AndroidBuiltinService.sendSMS(s_phone, message);
-
-            if(!b){
-                progressDialog.dismiss();
-                AndroidUtil.showToast(getApplicationContext(), "获取验证码失败");
-                return;
+                Message message = new Message();
+                message.what = 1;
+                message.obj = captcha;
+                handler.sendMessage(message);
             }
-
-            progressDialog.dismiss();
-            AndroidUtil.showToast(getApplicationContext(), "获取验证码成功");
-
-            final String oldText = btnGetCaptcha.getText().toString();
-            int seconds = 60;
-
-            //倒计时
-            new CountDownTimer(seconds * 1000 + 1050, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    btnGetCaptcha.setEnabled(false);
-                    btnGetCaptcha.setText((millisUntilFinished / 1000 - 1) + "秒后重试"); //剩余时间
-                }
-
-                @Override
-                public void onFinish() {
-                    btnGetCaptcha.setEnabled(true);
-                    btnGetCaptcha.setText(oldText);
-
-                }
-            }.start();
-
-        }catch (Exception ex){
-            logger.error("", ex);
-            progressDialog.dismiss();
-            AndroidUtil.showToast(getApplicationContext(), "获取验证码失败");
-        }
+        }).start();
     }
+
 }

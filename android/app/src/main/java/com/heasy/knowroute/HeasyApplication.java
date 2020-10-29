@@ -8,12 +8,16 @@ import android.support.multidex.MultiDexApplication;
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Administrator on 2017/9/14.
  */
 public class HeasyApplication extends MultiDexApplication {
+    private static final Logger logger = LoggerFactory.getLogger(HeasyApplication.class);
     private static HeasyApplication instance;
     private ConcurrentHashMap<String, Activity> activities = new ConcurrentHashMap<>();
 
@@ -22,6 +26,7 @@ public class HeasyApplication extends MultiDexApplication {
         super.onCreate();
         instance = this;
         initMapSDK();
+        logger.info("HeasyApplication created");
     }
 
     private void initMapSDK(){
@@ -38,9 +43,12 @@ public class HeasyApplication extends MultiDexApplication {
     public void onTerminate() {
         super.onTerminate();
         exit();
+        logger.info("HeasyApplication Terminated");
     }
 
     public void exit(){
+        instance = null;
+
         finishAllActivity();
 
         try {
@@ -48,8 +56,6 @@ public class HeasyApplication extends MultiDexApplication {
         }catch (Exception ex){
             ex.printStackTrace();
         }
-
-        instance = null;
 
         System.exit(0);
     }

@@ -18,8 +18,8 @@ public class QuickHelpController extends BaseController{
 	@RequestMapping(value="/helpme", method=RequestMethod.GET)
 	public String map(ModelMap modelMap, @RequestParam(value="u") String userId, 
 			@RequestParam(value="p") String phone) {
-		Float longitude = null;
-		Float latitude = null;
+		Double longitude = null;
+		Double latitude = null;
 		String address = "";
 		
 		UserBean userBean = userService.getUser(Integer.parseInt(userId));

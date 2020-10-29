@@ -182,6 +182,13 @@ public class DatetimeUtil {
         return ret;
     }
     
+    public static Date add(Date date, int datepart, int value) {
+    	Calendar cal = getCalendar();
+    	cal.setTime(date);
+    	cal.add(datepart, value);
+    	return cal.getTime();
+    }
+    
     /**
      * 当前日期增加若干日期数，可正可负
      * 

@@ -25,7 +25,12 @@ import com.heasy.knowroute.utils.StringUtil;
 public class UserServiceImpl extends BaseService implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     
-    /**
+    @Override
+	public String getCaptche(String phone) {
+		return null;
+	}
+
+	/**
      * 登录处理：
      * 	手机号对应的用户记录不存在，则添加新用户
      * 	返回用户记录的id值
@@ -166,13 +171,15 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     public boolean updatePositionInfo(int id, double longitude, double latitude, String address) {
     	try {
-	    	String sql = "update users set longitude=?,latitude=?,address=? where id=?";
-	    	int count = jdbcTemplate.update(sql, longitude, latitude, address, id);
-	    	return count > 0;
+    		if(StringUtil.isNotEmpty(address)) {
+		    	String sql = "update users set longitude=?,latitude=?,address=? where id=?";
+		    	int count = jdbcTemplate.update(sql, longitude, latitude, address, id);
+		    	return count > 0;
+    		}
 		}catch(Exception ex) {
 			logger.error("", ex);
-			return false;
 		}
+		return false;
     }
     
     class UserRowMapper implements RowMapper<UserBean>{
@@ -181,8 +188,8 @@ public class UserServiceImpl extends BaseService implements UserService {
     		int id = rs.getInt("id");
 			String phone = rs.getString("phone");
 			String nickname = rs.getString("nickname");
-			Float longitude = rs.getFloat("longitude");
-			Float latitude = rs.getFloat("latitude");
+			Double longitude = rs.getDouble("longitude");
+			Double latitude = rs.getDouble("latitude");
 			String address = rs.getString("address");
 			String invite_code = rs.getString("invite_code");
 			Date create_date = DatetimeUtil.toDate(rs.getString("create_date"));

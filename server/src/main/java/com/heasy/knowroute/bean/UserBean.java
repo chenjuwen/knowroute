@@ -10,8 +10,8 @@ public class UserBean {
 	private int id;
     private String phone;
     private String nickname;
-    private Float longitude;
-    private Float latitude;
+    private Double longitude;
+    private Double latitude;
     private String address;
     private String inviteCode;
     private Date createDate;
@@ -41,19 +41,19 @@ public class UserBean {
 		this.nickname = nickname;
 	}
 	
-	public Float getLongitude() {
+	public Double getLongitude() {
 		return longitude;
 	}
 	
-	public void setLongitude(Float longitude) {
+	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
 	
-	public Float getLatitude() {
+	public Double getLatitude() {
 		return latitude;
 	}
 	
-	public void setLatitude(Float latitude) {
+	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
 	

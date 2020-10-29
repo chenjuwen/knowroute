@@ -62,7 +62,7 @@ public class HeasyLocationClient extends AbstractLocationClient {
     @Override
     public void handleReceiveLocation(BDLocation dbLocation, LocationBean locationBean) {
         try {
-            //logger.debug(FastjsonUtil.object2String(locationBean));
+            logger.debug(FastjsonUtil.object2String(locationBean));
             queue.put(locationBean);
         } catch (InterruptedException ex) {
             logger.error("", ex);

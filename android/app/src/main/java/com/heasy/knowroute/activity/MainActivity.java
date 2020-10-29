@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity{
             Intent serviceIntent = new Intent(MainActivity.this, HeasyLocationService.class);
             startService(serviceIntent);
         }
+        logger.info("MainActivity Created");
     }
 
     /**
@@ -87,7 +88,44 @@ public class MainActivity extends AppCompatActivity{
 
         String mainPage = ServiceEngineFactory.getServiceEngine().getConfigurationService().getConfigBean().getMainPage();
         webViewWrapper.loadUrlFromAsset(mainPage);
-        //webViewWrapper.loadUrl("file:///sdcard/sdcard_file.html");
+    }
+
+    private void destroyWebViewWrapper(){
+        if(webViewWrapper != null) {
+            webViewWrapper.destroy();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
+
+        destroyWebViewWrapper();
+
+        HeasyApplication heasyApplication = (HeasyApplication)getApplication();
+        heasyApplication.finishActivity(this);
+
+        logger.info("MainActivity Destroy");
+    }
+
+    /**
+     * 退出应用
+     * @param exitAppEvent
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void exitApp(ExitAppEvent exitAppEvent){
+        if(exitAppEvent != null) {
+            logger.debug(exitAppEvent.getSource().getClass().getName());
+        }
+
+        //finish和按back键处理过程一样：onPause、onStop、onDestory
+        //finish();
+        finishAffinity();
+
+        System.exit(0);
+        logger.info("App exit");
     }
 
     /*
@@ -111,40 +149,5 @@ public class MainActivity extends AppCompatActivity{
         }
     }
     */
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
-
-        _destroy();
-
-        HeasyApplication heasyApplication = (HeasyApplication)getApplication();
-        heasyApplication.finishActivity(this);
-    }
-
-    /**
-     * 退出应用
-     * @param exitAppEvent
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void exitApp(ExitAppEvent exitAppEvent){
-        if(exitAppEvent != null) {
-            logger.debug(exitAppEvent.getSource().getClass().getName());
-        }
-
-        _destroy();
-        finish();
-        System.exit(0);
-    }
-
-    private void _destroy(){
-        if(webViewWrapper != null) {
-            webViewWrapper.destroy();
-        }
-
-        ServiceEngineFactory.getServiceEngine().close();
-    }
 
 }

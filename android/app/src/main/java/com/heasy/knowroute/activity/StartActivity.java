@@ -150,7 +150,7 @@ public class StartActivity extends BaseActivity {
                 initServiceEngine();
                 initActionDispatcher();
 
-                TimeUnit.MILLISECONDS.sleep(5000);
+                TimeUnit.MILLISECONDS.sleep(2000);
 
                 handler.sendEmptyMessage(1);
             } catch (Exception ex) {

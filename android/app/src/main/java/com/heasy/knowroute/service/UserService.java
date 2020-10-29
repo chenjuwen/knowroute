@@ -7,5 +7,5 @@ import com.heasy.knowroute.core.service.Service;
  * Created by Administrator on 2020/9/26.
  */
 public interface UserService extends Service{
-    UserBean getUser(String account);
+
 }
