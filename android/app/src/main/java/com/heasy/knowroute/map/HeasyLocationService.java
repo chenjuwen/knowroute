@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HeasyLocationService extends Service {
     private static final Logger logger = LoggerFactory.getLogger(HeasyLocationService.class);
-    private HeasyLocationClient heasyLocationClient;
+    private static HeasyLocationClient heasyLocationClient;
 
     @Override
     public void onCreate() {
@@ -63,6 +63,7 @@ public class HeasyLocationService extends Service {
 
         if(heasyLocationClient != null) {
             heasyLocationClient.destroy();
+            heasyLocationClient = null;
         }
 
         //停止前台Service
@@ -71,4 +72,7 @@ public class HeasyLocationService extends Service {
         logger.info("HeasyLocationService destroy");
     }
 
+    public static HeasyLocationClient getHeasyLocationClient() {
+        return heasyLocationClient;
+    }
 }

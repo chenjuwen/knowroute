@@ -1,4 +1,4 @@
-package com.heasy.knowroute.action;
+package com.heasy.knowroute.action.business;
 
 import com.alibaba.fastjson.JSONObject;
 import com.heasy.knowroute.core.Constants;

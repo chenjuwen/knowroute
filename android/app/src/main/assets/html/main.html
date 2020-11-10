@@ -23,100 +23,87 @@
 	<script src="js/muse-ui-message.js"></script>
 
 	<style type="text/css">
-		.contact-item{
-			background-color: #F5F5DC;
-			height: 40px;
-			border-bottom: 5px solid #FFF;
+		/** position-info **/
+		.position-info{
+			margin:3px;
+			padding: 3px;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+		}
+
+		.position-info .head{
+			padding-right: 3px;
+		}
+
+		.position-info .nickname{
 			font-size: 15px;
+			font-weight: 600;
 		}
 
-		/** dialog **/
-		.mu-dialog-body{
-			padding: 0;
+		.position-info .times{
+			font-size: 14px;
+			color: #999999;
 		}
 
-		.mu-appbar{
-			height: 45px;
+		.position-info .address{
+			font-size: 14px;
+			color: #777777;
 		}
 
-		.mu-appbar-title{
-			font-size: 16px;
+		.position-info .track{
+			font-size: 14px;
+			width: 60px;
+			height: 35px;
 		}
 
-		.dialog-form-container{
-			width: 100%;
-		}
-
-		.dialog-form-container input{
-			border: 0;
-			border-bottom: 1px solid #ccc;
-		}
-
-		.dialog-form-item{
-			height: 60px;
-		}
-
-		.sendConfirm{
-			padding: 0 10px;
-		}
-
-		.mu-dialog-title{
-			font-size: 20px;
+		/** button **/
+		.add-care-person{
+			font-size: 15px;
+			width: 200px;
 		}
 	</style>
 </HEAD>
 <BODY>
 	<div id="app" class="vue-mint-container">
-		<mt-header fixed title="紧急求助"></mt-header>
+		<mt-header fixed title="我关心的人"></mt-header>
 
-		<div style="font-size:15px; color:#777; font-weight:normal; text-indent:30px; line-height:25px; padding:0 5px">
-			当您遇到紧急情况使用求助功能时，系统会发送求助信息给您的紧急联系人。您的联系人将会收到短信以及app消息。
+		<div class="position-info">
+			<table width="100%" border="0">
+				<tr>
+					<td rowspan="2" width="50" align="center" class="head">
+						<img src="images/head1.png" width="48" height="48" alt="头像">
+					</td>
+					<td class="nickname">&nbsp;我自己</td>
+					<td rowspan="2" width="80" align="center">
+						<mt-button type="primary" size="normal" class="track" @click="viewTrack('me','我自己')">轨迹</mt-button>
+					</td>
+				</tr>
+				<tr>
+					<td class="times">&nbsp;{{ locationInfo.time }}</td>
+				</tr>
+				<tr>
+					<td colspan="3" class="address">&nbsp;{{ locationInfo.address }}</td>
+				</tr>
+			</table>
 		</div>
 
 		<table width="100%">
 			<tr>
-				<td align="center" valign="top" style="height:120px;">
-					<table width="90%" style="border-collapse:collapse;">
-						<tr class="contact-item" v-if="contactList.length > 0" v-for="item in contactList" @click.stop="editContact(item)">
-							<td>{{ item.contactName }}</td>
-							<td>{{ item.contactPhone }}</td>
-							<td width="30">&gt;</td>
-						</tr>
-						<tr v-if="contactList.length <= 0">
-							<td colspan="3" align="center" style="height:120px">暂无紧急联系人</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-
-		<table width="100%">
-			<tr>
-				<td align="center">
-					<mt-button type="primary" size="normal" @click="addContact" style="width:250px; height:50px;">添加紧急联系人</mt-button>
-					<div style="color:#555; margin-top:5px; font-size:14px;">最多只能添加3位</div>
-				</td>
-			</tr>
-		</table>
-
-		<table width="100%" style="position:fixed; bottom:90px; ">
-			<tr>
-				<td align="center" style="padding-top:30px;">
-					<mt-button type="danger" size="normal" @click="sendHelp" style="width:250px; height:50px;">发出求助</mt-button>
-					<div style="color:#555; margin-top:5px; font-size:14px;">发送求助信息给紧急联系人</div>
+				<td align="center" height="60">
+					<mt-button type="primary" size="normal" class="add-care-person">添加要关心的人</mt-button>
 				</td>
 			</tr>
 		</table>
 
 		<table class="tabbar" width="100%">
 			<tr>
-				<td width="25%" align="center" class="tabbar-item">
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('main.html')">
 					<img src="images/home.jpg">
-					<div>主页</div>
+					<div class="tabbar-item-selected">主页</div>
 				</td>
-				<td width="25%" align="center" class="tabbar-item">
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('contact.html')">
 					<img src="images/alert.jpg">
-					<div class="tabbar-item-selected">紧急</div>
+					<div>紧急</div>
 				</td>
 				<td width="25%" align="center" class="tabbar-item">
 					<img style="position:absolute; top:-15px; left:50%; margin-left:-25;" src="images/location.png">
@@ -132,227 +119,36 @@
 				</td>
 			</tr>
 		</table>
-
-		<mu-dialog transition="slide-left" width="260"
-				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openAddContactDialog">
-			<mu-appbar color="primary" title="添加紧急联系人">
-				<mu-button slot="right" flat  @click="closeAddContactDialog">关闭</mu-button>
-			</mu-appbar>
-
-			<table class="dialog-form-container">
-				<tr class="dialog-form-item">
-					<td width="70" align="right">姓名：</td>
-					<td>
-						<input type="text" size="15" maxlength="20" v-model.trim="contact_name"/>
-						<img src="images/contact.jpg" @click="selectContact"/>
-					</td>
-				</tr>
-				<tr class="dialog-form-item">
-					<td width="70" align="right">手机号：</td>
-					<td>
-						<input type="text" size="15" maxlength="11" v-model.trim="contact_phone"
-							   onkeyup="this.value=this.value.replace(/\D/g,'')"
-							   onafterpaste="this.value=this.value.replace(/\D/g,'')"
-						       oninput="this.value=this.value.replace(/\D/g,'')" />
-					</td>
-				</tr>
-				<tr class="dialog-form-item">
-					<td colspan="2" align="center">
-						<mt-button type="primary" id="btnSaveContact" size="small" @click="saveContact">保存</mt-button>
-					</td>
-				</tr>
-			</table>
-		</mu-dialog>
-
-
-		<mu-dialog transition="slide-left" width="260"
-				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openEditContactDialog">
-			<mu-appbar color="primary" title="修改紧急联系人">
-				<mu-button slot="right" flat  @click="closeEditContactDialog">关闭</mu-button>
-			</mu-appbar>
-
-			<table class="dialog-form-container">
-				<tr class="dialog-form-item">
-					<td width="70" align="right">姓名：</td>
-					<td>
-						<input type="text" size="15" maxlength="20" v-model.trim="contact_name2"/>
-						<img src="images/contact.jpg" @click="selectContact"/>
-					</td>
-				</tr>
-				<tr class="dialog-form-item">
-					<td width="70" align="right">手机号：</td>
-					<td>
-						<input type="text" size="15" maxlength="11" v-model.trim="contact_phone2"
-							   onkeyup="this.value=this.value.replace(/\D/g,'')"
-							   onafterpaste="this.value=this.value.replace(/\D/g,'')"
-							   oninput="this.value=this.value.replace(/\D/g,'')" />
-					</td>
-				</tr>
-				<tr class="dialog-form-item">
-					<td colspan="2" align="center">
-						<mt-button type="primary" id="btnUpdateContact" size="small" @click="updateContact">保存</mt-button>
-						<mt-button type="danger" id="btnDeleteContact" size="small" @click="deleteContact">删除联系人</mt-button>
-					</td>
-				</tr>
-			</table>
-		</mu-dialog>
 	</div>
 
 	<script>
+		var nowDate = new Date();
+		var y = nowDate.getFullYear();
+		var m = nowDate.getMonth()+1;
+		if(m < 10) m = "0" + m;
+		var d = nowDate.getDate();
+		if(d < 10) d = "0" + d;
+		var h = nowDate.getHours();
+		if(h < 10) h = "0" + h;
+		var mi = nowDate.getMinutes();
+		if(mi < 10) mi = "0" + mi;
+		var s = nowDate.getSeconds();
+		if(s < 10) s = "0" + s;
+
+		nowDate = y + "-" + m + "-" + d + " " + h + ":" + mi + ":" + s;
+
 		var vm = new Vue({
 			el: '#app',
 			data: {
-				contactList:[
-					//{id:1, userId:5, contactName:"张三风", contactPhone:"13798178123"},
-					//{id:2, userId:5, contactName:"李四", contactPhone:"13798178124"},
-					//{id:3, userId:5, contactName:"王春华", contactPhone:"13798178125"}
-				],
-
-				openAddContactDialog: false,
-				contact_name: "",
-				contact_phone: "",
-
-				openEditContactDialog: false,
-				selectedItemId: "",
-				contact_name2: "",
-				contact_phone2: ""
+				//广东省云浮市罗定市大路口附近
+				locationInfo: {address:"", time:nowDate}
 			},
 			methods: {
-				addContact: function(){
-					this.contact_name = "";
-					this.contact_phone = "";
-					this.openAddContactDialog = true;
+				changeTabPage: function(pageURL){
+					transferPage(pageURL);
 				},
-				closeAddContactDialog: function(){
-					this.contact_name = "";
-					this.contact_phone = "";
-					this.openAddContactDialog = false;
-				},
-				selectContact: function(){
-					jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({}), "getContactInfo");
-				},
-				saveContact: function(){
-					if(this.contact_name == ""){
-						this.$toast.message('请输入联系人的姓名');
-						return;
-					}
-
-					if(!isMobile(this.contact_phone)){
-						this.$toast.message('请输入11位的手机号');
-						return;
-					}
-
-					const loading = this.$loading({
-        				target: document.getElementById("btnSaveContact"),
-        				size: 15
-      				});
-
-					var obj = {"contact_name":vm.contact_name, "contact_phone":vm.contact_phone};
-					var msg = jsBridge.dispatchAction("ContactsAction", JSON.stringify(obj), "save");
-					loading.close();
-
-					if(msg == "success"){
-						this.$toast.message('保存成功');
-						this.closeAddContactDialog();
-						pageFinishCallback();
-					}else{
-						this.$toast.message(msg);
-					}
-				},
-				editContact: function(item){
-					this.selectedItemId = item.id;
-					this.contact_name2 = item.contactName;
-					this.contact_phone2 = item.contactPhone;
-					this.openEditContactDialog = true;
-				},
-				closeEditContactDialog: function(){
-					this.selectedItemId = "";
-					this.contact_name2 = "";
-					this.contact_phone2 = "";
-					this.openEditContactDialog = false;
-				},
-				updateContact: function(){
-					if(this.contact_name2 == ""){
-						this.$toast.message('请输入联系人的姓名');
-						return;
-					}
-
-					if(!isMobile(this.contact_phone2)){
-						this.$toast.message('请输入11位的手机号');
-						return;
-					}
-
-					const loading = this.$loading({
-        				target: document.getElementById("btnUpdateContact"),
-        				size: 15
-      				});
-
-					var obj = {"id":vm.selectedItemId, "contact_name":vm.contact_name2, "contact_phone":vm.contact_phone2};
-					var msg = jsBridge.dispatchAction("ContactsAction", JSON.stringify(obj), "update");
-					loading.close();
-
-					if(msg == "success"){
-						this.$toast.message('修改成功');
-						this.closeEditContactDialog();
-						pageFinishCallback();
-					}else{
-						this.$toast.message(msg);
-					}
-				},
-				deleteContact: function(){
-					if(confirm("确定要删除该紧急联系人？")){
-						const loading = this.$loading({
-							target: document.getElementById("btnDeleteContact"),
-							size: 15
-						});
-
-						var obj = {"id":vm.selectedItemId};
-						var msg = jsBridge.dispatchAction("ContactsAction", JSON.stringify(obj), "delete");
-						loading.close();
-
-						if(msg == "success"){
-							this.$toast.message('删除成功');
-							this.closeEditContactDialog();
-							pageFinishCallback();
-						}else{
-							this.$toast.message(msg);
-						}
-					}
-				},
-				sendHelp: function(){
-					if(this.contactList.length <= 0){
-						this.$toast.message("没有紧急联系人，请先添加");
-						return;
-					}
-
-					var names = "";
-					var phones = "";
-					for(i=0; i<this.contactList.length; i++){
-						if(i > 0){
-							names += ",";
-							phones += ",";
-						}
-						names += this.contactList[i].contactName;
-						phones += this.contactList[i].contactPhone;
-					}
-
-					this.$confirm('我们将会短信联系"' + names + '"', '发送求助信息', {
-						type: "info",
-						className: "sendConfirm",
-						okLabel: "立即发送"
-					}).then(({ result }) => {
-						if(result){
-							const loading = this.$loading();
-							var result = jsBridge.dispatchAction("ContactsAction", JSON.stringify({"phones":phones}), "sendHelp");
-						  	loading.close();
-
-							if(result == "success"){
-						  		this.$toast.success('求助信息已发送');
-							}else{
-								this.$toast.success(result);
-							}
-						}
-      				});
+				viewTrack: function(userId, nickName){
+					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": userId, "nickName":nickName}), "viewTrack");
 				}
 			}
 		})
@@ -360,16 +156,12 @@
 
 	<script type="text/javascript">
         function pageFinishCallback(){
-			var dataArr = jsBridge.dispatchAction("ContactsAction", JSON.stringify({}), "getAll");
-			vm.contactList = jQuery.parseJSON(dataArr);
-        }
-
-        function getContactInfo_callback(userName, userNumber){
-			vm.contact_name = userName;
-			vm.contact_phone = userNumber;
-
-			vm.contact_name2 = userName;
-			vm.contact_phone2 = userNumber;
+			setInterval(function(){
+				try{
+					var obj = jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "getCurrentPosition");
+					vm.locationInfo = jQuery.parseJSON(obj);
+				}catch(e){ }
+			}, 3 * 1000);
         }
     </script>
 </BODY>

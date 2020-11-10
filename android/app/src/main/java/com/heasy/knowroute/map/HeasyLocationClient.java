@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
+ * 获取定位信息并发送到系统后台存储
  * Created by Administrator on 2020/10/25.
  */
 public class HeasyLocationClient extends AbstractLocationClient {
@@ -39,6 +40,8 @@ public class HeasyLocationClient extends AbstractLocationClient {
         sender = new Sender();
         sender.setDaemon(true);
         sender.start();
+
+        logger.info("HeasyLocationClient inited!");
     }
 
     @Override
@@ -57,6 +60,8 @@ public class HeasyLocationClient extends AbstractLocationClient {
         } catch (Exception ex) {
             logger.error("", ex);
         }
+
+        logger.info("HeasyLocationClient destroy!");
     }
 
     @Override
@@ -64,7 +69,7 @@ public class HeasyLocationClient extends AbstractLocationClient {
         try {
             logger.debug(FastjsonUtil.object2String(locationBean));
             queue.put(locationBean);
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
             logger.error("", ex);
         }
     }
@@ -98,7 +103,7 @@ public class HeasyLocationClient extends AbstractLocationClient {
                         logger.error(HttpService.getFailureMessage(responseBean));
                     }
                 }catch (Exception ex){
-                    logger.error("", ex.toString());
+                    logger.error("", ex);
                 }
             }
         }

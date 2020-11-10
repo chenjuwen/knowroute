@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.heasy.knowroute.R;
 import com.heasy.knowroute.ServiceEngineFactory;
 import com.heasy.knowroute.core.Constants;
+import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.service.AndroidBuiltinService;
@@ -162,7 +163,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         progressDialog = AndroidUtil.showLoadingDialog(this, "正在登录中...");
 
         //登录处理
-        new Thread(new Runnable() {
+        new DefaultDaemonThread(){
             @Override
             public void run() {
                 logger.debug("start login...");
@@ -175,7 +176,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                 message.obj = result;
                 handler.sendMessage(message);
             }
-        }).start();
+        }.start();
     }
 
     /**

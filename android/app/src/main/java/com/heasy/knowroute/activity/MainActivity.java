@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends BaseActivity{
     private static final Logger logger = LoggerFactory.getLogger(MainActivity.class);
     private WebViewWrapper webViewWrapper;
     private long exitTime = 0;
@@ -29,16 +29,6 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //activity设置属性： android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-
-        //隐藏android的标题栏
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        //        WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        //隐藏activity的actionBar
-        //getSupportActionBar().hide();
 
         //HeasyApplication
         HeasyApplication heasyApplication = (HeasyApplication)getApplication();

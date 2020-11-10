@@ -9,6 +9,19 @@ import java.util.Map;
  * Created by Administrator on 2018/12/10.
  */
 public class ParameterUtil {
+    public static final String CHARACTER_NAME = "utf-8";
+
+    public static String encodeParamValue(String value){
+        if(StringUtil.isEmpty(value)){
+            return "";
+        }
+        try {
+            return URLEncoder.encode(value, CHARACTER_NAME);
+        } catch (UnsupportedEncodingException e) {
+            return value;
+        }
+    }
+
     public static String toParamString(Map<String, String> params, boolean encodeValue){
         StringBuilder sb = new StringBuilder();
         int index = 0;
@@ -24,15 +37,7 @@ public class ParameterUtil {
             sb.append("=");
 
             if(encodeValue) {
-                try {
-                    if(StringUtil.isNotEmpty(value)){
-                        sb.append(URLEncoder.encode(value, "utf-8"));
-                    }else{
-                        sb.append("");
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    sb.append(value);
-                }
+                sb.append(encodeParamValue(value));
             }else{
                 sb.append(value);
             }

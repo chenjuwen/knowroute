@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 
 repositories {
     flatDir {
-        dir 'libs'
+        dir '../libs'
     }
 }
 
@@ -39,11 +39,11 @@ android {
         }
     }
 
-    sourceSets {
-        main {
-            jniLibs.srcDir 'libs'
-        }
-    }
+    //sourceSets {
+    //    main {
+     //       jniLibs.srcDir '../libs'
+     //   }
+    //}
 
     dexOptions {
         javaMaxHeapSize "2g"
@@ -67,6 +67,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:design:25.4.0'
+    //compile 'com.android.support.constraint:constraint-layout:2.0.2'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -82,6 +83,7 @@ dependencies {
     compile files('../libs/jaxen-1.1.4.jar')
     compile files('../libs/eventbus-3.1.1.jar')
     compile files('../libs/BaiduLBS_Android.jar')
+    compile(name: '../libs/DateTimePickerLibrary-0.4.8', ext: 'aar')
     compile project(':core')
     compile project(':okhttp')
     compile project(':map')

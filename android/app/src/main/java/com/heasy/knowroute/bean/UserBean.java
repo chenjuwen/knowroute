@@ -7,85 +7,84 @@ import java.util.Date;
  */
 public class UserBean {
 	private int id;
-    private String phone;
-    private String nickname;
-    private Float longitude;
-    private Float latitude;
-    private String address;
-    private String invite_code;
-    private Date create_date;
-    private Date last_login_date;
-    
+	private String phone;
+	private String nickname;
+	private Double longitude;
+	private Double latitude;
+	private String address;
+	private String inviteCode;
+	private Date createDate;
+	private Date lastLoginDate;
+
 	public int getId() {
 		return id;
 	}
-	
+
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	public String getPhone() {
 		return phone;
 	}
-	
+
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	
+
 	public String getNickname() {
 		return nickname;
 	}
-	
+
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
-	
-	public Float getLongitude() {
+
+	public Double getLongitude() {
 		return longitude;
 	}
-	
-	public void setLongitude(Float longitude) {
+
+	public void setLongitude(Double longitude) {
 		this.longitude = longitude;
 	}
-	
-	public Float getLatitude() {
+
+	public Double getLatitude() {
 		return latitude;
 	}
-	
-	public void setLatitude(Float latitude) {
+
+	public void setLatitude(Double latitude) {
 		this.latitude = latitude;
 	}
-	
+
 	public String getAddress() {
 		return address;
 	}
-	
+
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
-	public String getInvite_code() {
-		return invite_code;
+
+	public String getInviteCode() {
+		return inviteCode;
 	}
-	
-	public void setInvite_code(String invite_code) {
-		this.invite_code = invite_code;
+
+	public void setInviteCode(String inviteCode) {
+		this.inviteCode = inviteCode;
 	}
-	
-	public Date getCreate_date() {
-		return create_date;
+
+	public Date getCreateDate() {
+		return createDate;
 	}
-	
-	public void setCreate_date(Date create_date) {
-		this.create_date = create_date;
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
-	
-	public Date getLast_login_date() {
-		return last_login_date;
+
+	public Date getLastLoginDate() {
+		return lastLoginDate;
 	}
-	
-	public void setLast_login_date(Date last_login_date) {
-		this.last_login_date = last_login_date;
+
+	public void setLastLoginDate(Date lastLoginDate) {
+		this.lastLoginDate = lastLoginDate;
 	}
-    
 }

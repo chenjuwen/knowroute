@@ -1,7 +1,10 @@
 package com.heasy.knowroute.core.utils;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Point;
+import android.view.Display;
 import android.view.Gravity;
 import android.widget.Toast;
 
@@ -25,5 +28,17 @@ public class AndroidUtil {
         progressDialog.setMessage(message);
         progressDialog.show();
         return progressDialog;
+    }
+
+    /**
+     * 获取应用程序显示区域
+     * @param activity
+     * @return
+     */
+    public static Point getDisplaySize(Activity activity){
+        Display defaultDisplay = activity.getWindowManager().getDefaultDisplay();
+        Point point = new Point();
+        defaultDisplay.getSize(point);
+        return point;
     }
 }

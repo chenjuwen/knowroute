@@ -9,14 +9,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
-
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <!-- 发送短信 -->
@@ -48,7 +45,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:theme">
-
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
             android:value="KgOrbWK9B03DoNBsLKaYPz9uWpXGpXv3" />
@@ -60,7 +56,6 @@
             android:hardwareAccelerated="true"
             android:launchMode="singleTask"
             android:theme="@style/TranslucentTheme" />
-
         <activity
             android:name=".activity.StartActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
@@ -71,7 +66,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.LoginActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
@@ -86,15 +80,13 @@
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote" />
-
         <service
             android:name=".map.HeasyLocationService"
             android:enabled="true"
             android:exported="false" />
 
-        <activity android:name=".map.activity.CompassActivity" />
-        <activity android:name=".map.activity.SettingsActivity" />
-        <activity android:name=".map.activity.RouteTraceActivity"></activity>
+        <activity android:name=".activity.RouteTrackActivity" />
+        <activity android:name=".DatetimeActivity"></activity>
     </application>
 
 </manifest>

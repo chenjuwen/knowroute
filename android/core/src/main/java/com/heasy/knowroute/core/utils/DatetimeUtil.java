@@ -10,8 +10,19 @@ import java.util.Locale;
  * Created by Administrator on 2018/2/13.
  */
 public class DatetimeUtil {
+    /**
+     * 格式为 yyyy-MM-dd
+     */
     public static final String DEFAULT_PATTERN = "yyyy-MM-dd";
+    
+    /**
+     * 格式为 yyyy-MM-dd HH:mm:ss
+     */
     public static final String DEFAULT_PATTERN_DT = "yyyy-MM-dd HH:mm:ss";
+    
+    /**
+     * 格式为 yyyy-MM-dd HH:mm
+     */
     public static final String DEFAULT_PATTERN_DT2 = "yyyy-MM-dd HH:mm";
 
     public static Calendar getCalendar(){
@@ -47,6 +58,10 @@ public class DatetimeUtil {
         return today;
     }
 
+    public static String getToday(){
+    	return getToday(DEFAULT_PATTERN_DT);
+    }
+
     public static String changeDateFormat(String date, String fromPattern, String toPattern){
         try{
             SimpleDateFormat sdf1 = new SimpleDateFormat(fromPattern);
@@ -58,6 +73,10 @@ public class DatetimeUtil {
         }catch(Exception ex){
             return date;
         }
+    }
+    
+    public static String formatDate(Date date){
+    	return formatDate(date, DEFAULT_PATTERN_DT);
     }
 
     public static String formatDate(Date date, String pattern){
@@ -108,6 +127,10 @@ public class DatetimeUtil {
             return null;
         }
     }
+    
+    public static Date toDate(String date){
+    	return toDate(date, DEFAULT_PATTERN_DT);
+    }
 
     public static Date toDate(Timestamp timestamp){
         try{
@@ -129,7 +152,7 @@ public class DatetimeUtil {
      * 为指定日期增加若干日期数，可正可负
      *
      * @param sDate 日期字符串，格式为：yyyyMMdd or yyyyMM
-     * @param datepart 日期字段，如年、月、日、时、分、秒等
+     * @param datepart 日期类型字段，如年、月、日、时、分、秒等
      * @param value 要增加的日期数
      * @param outPattern 日期的返回格式
      */
@@ -159,6 +182,28 @@ public class DatetimeUtil {
         return ret;
     }
 
+    public static Date addDate(int datepart, int value) {
+        return addDate(nowDate(), datepart, value);
+    }
+    
+    public static Date addDate(Date date, int datepart, int value) {
+    	Calendar cal = getCalendar();
+    	cal.setTime(date);
+    	cal.add(datepart, value);
+    	return cal.getTime();
+    }
+    
+    /**
+     * 当前日期增加若干日期数，可正可负
+     * 
+     * @param datepart 日期类型字段，如年、月、日、时、分、秒等
+     * @param value 要增加的日期数
+     * @return 返回yyyy-MM-dd HH:mm:ss格式的日期字符串 
+     */
+    public static String add(int datepart, int value) {
+    	return add(getToday(), datepart, value, DEFAULT_PATTERN_DT);
+    }
+
     public static String getSimpleWeekName(){
         String dayNames[] = {"日", "一", "二", "三", "四", "五", "六"};
         int dayOfWeek = getCalendar().get(Calendar.DAY_OF_WEEK) - 1;
@@ -175,6 +220,21 @@ public class DatetimeUtil {
             dayOfWeek = 0;
         }
         return dayNames[dayOfWeek];
+    }
+
+    /**
+     * 两个日期相差几个小时
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @return
+     */
+    public static long differHours(Date startDate, Date endDate) {
+        if(startDate == null || endDate == null) {
+            return 0;
+        }
+
+        long milliseconds = endDate.getTime() - startDate.getTime();
+        return milliseconds / (60*60*1000);
     }
 
 }

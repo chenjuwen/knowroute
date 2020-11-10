@@ -9,6 +9,7 @@ import com.baidu.mapapi.model.LatLng;
 public class LocationBean {
     private double longitude;
     private double latitude;
+    private float radius = 0.0f;
     private String address;
     private String time;
 
@@ -26,6 +27,14 @@ public class LocationBean {
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
+    }
+
+    public float getRadius() {
+        return radius;
+    }
+
+    public void setRadius(float radius) {
+        this.radius = radius;
     }
 
     public String getAddress() {

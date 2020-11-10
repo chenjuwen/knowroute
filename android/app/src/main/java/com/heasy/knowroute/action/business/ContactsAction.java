@@ -1,6 +1,8 @@
-package com.heasy.knowroute.action;
+package com.heasy.knowroute.action.business;
 
 import com.alibaba.fastjson.JSONObject;
+import com.heasy.knowroute.action.ResponseBean;
+import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.annotation.JSActionAnnotation;
