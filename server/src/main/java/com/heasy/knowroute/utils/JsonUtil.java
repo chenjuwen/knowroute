@@ -1,9 +1,14 @@
 package com.heasy.knowroute.utils;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.heasy.knowroute.common.DateJsonValueProcessor;
+
 import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
 
 public class JsonUtil {
     /**
@@ -35,11 +40,19 @@ public class JsonUtil {
         return value;
     }
 
-    public static String object2String(JSONObject object){
-        if(object == null){
-            return null;
-        }else{
-            return object.toString(2);
+    public static String object2String(Object object){
+        return object2String(object, getJsonConfigOfDate());
+    }
+    
+    public static String object2String(Object object, JsonConfig jsonConfig) {
+        if(object == null) {
+        	return null;
+        }
+        
+        if(jsonConfig != null) {
+        	return JSONObject.fromObject(object, jsonConfig).toString(2);
+        }else {
+        	return JSONObject.fromObject(object).toString(2);
         }
     }
 
@@ -98,21 +111,18 @@ public class JsonUtil {
         return object.toString(2);
     }
     
-//    public static void main(String[] args) {
-//		System.out.println(toJSONString("cjm", "123"));
-//		
-//		User user = string2JavaBean("{username:\"cjm\", password:\"123\"}", User.class);
-//		System.out.println(user.getUsername());
-//		System.out.println(user.getPassword());
-//		
-//		JSONObject object = new JSONObject();
-//		object.put("uid", "cjm");
-//		object.put("pwd", "123");
-//		System.out.println(object2String(object));
-//		System.out.println(getString(object, "pwd"));
-//		
-//		object = string2object("{username:\"cjm\", password:\"123\"}");
-//		System.out.println(getString(object, "username"));
-//	}
+    /**
+     * 对json对象中的日期字段进行格式化处理
+     */
+    public static JsonConfig getJsonConfigOfDate() {
+    	return getJsonConfigOfDate(DatetimeUtil.DEFAULT_PATTERN_DT);
+    }
+    
+    public static JsonConfig getJsonConfigOfDate(String pattern) {
+    	JsonConfig config = new JsonConfig();
+    	config.registerJsonValueProcessor(Date.class, new DateJsonValueProcessor(pattern));
+    	config.registerJsonValueProcessor(Timestamp.class, new DateJsonValueProcessor(pattern));
+    	return config;
+    }
 
 }

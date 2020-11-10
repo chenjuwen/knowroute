@@ -36,6 +36,12 @@ public class QuickHelpController extends BaseController{
 		modelMap.put("phone", phone); //手机号
 		modelMap.put("address", address); //地址
 		
-		return "helpme_map";
+		return "helpme";
 	}
+
+	@RequestMapping(value="/map", method=RequestMethod.GET)
+	public String map() {
+		return "map";
+	}
+	
 }

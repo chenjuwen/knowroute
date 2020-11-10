@@ -51,16 +51,16 @@
 				display: none;
 			}
 		</style>
+		
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=dznCIamw2fFeqGOxQGHKYAxACOYw143G"></script>
 		<script type="text/javascript" src="js/map.js"></script>
-		<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=dznCIamw2fFeqGOxQGHKYAxACOYw143G">
-		</script>
     </head>
     <body>    	
 		<div id="container"></div> 
 		<script type="text/javascript">
 			var longitude = ${longitude};
 	    	var latitude = ${latitude};
-			var point = newPoint(longitude, latitude);
+			var point = new BMap.Point(longitude, latitude);
 			
 			var map = newMap("container", point, false);
 			

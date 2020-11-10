@@ -30,6 +30,10 @@ public class WebResponse implements Serializable{
 		return result;
 	}
 	
+	public static WebResponse failure() {
+		return failure(ResponseCode.FAILURE);
+	}
+	
 	public static WebResponse failure(ResponseCode resultCode) {
 		WebResponse result = new WebResponse();
 		result.setResultCode(resultCode);

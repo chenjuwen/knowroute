@@ -24,11 +24,6 @@ import com.heasy.knowroute.utils.StringUtil;
 @Service
 public class UserServiceImpl extends BaseService implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-    
-    @Override
-	public String getCaptche(String phone) {
-		return null;
-	}
 
 	/**
      * 登录处理：

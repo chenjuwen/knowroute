@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.api.ResponseCode;
 import com.heasy.knowroute.api.WebResponse;
+import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.service.CaptcheService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.JsonUtil;
@@ -27,13 +28,26 @@ public class UserController extends BaseController{
 	
 	@Autowired
 	private CaptcheService captcheService;
+
+	@RequestMapping(value="/getCaptche", method=RequestMethod.GET)
+	public WebResponse getCaptche(@RequestParam(value="phone") String phone) {
+		if(!StringUtil.isMobile(phone)) {
+			return WebResponse.failure(ResponseCode.PHONE_INVALID);
+		}
+
+		String captche = StringUtil.getFourDigitRandomNumber();
+		captcheService.set(phone, captche);
+		logger.info("captche=" + captche);
+		
+		return WebResponse.success(JsonUtil.toJSONString("captche", captche));
+	}
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public WebResponse login(HttpServletRequest request){
 		String phone = StringUtil.trimToEmpty(request.getParameter("phone"));
 		String captche = StringUtil.trimToEmpty(request.getParameter("captche"));
 		logger.debug("start login: phone=" + phone + ", captche=" + captche);
-		
+
 		String validCaptche = captcheService.get(phone);
 		logger.debug("validCaptche=" + validCaptche);
 		
@@ -57,18 +71,38 @@ public class UserController extends BaseController{
 			return WebResponse.failure(ResponseCode.LOGIN_ERROR);
 		}
 	}
-
-	@RequestMapping(value="/getCaptche", method=RequestMethod.GET)
-	public WebResponse getCaptche(@RequestParam(value="phone") String phone) {
-		if(!StringUtil.isMobile(phone)) {
-			return WebResponse.failure(ResponseCode.PHONE_INVALID);
+	
+	@RequestMapping(value="/getById", method=RequestMethod.GET)
+	public WebResponse getById(@RequestParam(value="id") Integer id){
+		UserBean bean = userService.getUser(id);
+		if(bean != null) {
+			String data = JsonUtil.object2String(bean);
+			return new WebResponse(ResponseCode.SUCCESS, data);
+		}else {
+			return WebResponse.failure(ResponseCode.NO_DATA);
 		}
-		
-		String captche = StringUtil.getFourDigitRandomNumber();
-		logger.info("captche=" + captche);
-		
-		captcheService.set(phone, captche); 
-		return WebResponse.success(JsonUtil.toJSONString("captche", captche));
+	}
+	
+	@RequestMapping(value="/getByPhone", method=RequestMethod.GET)
+	public WebResponse getByPhone(@RequestParam(value="phone") String phone){
+		UserBean bean = userService.getUser(phone);
+		if(bean != null) {
+			String data = JsonUtil.object2String(bean);
+			return new WebResponse(ResponseCode.SUCCESS, data);
+		}else {
+			return WebResponse.failure(ResponseCode.NO_DATA);
+		}
+	}
+	
+	@RequestMapping(value="/updateNickname", method=RequestMethod.GET)
+	public WebResponse updateNickname(@RequestParam(value="userId") int userId, 
+			@RequestParam(value="newNickname") String newNickname){
+		boolean b = userService.updateNickname(userId, newNickname);
+		if(b) {
+			return WebResponse.success();
+		}else {
+			return WebResponse.failure();
+		}
 	}
 	
 }

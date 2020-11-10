@@ -51,23 +51,32 @@ public class PositionController extends BaseController{
 			logger.error("", ex);
 		}
 		
-		return WebResponse.failure(ResponseCode.FAILURE);
+		return WebResponse.failure();
 	}
 	
 	@RequestMapping(value="/getPoints", method=RequestMethod.GET)
     public WebResponse getPoints(@RequestParam(value="userId") Integer userId,
-    		@RequestParam(value="fromDate") @DateTimeFormat(pattern = DatetimeUtil.DEFAULT_PATTERN_DT2)  Date fromDate,
-    		@RequestParam(value="toDate") @DateTimeFormat(pattern = DatetimeUtil.DEFAULT_PATTERN_DT2)  Date toDate) {
+    		@RequestParam(value="startDate") @DateTimeFormat(pattern = DatetimeUtil.DEFAULT_PATTERN_DT2)  Date startDate,
+    		@RequestParam(value="endDate") @DateTimeFormat(pattern = DatetimeUtil.DEFAULT_PATTERN_DT2)  Date endDate) {
 		try {
-			List<PointBean> list = positionService.getPoints(userId, fromDate, toDate);
+			if(startDate.after(endDate)){
+				return WebResponse.failure(ResponseCode.FAILURE, "开始时间不能大于结束时间");
+            }
+
+            if(DatetimeUtil.differHours(startDate, endDate) > 24){
+				return WebResponse.failure(ResponseCode.FAILURE, "轨迹查询时间段必须在24小时内");
+            }
+            
+			List<PointBean> list = positionService.getPoints(userId, startDate, endDate);
 			if(!CollectionUtils.isEmpty(list)) {
 				return WebResponse.success(JSONArray.fromObject(list).toString(2));
+			}else {
+				return WebResponse.success("[]");
 			}
 		}catch(Exception ex) {
 			logger.error("", ex);
+			return WebResponse.failure(ResponseCode.FAILURE, "获取数据失败");
 		}
-		
-		return WebResponse.success("[]");
     }
 	
 }
