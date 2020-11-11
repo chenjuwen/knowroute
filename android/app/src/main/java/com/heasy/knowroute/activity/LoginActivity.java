@@ -192,7 +192,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         progressDialog = AndroidUtil.showLoadingDialog(this, "正在获取验证码");
 
         //获取验证码
-        new Thread(new Runnable() {
+        new DefaultDaemonThread() {
             @Override
             public void run() {
                 LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
@@ -203,7 +203,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                 message.obj = captcha;
                 handler.sendMessage(message);
             }
-        }).start();
+        }.start();
     }
 
 }

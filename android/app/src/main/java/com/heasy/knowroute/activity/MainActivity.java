@@ -118,26 +118,4 @@ public class MainActivity extends BaseActivity{
         logger.info("App exit");
     }
 
-    /*
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if(webViewWrapper.canGoBack()){
-                webViewWrapper.goBack();
-                return true;
-            }else {
-                if ((System.currentTimeMillis() - exitTime) > 2000) {
-                    Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
-                    exitTime = System.currentTimeMillis();
-                } else {
-                    exitApp(null);
-                }
-                return true; //此行代码很关键
-            }
-        }else{
-            return super.onKeyDown(keyCode, event);
-        }
-    }
-    */
-
 }

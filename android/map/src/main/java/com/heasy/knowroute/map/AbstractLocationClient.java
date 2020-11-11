@@ -38,7 +38,7 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
     /**
      * 接纳为轨迹点的最少间隔距离，单位为米
      */
-    private long acceptMinDistance = 5;
+    private long acceptMinDistance = 10;
 
     public AbstractLocationClient(Context context){
         this.context = context;

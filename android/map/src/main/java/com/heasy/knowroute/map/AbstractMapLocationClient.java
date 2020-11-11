@@ -15,6 +15,9 @@ import com.heasy.knowroute.map.bean.LocationBean;
  * Created by Administrator on 2020/11/6.
  */
 public abstract class AbstractMapLocationClient extends AbstractLocationClient{
+    /**
+     * 默认缩放层级
+     */
     public static final float DEFAULT_ZOOM =  17.0f;
 
     private BaiduMap baiduMap;
@@ -28,19 +31,11 @@ public abstract class AbstractMapLocationClient extends AbstractLocationClient{
         this.baiduMap = baiduMap;
     }
 
-    @Override
-    public void init() {
-        super.init();
-
-        // 开启定位图层
-        baiduMap.setMyLocationEnabled(true);
-    }
-
     public MyLocationData getLocationData(){
         if(getCurrentLocation() != null) {
             MyLocationData locationData = new MyLocationData.Builder()
                     .accuracy(getCurrentLocation().getRadius())
-                    .direction(direction)  // 方向信息，顺时针0-360
+                    .direction(getDirection())  // 方向信息，顺时针0-360
                     .longitude(getCurrentLocation().getLongitude())
                     .latitude(getCurrentLocation().getLatitude())
                     .build();
@@ -57,14 +52,18 @@ public abstract class AbstractMapLocationClient extends AbstractLocationClient{
         //首次定位
         if (isFirstLocation) {
             isFirstLocation = false;
-            MapStatus.Builder builder = new MapStatus.Builder();
-            builder.target(new LatLng(locationBean.getLatitude(), locationBean.getLongitude())).zoom(DEFAULT_ZOOM); //初始缩放
-            baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build())); //定位到指定位置
+            updateMapStatus(new LatLng(locationBean.getLatitude(), locationBean.getLongitude()));
         }
 
         if(realtimeLocation){ //实时处理定位
             handleRealtimeLocation(dbLocation, locationBean);
         }
+    }
+
+    private void updateMapStatus(LatLng targetLatLng){
+        MapStatus.Builder builder = new MapStatus.Builder();
+        builder.target(targetLatLng).zoom(DEFAULT_ZOOM); //初始缩放
+        baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build())); //定位到指定位置
     }
 
     public abstract void handleRealtimeLocation(BDLocation location, LocationBean locationBean);

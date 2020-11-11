@@ -14,6 +14,7 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.model.LatLng;
+import com.heasy.knowroute.map.AbstractMapLocationClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,22 +24,24 @@ import org.slf4j.LoggerFactory;
  */
 public class BaseMapActivity extends BaseActivity  implements SensorEventListener {
     private static final Logger logger = LoggerFactory.getLogger(BaseMapActivity.class);
-    public static final float DEFAULT_ZOOM =  17.0f;
 
     protected ProgressDialog progressDialog;
 
     // 传感器相关
     protected SensorManager mSensorManager;
     protected Double lastX = 0.0;
+    protected int direction = 0;
 
     // Map相关
     protected MapView mMapView;
     protected BaiduMap mBaiduMap;
-    protected int direction = 0;
+
+    private AbstractMapLocationClient mapLocationClient;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // 获取传感器管理服务
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }
@@ -58,7 +61,7 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
 
     protected void updateMapStatus(LatLng targetLatLng){
         MapStatus.Builder builder = new MapStatus.Builder();
-        builder.target(targetLatLng).zoom(DEFAULT_ZOOM); //初始缩放
+        builder.target(targetLatLng).zoom(AbstractMapLocationClient.DEFAULT_ZOOM); //初始缩放
         mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build())); //定位到指定位置
     }
 
@@ -70,6 +73,11 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
         double x = sensorEvent.values[SensorManager.DATA_X];
         if (Math.abs(x - lastX) > 1.0) {
             direction = (int) x;
+
+            if(mapLocationClient != null) {
+                mapLocationClient.setDirection(direction);
+                mBaiduMap.setMyLocationData(mapLocationClient.getLocationData());
+            }
         }
         lastX = x;
     }
@@ -107,12 +115,27 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
     protected void onDestroy() {
         super.onDestroy();
 
-        // 关闭定位图层
-        mBaiduMap.setMyLocationEnabled(false);
-        mBaiduMap.clear();
+        if(mapLocationClient != null){
+            mapLocationClient.destroy();
+        }
 
-        mMapView.onDestroy();
-        mMapView = null;
+        if(mBaiduMap != null) {
+            // 关闭定位图层
+            mBaiduMap.setMyLocationEnabled(false);
+            mBaiduMap.clear();
+        }
+
+        if(mMapView != null) {
+            mMapView.onDestroy();
+            mMapView = null;
+        }
     }
 
+    public AbstractMapLocationClient getMapLocationClient() {
+        return mapLocationClient;
+    }
+
+    public void setMapLocationClient(AbstractMapLocationClient mapLocationClient) {
+        this.mapLocationClient = mapLocationClient;
+    }
 }

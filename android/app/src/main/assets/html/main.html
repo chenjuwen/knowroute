@@ -145,7 +145,9 @@
 			},
 			methods: {
 				changeTabPage: function(pageURL){
+					const loading = this.$loading();
 					transferPage(pageURL);
+					loading.close();
 				},
 				viewTrack: function(userId, nickName){
 					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": userId, "nickName":nickName}), "viewTrack");
@@ -161,7 +163,7 @@
 					var obj = jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "getCurrentPosition");
 					vm.locationInfo = jQuery.parseJSON(obj);
 				}catch(e){ }
-			}, 3 * 1000);
+			}, 2 * 1000);
         }
     </script>
 </BODY>
