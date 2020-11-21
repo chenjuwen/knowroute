@@ -1,7 +1,9 @@
 #指定代码的压缩级别
 -optimizationpasses 5
+
  #优化  不优化输入的类文件
--dontoptimize
+#-dontoptimize
+
 #不做预校验
 -dontpreverify
  #混淆时是否记录日志
@@ -9,11 +11,8 @@
  # 混淆时所采用的算法
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
 
-
-
-
 #保留不混淆:注解、内部类、泛型
--keepattributes *Annotation*,InnerClasses,Signature,EnclosingMethod
+-keepattributes *Annotation*,InnerClasses,Signature,EnclosingMethod,Exceptions
 
 #抛出异常时保留代码行号
 -keepattributes SourceFile,LineNumberTable
@@ -35,17 +34,44 @@
 -keep public class * extends android.support.v4.app.Fragment
 
 #如果引用了v4或者v7包
+-keep class android.support.** {*;}
 -dontwarn android.support.**
+-keep interface android.support.** { *; }
+
+#androidx
+-keep class androidx.** {*;}
+-keep interface androidx.** {*;}
+-keep public class * extends androidx.**
+-dontwarn androidx.**
+
+#support v4/7库
+-keep public class * extends android.support.v4.**
+-keep public class * extends android.support.v7.**
+-keep public class * extends android.support.annotation.**
+
+#support design库
+-dontwarn android.support.design.**
+-keep class android.support.design.** { *; }
+-keep interface android.support.design.** { *; }
+-keep public class android.support.design.R$* { *; }
+
+-keep class com.google.android.material.** {*;}
+-dontwarn com.google.android.material.**
+-dontnote com.google.android.material.**
 
 #保持 native 方法不被混淆
 -keepclasseswithmembernames class * {
     native <methods>;
 }
 
-# 保留在Activity中的方法参数是view的方法，
-# 这样以来我们在layout中写的onClick就不会被影响
+#避免layout中onclick方法（android:onclick="onClick"）混淆
 -keepclassmembers class * extends android.app.Activity{
     public void *(android.view.View);
+}
+
+#避免回调函数 onXXEvent 混淆
+-keepclassmembers class * {
+    void *(*Event);
 }
 
 # 保留自定义View
@@ -65,7 +91,7 @@
 
 #保持 Parcelable 不被混淆
 -keepclassmembers class * implements android.os.Parcelable {
-  public static final android.os.Parcelable$Creator CREATOR;
+  public static final android.os.Parcelable$Creator *;
 }
 
 #保留R文件中的成员
@@ -102,11 +128,23 @@
 -keepclassmembers class * {
     public void *ButtonClicked(android.view.View);
 }
+-keepattributes JavascriptInterface
+
+#ButterKnife混淆配置
+-keep class butterknife.** { *; }
+-dontwarn butterknife.internal.**
+-keep class **$$ViewBinder { *; }
+-keepclasseswithmembernames class * {
+    @butterknife.* <fields>;
+}
+-keepclasseswithmembernames class * {
+    @butterknife.* <methods>;
+}
+
 
 
 
 #EventBus
-#-keepattributes *Annotation*
 -keepclassmembers class ** {
     @org.greenrobot.eventbus.Subscribe <methods>;
 }
@@ -132,11 +170,12 @@
 -keep class com.google.** {*;}
 -dontwarn com.google.**
 
--keep class okio.** {*;}
--dontwarn okio.**
-
+#OkHttp3混淆配置
 -keep class okhttp3.** {*;}
 -dontwarn okhttp3.**
+
+-keep class okio.** {*;}
+-dontwarn okio.**
 
 -keep class ch.** {*;}
 -dontwarn ch.**
@@ -146,4 +185,13 @@
 
 -keep class de.** {*;}
 -dontwarn de.**
+
+-keep class jsc.kit.** {*;}
+-dontwarn jsc.kit.**
+
+#业务代码
+#保持包及其子包下的类、方法和成员变量不被混淆
+-keep public class com.heasy.knowroute.** {
+    public *;
+}
 
