@@ -16,31 +16,31 @@
 				position: fixed;
 				bottom: 0;
 				z-index: 999;
-				background-color: #008080;
+				background-color: #2F4F4F;
 				width: 100%;
-				height: 115px;
+				height: 100px;
 				padding: 3px 0 3px 0;
 				align: center;
 				color: #FFF;
 			}
 			.divMessageContainer .phone{
 				text-align: center;
-				height: 25px;
-				font-size: 18px;
+				height: 22px;
+				font-size: 16px;
 			}
 			.divMessageContainer .address{
 				text-align: center;
-				height: 25px;
-				padding-bottom: 20px;
-				font-size: 18px;
+				height: 22px;
+				padding-bottom: 15px;
+				font-size: 16px;
 			}
 			.divMessageContainer .position{
 				width: 100%;
-				height: 25px;
+				height: 20px;
 				text-align: center;
 				vertical-align: middle;
 				color: #ccc;
-				font-size: 16px;
+				font-size: 15px;
 			}
 			
 			.show_true{
@@ -78,7 +78,7 @@
 		
     	<div class="divMessageContainer show_${address != ''}">
     		<div class="phone">${phone}</div>
-    		<div class="address">位置：${address}</div>
+    		<div class="address">${address}</div>
     		<div class="position">经度：${longitude}</div>
     		<div class="position">纬度：${latitude}</div>
     	</div>
