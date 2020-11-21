@@ -6,6 +6,7 @@ import com.heasy.knowroute.action.AbstractAction;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.activity.RouteTrackActivity;
+import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
@@ -102,8 +103,6 @@ public class LocationAction extends AbstractAction {
                             String message = "分享给您一个app，定位寻人用【知途】：http://www.knowroute.cn/knowroute/invite?mid=" + mid;
                             message += "&lng=" + longitude + "&lat=" + latitude;
 
-                            // TODO: 2020/11/19 开发环境短信发送给自己
-                            //AndroidBuiltinService.sendSMS(loginService.getPhone(), message);
                             AndroidBuiltinService.sendSMS(phone, message);
 
                             return Constants.SUCCESS;
@@ -117,6 +116,24 @@ public class LocationAction extends AbstractAction {
                 logger.error("", ex);
             }
             return "邀请失败";
+        }else if("startLocate".equalsIgnoreCase(extend)){
+            String phone = FastjsonUtil.getString(jsonObject, "phone");
+
+            String requestUrl = "user/getByPhone?phone=" + phone;
+            ResponseBean responseBean = HttpService.httpGet(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
+            if(responseBean.getCode() == ResponseCode.SUCCESS.code()) {
+                UserBean userBean = FastjsonUtil.string2JavaBean((String) responseBean.getData(), UserBean.class);
+
+                if(userBean == null){
+                    return "无此用户";
+                }
+
+                Map<String, String> params = new HashMap<>();
+                params.put("userId", String.valueOf(userBean.getId()));
+                params.put("nickName", userBean.getNickname());
+
+                startActivity(heasyContext, RouteTrackActivity.class, params);
+            }
         }
 
         return Constants.SUCCESS;

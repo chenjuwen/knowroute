@@ -87,7 +87,7 @@
 								<div v-show="showArr[2]" style="color:red;">短信已发送</div>
 								<div v-show="showArr[3]" style="color:red;">本机号</div>
 								<div v-show="showArr[4]" @click="addFriend" style="font-size:16px; color:#4169E1;">添加好友</div>
-								<div v-show="showArr[5]" @click="doLocate" style="font-size:16px; color:#4169E1;">立即定位</div>
+								<div v-show="showArr[5]" @click="startLocate" style="font-size:16px; color:#4169E1;">立即定位</div>
 							</td>
 						</tr>
 					</table>
@@ -148,8 +148,11 @@
 				addFriend: function(){
 
 				},
-				doLocate: function(){
-
+				startLocate: function(){
+					var result = jsBridge.dispatchAction("LocationAction", JSON.stringify({"phone": this.phone}), "startLocate");
+					if(result != "success"){
+						this.$toast.info(result);
+					}
 				}
 			}
 		})
