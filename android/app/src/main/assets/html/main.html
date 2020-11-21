@@ -90,7 +90,7 @@
 		<table width="100%">
 			<tr>
 				<td align="center" height="60">
-					<mt-button type="primary" size="normal" class="add-care-person">添加要关心的人</mt-button>
+					<mt-button type="primary" size="normal" class="add-care-person" @click="addFriend()">添加要关心的人</mt-button>
 				</td>
 			</tr>
 		</table>
@@ -109,7 +109,7 @@
 					<img style="position:absolute; top:-15px; left:50%; margin-left:-25;" src="images/location.png">
 					<div>&nbsp;</div>
 				</td>
-				<td width="25%" align="center" class="tabbar-item">
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('museui-test.html')">
 					<img src="images/message.jpg">
 					<div>消息</div>
 				</td>
@@ -145,12 +145,13 @@
 			},
 			methods: {
 				changeTabPage: function(pageURL){
-					const loading = this.$loading();
 					transferPage(pageURL);
-					loading.close();
 				},
 				viewTrack: function(userId, nickName){
 					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": userId, "nickName":nickName}), "viewTrack");
+				},
+				addFriend: function(){
+					transferPage("add-friend.html");
 				}
 			}
 		})

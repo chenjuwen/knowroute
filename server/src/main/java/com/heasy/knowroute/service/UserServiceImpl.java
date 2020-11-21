@@ -11,12 +11,14 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
+import com.heasy.knowroute.bean.MessageBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.StringUtil;
@@ -25,20 +27,43 @@ import com.heasy.knowroute.utils.StringUtil;
 public class UserServiceImpl extends BaseService implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
+    @Autowired
+    private MessageService messageService;
+    @Autowired
+    private FriendService friendService;
+    
 	/**
      * 登录处理：
      * 	手机号对应的用户记录不存在，则添加新用户
-     * 	返回用户记录的id值
+     * 	返回用户记录的id值，如果返回0则表示登录出错
      */
     @Override
     public int login(String phone) {
         try {
         	UserBean userBean = getUser(phone);
         	if(userBean == null) {
+        		//新用户注册
         		String inviteCode = StringUtil.getUUIDString();
         		int id = insert(phone, inviteCode);
+        		
+        		if(id > 0) {
+            		List<MessageBean> msgList = messageService.getInviteAgreeMessage(phone);
+            		//此用户为同意邀请的新用户，且多人邀请了TA
+            		if(CollectionUtils.isNotEmpty(msgList)){
+            			msgList.stream().forEach(bean -> {
+            				UserBean inviter = getUser(Integer.parseInt(bean.getSender()));
+                			if(inviter != null) {
+                    			//添加好友关系，双向的
+                    			friendService.insert(Integer.parseInt(bean.getSender()), phone);
+                    			friendService.insert(id, inviter.getPhone());
+                			}
+            			});
+            		}
+        		}
+        		
         		return id;
         	}else {
+        		//老用户更新登录时间
         		updateLastLoginDate(userBean.getId());
         	}
             
@@ -112,7 +137,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 					PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 					ps.setString(1, phone);
-					ps.setString(2, phone);
+					ps.setString(2, phone.substring(0, 7));
 					ps.setString(3, inviteCode);
 					ps.setString(4, date);
 					ps.setString(5, date);

@@ -27,13 +27,14 @@ import rx.functions.Action1;
  */
 public class AndroidBuiltinService {
     private static final Logger logger = LoggerFactory.getLogger(AndroidBuiltinService.class);
+    public static final int REQUEST_CODE__GET_CONTACT = 10001;
 
     /**
      * 发送短信
      * @param phoneNumber 手机号码
      * @param message 短信信息
      */
-    public static boolean sendSMS( String phoneNumber, String message) {
+    public static boolean sendSMS(String phoneNumber, String message) {
         try {
             SmsManager smsManager = SmsManager.getDefault();
 
@@ -48,16 +49,20 @@ public class AndroidBuiltinService {
             //sendMultipartTextMessage 发送多条短信，用户收到后合并成一条
             smsManager.sendMultipartTextMessage(phoneNumber, null, divideContents, sentIntents, null);
 
-            //sendTextMessage 发送多条短信，用户也收到多条
-            //for (String text : divideContents) {
-            //    smsManager.sendTextMessage(phoneNumber, null, text, null, null);
-            //}
-
             return true;
         }catch (Exception ex){
             logger.error("", ex);
             return false;
         }
+    }
+
+    public static void openSendSMSDialog(final HeasyContext heasyContext, String phoneNumber, String message){
+        Intent sendIntent = new Intent(Intent.ACTION_SENDTO);
+        sendIntent.setData(Uri.parse("smsto:" + phoneNumber));
+        sendIntent.putExtra("sms_body", message);
+
+        HeasyApplication heasyApplication = (HeasyApplication)heasyContext.getServiceEngine().getAndroidContext();
+        heasyApplication.getMainActivity().startActivity(sendIntent);
     }
 
     /**
@@ -74,7 +79,7 @@ public class AndroidBuiltinService {
             @Override
             public void run() {
                 RxActivity
-                    .startActivityForResult(activity, tmpIntent, 1)
+                    .startActivityForResult(activity, tmpIntent, REQUEST_CODE__GET_CONTACT)
                     .subscribe(new Action1<ActivityBackWrapper>() {
                         @Override
                         public void call(ActivityBackWrapper activityBackWrapper) {

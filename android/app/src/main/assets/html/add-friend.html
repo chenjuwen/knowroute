@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<TITLE>添加关心的人</TITLE>
+	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-toast.all.css" />
+	<link rel="stylesheet" type="text/css" href="css/material-icons.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-message.all.css" />
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
+
+	<script src="js/jquery.min-1.11.3.js"></script>
+	<script src="js/JSConstants.js"></script>
+	<script src="js/JSBridge.js"></script>
+	<script src="js/JSBridgeExt.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/vue.min.js"></script>
+	<script src="js/mint.min.js"></script>
+	<script src="js/muse-ui.js"></script>
+	<script src="js/muse-ui-toast.js"></script>
+	<script src="js/muse-ui-message.js"></script>
+
+	<style type="text/css">
+		body{
+			background-color: #eee;
+		}
+
+		.remarks{
+			background-color: #4682B4;
+			position: fixed;
+			top: 50px;
+			width: 100%;
+			color: #eee;
+			font-size: 14px;
+		}
+
+		.form-container{
+			margin-top: 170px;
+			border: 1px solid #ddd;
+			background-color: #fff;
+		}
+
+		#app{
+			overflow-y: auto;
+		}
+	</style>
+</HEAD>
+<BODY>
+	<div id="app" class="vue-mint-container">
+		<mt-header fixed title="添加关心的人">
+			<mt-button icon="back" slot="left" @click="goBack">&nbsp;</mt-button>
+		</mt-header>
+
+		<table class="remarks" border="0">
+			<tr>
+				<td colspan="2" style="padding-left:20px; font-size:20px; font-weight:bold; ">查看TA的位置</td>
+			</tr>
+			<tr>
+				<td>
+					<ul>
+						<li>查看对方位置及历史轨迹</li>
+						<li>遇到危险一键求助</li>
+						<li>时刻守护对方安全</li>
+						<li>出入特定区域提醒</li>
+					</ul>
+				</td>
+				<td align="center" width="150">
+					<img src="images/location.png" width="65" height="85" style="position:relative; top:-20px;"/>
+				</td>
+			</tr>
+		</table>
+
+		<table class="form-container" width="95%" align="center">
+			<tr>
+				<td align="left" style="padding: 0 10px 5px 10px;">
+					<table width="100%" border="0" style="border-collapse:collapse;">
+						<tr>
+							<td colspan="2" style="height:40px; font-size:16px;">通过手机号码添加</td>
+						</tr>
+						<tr>
+							<td style="background-color:#eee; padding:8px;">
+								<input type="number" size="15" maxlength="11" v-model.trim="phone" placeholder="请输入手机号码" style="font-size:13px; border:0; height:25px;"/>
+							</td>
+							<td style="background-color:#eee; padding:8px;" width="100">
+								<div v-show="showArr[0]" @click="selectContact" style="font-size:16px; color:#4169E1;">通讯录</div>
+								<div v-show="showArr[1]" @click="doInvite" style="font-size:16px; color:#4169E1;">短信邀请</div>
+								<div v-show="showArr[2]" style="color:red;">短信已发送</div>
+								<div v-show="showArr[3]" style="color:red;">本机号</div>
+								<div v-show="showArr[4]" @click="addFriend" style="font-size:16px; color:#4169E1;">添加好友</div>
+								<div v-show="showArr[5]" @click="doLocate" style="font-size:16px; color:#4169E1;">立即定位</div>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+
+		<table width="95%" align="center" style="margin-top:80px;">
+			<tr><td style="font-weight:600; font-size:15px; color:#555;">温馨提示</td></tr>
+			<tr><td style="font-size:12px; color:#888;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;此产品定位他人功能需双方下载并同意后才可正常使用，不涉及侵犯个人隐私问题</td></tr>
+		</table>
+	</div>
+
+	<script>
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				phone: "",
+
+				showArr: [true, false, false, false, false, false]
+			},
+			watch: {
+				phone: function(newValue){
+					if(this.phone.length > 11){
+						this.phone = this.phone.substring(0,11);
+					}
+
+					if(isMobile(this.phone)){
+						setTimeout(function(){
+							doFriendCheck();
+						}, 500);
+					}else{
+						this.showArr = getShowArray(0);
+					}
+				}
+			},
+			methods: {
+				goBack: function(){
+					transferPage("main.html");
+				},
+				selectContact: function(){
+					jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({}), "getContactInfo");
+				},
+				doInvite: function(){
+					this.$confirm('确定要邀请？', '提示', {
+						type: "info"
+					}).then(({ result }) => {
+						if (result) {
+						 	var result = jsBridge.dispatchAction("LocationAction", JSON.stringify({"phone": this.phone}), "invite");
+							if(result == "success"){
+								this.$toast.success('短信已成功发送');
+							}else{
+								this.$toast.error(result);
+							}
+						}
+      				});
+				},
+				addFriend: function(){
+
+				},
+				doLocate: function(){
+
+				}
+			}
+		})
+	</script>
+
+	<script type="text/javascript">
+		function getShowArray(index){
+			var newArray= [vm.showArr.length];
+			for(i=0; i<vm.showArr.length; i++){
+				if(i == index){
+					newArray[i] = true;
+				}else{
+					newArray[i] = false;
+				}
+			}
+			return newArray;
+		}
+
+		function doFriendCheck(){
+			var result = jsBridge.dispatchAction("LocationAction", JSON.stringify({"phone": vm.phone}), "checkFriend");
+
+			if("NOT_INVITED" == result){
+				vm.showArr = getShowArray(1);
+			}else if("INVITED" == result){
+				vm.showArr = getShowArray(2);
+			}else if("SELF" == result){
+				vm.showArr = getShowArray(3);
+			}else if("NOT_FRIEND" == result){
+				vm.showArr = getShowArray(4);
+			}else if("ALREADY_FRIEND" == result){
+				vm.showArr = getShowArray(5);
+			}else{
+				vm.showArr = getShowArray(0);
+			}
+		}
+
+        function pageFinishCallback(){
+
+        }
+
+        function getContactInfo_callback(userName, userNumber){
+			vm.phone = userNumber;
+        }
+    </script>
+</BODY>
+</HTML>

@@ -9,8 +9,9 @@ body {
 
 /* header */
 .mint-header {
-	background-color: #607d8b;
+	background-color: #4682B4;
 	height: 50px;
+	line-height: 2;
 }
 
 .mint-header .mint-button-text{

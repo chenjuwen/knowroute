@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import com.heasy.knowroute.common.DateJsonValueProcessor;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 
@@ -38,6 +39,10 @@ public class JsonUtil {
             value = StringUtil.trimToEmpty(jsonObject.getString(key));
         }
         return value;
+    }
+    
+    public static String object2ArrayString(Object object) {
+    	return JSONArray.fromObject(object).toString(2);
     }
 
     public static String object2String(Object object){

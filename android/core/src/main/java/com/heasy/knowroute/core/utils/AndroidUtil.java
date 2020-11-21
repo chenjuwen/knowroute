@@ -13,13 +13,25 @@ import android.widget.Toast;
  */
 public class AndroidUtil {
     public static void showToast(Context context, String msg){
-        Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+        showToast(context, msg, Toast.LENGTH_SHORT);
+    }
+
+    public static void showToast(Context context, String msg, int duration){
+        Toast toast = Toast.makeText(context, msg, duration);
         toast.setGravity(Gravity.CENTER, 0, 0); //居中显示
         toast.show();
     }
 
     public static ProgressDialog showLoadingDialog(Context context, String message){
         ProgressDialog progressDialog = new ProgressDialog(context);
+
+        //progressDialog.getWindow().getAttributes().gravity = Gravity.CENTER; //居中
+
+        //对话框宽度
+        //WindowManager.LayoutParams params = progressDialog.getWindow().getAttributes();
+        //params.width = 200;
+        //progressDialog.getWindow().setAttributes(params);
+
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER); //环形进度条
         progressDialog.setCancelable(false);
         progressDialog.setCanceledOnTouchOutside(false); //点击外部返回

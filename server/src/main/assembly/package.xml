@@ -41,5 +41,13 @@
             </includes>   
             <outputDirectory>/config</outputDirectory> 
         </fileSet>
+        
+        <fileSet>
+            <directory>download</directory>  
+            <includes>
+                <include>me.txt</include>
+            </includes>   
+            <outputDirectory>/download</outputDirectory> 
+        </fileSet>
     </fileSets>  
 </assembly>

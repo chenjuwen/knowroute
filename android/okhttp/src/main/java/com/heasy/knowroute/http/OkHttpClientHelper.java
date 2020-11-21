@@ -84,7 +84,7 @@ public class OkHttpClientHelper {
             response.close();
             
         }catch (Exception ex){
-            logger.error("synGet error: " + ex.toString());
+            logger.error("synGet error", ex);
         }
         return result;
     }
@@ -113,7 +113,7 @@ public class OkHttpClientHelper {
             result = synGet(builder.toString());
 
         }catch (Exception ex){
-            logger.error("synGet error: " + ex.toString());
+            logger.error("synGet error", ex);
         }
         return result;
     }

@@ -6,7 +6,7 @@
  */
 function newMap(_containerId, _point, _showContextMenu){
 	var map = new BMap.Map(_containerId); //创建地图实例
-	map.centerAndZoom(_point, 18); //初始化地图，设置中心点坐标和地图级别
+	map.centerAndZoom(_point, 16); //初始化地图，设置中心点坐标和地图级别
 	//map.centerAndZoom("罗定", 15);		//根据城市名定位
 	map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
 	map.enableContinuousZoom(); //启用地图惯性拖拽

@@ -1,0 +1,181 @@
+package com.heasy.knowroute.service;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Service;
+
+import com.heasy.knowroute.bean.FriendBean;
+import com.heasy.knowroute.bean.MessageBean;
+import com.heasy.knowroute.bean.UserBean;
+import com.heasy.knowroute.common.EnumConstants;
+import com.heasy.knowroute.utils.StringUtil;
+
+@Service
+public class FriendServiceImpl extends BaseService implements FriendService {
+    private static final Logger logger = LoggerFactory.getLogger(FriendServiceImpl.class);
+    
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private MessageService messageService;
+    
+    /**
+     * 检查好友的关联关系
+     * @param userId 邀请者
+     * @param phone 待邀请好友的手机号码
+     */
+	@Override
+	public String checkFriend(int userId, String phone) {
+		//无效的手机号码
+		if(!StringUtil.isMobile(phone)) {
+			return EnumConstants.FriendStatusCode.INVALID_PHONE.name();
+		}
+		
+		UserBean userBean = userService.getUser(phone);
+		
+		//不是系统用户
+		if(userBean == null) {
+			MessageBean messageBean = messageService.getMessage(String.valueOf(userId), 
+					phone, EnumConstants.MessageCategory.INVITE_FRIEND.name());
+			if(messageBean != null) {
+				return EnumConstants.FriendStatusCode.INVITED.name();
+			}else {
+				return EnumConstants.FriendStatusCode.NOT_INVITED.name();
+			}
+		}else {
+			if(userBean.getId() == userId) {
+				return EnumConstants.FriendStatusCode.SELF.name();
+			}else {
+				FriendBean friendBean = getFriend(userId, phone);
+				if(friendBean != null) {
+					return EnumConstants.FriendStatusCode.ALREADY_FRIEND.name();
+				}else {
+					return EnumConstants.FriendStatusCode.NOT_FRIEND.name();
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 获取好友信息
+	 * @param userId 邀请者
+	 * @param phone 待邀请好友的手机号码
+	 */
+	@Override
+	public FriendBean getFriend(int userId, String phone) {
+		try{
+			StringBuffer sb = new StringBuffer();
+			sb.append(" select a.id,a.user_id,a.related_user_id,b.phone,a.nickname ");
+			sb.append(" from friends a left join users b on a.related_user_id=b.id ");
+			sb.append(" where a.user_id=? and b.phone=? ");
+        	
+        	List<FriendBean> list = jdbcTemplate.query(sb.toString(), new FriendRowMapper(), userId, phone);
+        	
+        	if(!CollectionUtils.isEmpty(list)) {
+        		return list.get(0);
+        	}
+        }catch (Exception ex){
+            logger.error("", ex);
+        }
+        return null;
+	}
+	
+	@Override
+	public List<FriendBean> getFriendList(int userId) {
+		try{
+			StringBuffer sb = new StringBuffer();
+			sb.append(" select a.id,a.user_id,a.related_user_id,b.phone,a.nickname ");
+			sb.append(" from friends a left join users b on a.related_user_id=b.id ");
+			sb.append(" where a.user_id=?");
+        	
+        	List<FriendBean> list = jdbcTemplate.query(sb.toString(), new FriendRowMapper(), userId);
+        	
+        	return list;
+        	
+        }catch (Exception ex){
+            logger.error("", ex);
+        }
+        return null;
+	}
+
+	/**
+	 * 添加好友
+	 * @param userId 用户id
+	 * @param phone 好友的手机号
+	 */
+	@Override
+	public boolean insert(int userId, String phone) {
+		try{
+			String result = checkFriend(userId, phone);
+			if(EnumConstants.FriendStatusCode.NOT_FRIEND.name().equals(result)) {
+				UserBean userBean = userService.getUser(phone);
+				if(userBean != null) {
+					String sql = "insert into friends(user_id,related_user_id,nickname) values (?,?,?)";
+		        	jdbcTemplate.update(sql, userId, userBean.getId(), userBean.getNickname());
+		        	logger.debug("添加好友关系： " + userId + " >> " + phone);
+		            return true;
+				}else {
+					logger.warn("好友 " + phone + " 不在系统中");
+				}
+			}else {
+				logger.warn("insert friend status code: " + result);
+			}
+        }catch (Exception ex){
+            logger.error("", ex);
+        }
+        return false;
+	}
+
+	@Override
+	public boolean updateNickname(int id, String newNickname) {
+		try{
+        	String sql = "update friends set nickname=? where id=?";
+        	jdbcTemplate.update(sql, newNickname, id);
+            return true;
+        }catch (Exception ex){
+            logger.error("", ex);
+            return false;
+        }
+	}
+
+	@Override
+	public boolean delete(int id) {
+		try{
+        	String sql = "delete from friends where id=?";
+        	jdbcTemplate.update(sql, id);
+            return true;
+        }catch (Exception ex){
+            logger.error("", ex);
+            return false;
+        }
+	}
+
+	class FriendRowMapper implements RowMapper<FriendBean>{
+		@Override
+		public FriendBean mapRow(ResultSet rs, int rowNum) throws SQLException {
+			int id = rs.getInt("id");
+			int user_id = rs.getInt("user_id");
+			int related_user_id = rs.getInt("related_user_id");
+			String phone = rs.getString("phone");
+			String nickname = rs.getString("nickname");
+			
+			FriendBean bean = new FriendBean();
+			bean.setId(id);
+			bean.setUserId(user_id);
+			bean.setRelatedUserId(related_user_id);
+			bean.setPhone(phone);
+			bean.setNickname(nickname);
+			
+			return bean;
+		}
+	}
+	
+}

@@ -55,17 +55,6 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/label2_3"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="可省心"
-            android:textColor="@color/textColor1"
-            android:textSize="25dp"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/none4"
             android:layout_width="match_parent"
             android:layout_height="0dp"

@@ -66,11 +66,10 @@
 			
 		    var label = new BMap.Label("我在这里", {offset:new BMap.Size(20,-20)});
 		    label.setStyle({
-		    	padding:"5px",
+		    	padding:"2px",
 		    	backgroundColor:"yellow", 
-		    	color:"red", 
-		    	fontWeight:"600", 
-		    	fontSize:"14px",
+		    	color:"red",  
+		    	fontSize:"13px",
 		    	border: "1px solid #555"
 		    });
 		    

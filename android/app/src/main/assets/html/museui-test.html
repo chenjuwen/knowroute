@@ -16,27 +16,26 @@
 </HEAD>
 <BODY>
 	<div id="app">
-		Loading:
-		<mu-container>
-			<mu-button color="primary" @click="loading(1)" id="btn1">区域加载</mu-button>
-			<mu-button color="secondary" @click="loading(2)" id="btn2">全屏加载</mu-button>
-		</mu-container><br>
-
 		Toast:
 		<mu-container>
-			<mu-button class="demo-button" color="primary" @click="toast(1)">message</mu-button>
-			<mu-button class="demo-button" color="success" @click="toast(2)">success</mu-button>
-			<mu-button class="demo-button" color="info" @click="toast(3)">info</mu-button>
-			<mu-button class="demo-button" color="warning" @click="toast(4)">warning</mu-button>
-			<mu-button class="demo-button" color="error" @click="toast(5)">error</mu-button>
+			<mu-button color="primary" @click="toast(1)">message</mu-button>
+			<mu-button color="success" @click="toast(2)">success</mu-button>
+			<mu-button color="info" @click="toast(3)">info</mu-button>
+			<mu-button color="warning" @click="toast(4)">warning</mu-button>
+			<mu-button color="error" @click="toast(5)">error</mu-button>
 		</mu-container><br>
 
 		Message:
 		<mu-container>
-			<mu-button class="demo-button" color="primary" @click="alert()">Alert</mu-button>
-			<mu-button class="demo-button" color="secondary" @click="confirm()">Confirm</mu-button>
-			<mu-button class="demo-button" color="teal" @click="prompt()">Prompt</mu-button>
-		</mu-container>
+			<mu-button color="primary" @click="alert()">Alert</mu-button>
+			<mu-button color="secondary" @click="confirm()">Confirm</mu-button>
+		</mu-container><br>
+
+		Loading:
+		<mu-container>
+			<mu-button color="secondary" @click="loading(1)" id="btn1">按钮加载</mu-button>
+			<mu-button color="teal" @click="loading(2)" id="btn2">全屏加载</mu-button>
+		</mu-container><br>
 
 		<mu-avatar>
 			<img src="images/person.jpg">
@@ -47,9 +46,22 @@
 		var vm = new Vue({
 			el: '#app',
 	  		methods: {
-	  			alert: function(){
-					//this.$alert('Hello world', '提示');
+				toast: function(type){
+					if(type == 1) this.$toast.message('hello world');
+					if(type == 2) this.$toast.success('hello world');
+					if(type == 3) this.$toast.info('hello world');
+					if(type == 4) this.$toast.warning('hello world');
+					if(type == 5){
+						this.$toast.error({
+							message: "hello world",
+							close: false,
+							position: "top",
+							time: 2000
+						});
+					}
+				},
 
+	  			alert: function(){
 					this.$alert('Hello world', '提示', {
 						mode: "alert",
 						type: "success",   //success / info / error / warning
@@ -68,57 +80,28 @@
 						}
       				});
 	  			},
-	  			prompt: function(){
-					this.$prompt('请输入邮箱', '提示', {
 
-					  }).then(({ result, value }) => {
-						if (result) {
-						  this.$toast.message('你输入的邮箱：' + value);
-						} else {
-						  this.$toast.message('点击了取消');
-						}
-					  });
-	  			},
-				toast: function(type){
-					if(type == 1) this.$toast.message('hello world');
-					if(type == 2) this.$toast.success('hello world');
-					if(type == 3) this.$toast.info('hello world');
-					if(type == 4) this.$toast.warning('hello world');
-					if(type == 5){
-						this.$toast.error({
-							message: "hello world",
-							close: true,
-							position: "bottom",
-							time: 2000
-						});
-					}
-				},
 				loading: function(type){
 					var loading;
 
 					if(type == 1){
 						loading = this.$loading({
 							//text: "加载中",
-							//overlayColor: "#FFF",
+							overlayColor: "yellow",
 							color: "#6495ED",
 							target: document.getElementById("btn1"),
 							size: 15
 						});
 					}else{
-						loading = this.$loading();
+						loading = this.$loading({
+							overlayColor: "rgba(0, 0, 0, .7)"
+						});
 					}
+
       				setTimeout(function(){loading.close();}, 2000);
 				}
 	  		}
 		});
-
-		//vm.toast();
-
-		//MuseUIToast.message('hello world');
-		//MuseUIToast.success('hello world');
-		//MuseUIToast.info('hello world');
-		//MuseUIToast.warning('hello world');
-		//MuseUIToast.error('hello world');
 	</script>
 </BODY>
 </HTML>
