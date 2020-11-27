@@ -6,9 +6,14 @@ package com.heasy.knowroute.bean;
 public class FriendBean {
 	private int id;
 	private int userId;
+	
 	private int relatedUserId;
 	private String phone;
 	private String nickname;
+	private double longitude;
+	private double latitude;
+	private String address;
+	private String positionTimes;
 	
 	public int getId() {
 		return id;
@@ -48,6 +53,38 @@ public class FriendBean {
 	
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPositionTimes() {
+		return positionTimes;
+	}
+
+	public void setPositionTimes(String positionTimes) {
+		this.positionTimes = positionTimes;
 	}
 	
 }

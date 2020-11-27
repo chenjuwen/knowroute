@@ -13,6 +13,7 @@ public class UserBean {
     private Double longitude;
     private Double latitude;
     private String address;
+    private Date positionTimes;
     private String inviteCode;
     private Date createDate;
     private Date lastLoginDate;
@@ -63,6 +64,14 @@ public class UserBean {
 	
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public Date getPositionTimes() {
+		return positionTimes;
+	}
+
+	public void setPositionTimes(Date positionTimes) {
+		this.positionTimes = positionTimes;
 	}
 
 	public String getInviteCode() {

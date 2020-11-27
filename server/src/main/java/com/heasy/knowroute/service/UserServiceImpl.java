@@ -189,11 +189,12 @@ public class UserServiceImpl extends BaseService implements UserService {
      * 更新用户的位置信息
      */
     @Override
-    public boolean updatePositionInfo(int id, double longitude, double latitude, String address) {
+    public boolean updatePositionInfo(int id, double longitude, double latitude, String address, Date positionTimes) {
     	try {
     		if(StringUtil.isNotEmpty(address)) {
-		    	String sql = "update users set longitude=?,latitude=?,address=? where id=?";
-		    	int count = jdbcTemplate.update(sql, longitude, latitude, address, id);
+    			String times = DatetimeUtil.formatDate(positionTimes);
+		    	String sql = "update users set longitude=?,latitude=?,address=?,position_times=? where id=?";
+		    	int count = jdbcTemplate.update(sql, longitude, latitude, address, times, id);
 		    	return count > 0;
     		}
 		}catch(Exception ex) {
@@ -211,6 +212,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 			Double longitude = rs.getDouble("longitude");
 			Double latitude = rs.getDouble("latitude");
 			String address = rs.getString("address");
+			Date position_times = DatetimeUtil.toDate(rs.getString("position_times"));
 			String invite_code = rs.getString("invite_code");
 			Date create_date = DatetimeUtil.toDate(rs.getString("create_date"));
 			Date last_login_date = DatetimeUtil.toDate(rs.getString("last_login_date"));
@@ -222,6 +224,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 			bean.setLongitude(longitude);
 			bean.setLatitude(latitude);
 			bean.setAddress(address);
+			bean.setPositionTimes(position_times);
 			bean.setInviteCode(invite_code);
 			bean.setCreateDate(create_date);
 			bean.setLastLoginDate(last_login_date);

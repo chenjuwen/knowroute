@@ -1,5 +1,8 @@
 package com.heasy.knowroute.controller;
 
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.api.WebResponse;
+import com.heasy.knowroute.bean.FriendBean;
 import com.heasy.knowroute.service.FriendService;
 import com.heasy.knowroute.utils.JsonUtil;
+
+import net.sf.json.JSONArray;
 
 @RestController
 @RequestMapping("/friend")
@@ -30,6 +36,19 @@ public class FriendController extends BaseController{
 			logger.error("", ex);
 		}
 		return WebResponse.failure();
+	}
+	
+	@RequestMapping(value="/list", method=RequestMethod.GET)
+	public WebResponse list(@RequestParam(value="userId") Integer userId){
+		try {
+			List<FriendBean> list = friendService.getFriendList(userId);
+			if(CollectionUtils.isNotEmpty(list)) {
+				return WebResponse.success(JSONArray.fromObject(list).toString());
+			}
+		}catch(Exception ex) {
+			logger.error("", ex);
+		}
+		return WebResponse.success("[]");
 	}
 	
 }

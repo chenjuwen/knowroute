@@ -1,5 +1,7 @@
 package com.heasy.knowroute.service;
 
+import java.util.Date;
+
 import com.heasy.knowroute.bean.UserBean;
 
 /**
@@ -12,5 +14,5 @@ public interface UserService{
     int insert(String phone, String invite_code);
     boolean updateNickname(int id, String newNickname);
     boolean updateLastLoginDate(int id);
-    boolean updatePositionInfo(int id, double longitude, double latitude, String address);
+    boolean updatePositionInfo(int id, double longitude, double latitude, String address, Date positionTimes);
 }

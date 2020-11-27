@@ -12,12 +12,12 @@ public class MessageBean {
 	private String result;
 	private String sender;
 	private String receiver;
+	private Integer owner;
 	private Date createDate;
 	/**
 	 * 状态：0待处理，1已处理
 	 */
 	private int status;
-	private Integer owner;
 	
 	public int getId() {
 		return id;
@@ -66,6 +66,14 @@ public class MessageBean {
 	public void setReceiver(String receiver) {
 		this.receiver = receiver;
 	}
+
+	public Integer getOwner() {
+		return owner;
+	}
+
+	public void setOwner(Integer owner) {
+		this.owner = owner;
+	}
 	
 	public Date getCreateDate() {
 		return createDate;
@@ -81,14 +89,6 @@ public class MessageBean {
 
 	public void setStatus(int status) {
 		this.status = status;
-	}
-
-	public Integer getOwner() {
-		return owner;
-	}
-
-	public void setOwner(Integer owner) {
-		this.owner = owner;
 	}
 	
 }

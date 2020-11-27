@@ -13,7 +13,12 @@ public final class EnumConstants {
 		/**
 		 * 邀请好友
 		 */
-		INVITE_FRIEND
+		INVITE_FRIEND,
+		
+		/**
+		 * 添加好友
+		 */
+		ADD_FRIEND
 	}
 	
 	/**
@@ -41,9 +46,14 @@ public final class EnumConstants {
 		SELF,
 		
 		/**
-		 * 不是好友
+		 * 不是好友，已发送消息
 		 */
-		NOT_FRIEND,
+		NOT_FRIEND__ADDED,
+		
+		/**
+		 * 不是好友，未发送消息
+		 */
+		NOT_FRIEND__NOTADD,
 		
 		/**
 		 * 已是好友

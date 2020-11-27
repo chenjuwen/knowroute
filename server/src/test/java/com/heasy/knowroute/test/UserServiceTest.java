@@ -56,7 +56,7 @@ public class UserServiceTest {
 		if(bean != null) {
 			userService.updateNickname(bean.getId(), "张三");
 			userService.updateLastLoginDate(bean.getId());
-			userService.updatePositionInfo(bean.getId(), 1.123f, 2.456f, "address");
+			userService.updatePositionInfo(bean.getId(), 1.123f, 2.456f, "address", DatetimeUtil.nowDate());
 		}
 	}
 	

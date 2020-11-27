@@ -41,7 +41,7 @@ public class PositionController extends BaseController{
 			//更新用户的位置信息
 			userService.updatePositionInfo(positionBean.getUserId(), 
 					positionBean.getLongitude(), positionBean.getLatitude(), 
-					positionBean.getAddress());
+					positionBean.getAddress(), positionBean.getTimes());
 			
 			boolean b = positionService.insert(positionBean);
 			if(b) {

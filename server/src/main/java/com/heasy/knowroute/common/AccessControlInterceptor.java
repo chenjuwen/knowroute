@@ -20,8 +20,16 @@ public class AccessControlInterceptor extends HandlerInterceptorAdapter{
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
 			Object handler) throws Exception {
+		System.out.println("user-agent=" + request.getHeader("user-agent"));
+		
+		System.out.println("Method: " + request.getMethod());
+		System.out.println("QueryString: " + request.getQueryString());
+		System.out.println("RequestURI: " + request.getRequestURI());
+		
 		if(handler instanceof HandlerMethod){
 			HandlerMethod handlerMethod = (HandlerMethod) handler;
+			System.out.println(handlerMethod.getBeanType().getName());
+			System.out.println(handlerMethod.getMethod().getName());
 			
 			//获取方法注解
 			OnlyAdminAnnotation onlyAdminAnnotation = handlerMethod.getMethodAnnotation(OnlyAdminAnnotation.class);
