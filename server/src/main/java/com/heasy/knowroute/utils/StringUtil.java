@@ -4,6 +4,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.RandomStringUtils;
+
 public class StringUtil {
 	public static String trimToEmpty(String text){
 		if(text == null){
@@ -39,10 +41,25 @@ public class StringUtil {
 	 * 获取四位随机数
 	 */
 	public static String getFourDigitRandomNumber(){
-		return String.valueOf((int)((Math.random()*9+1)*1000));
+		return RandomStringUtils.randomNumeric(4);
 	}
 	
 //	public static void main(String[] args) {
-//		System.out.println(isMobile("13700000000"));
+//		System.out.println(RandomStringUtils.random(4, "utf-8")); //数字、小写字母、减号
+//		
+//		//纯数字
+//		System.out.println(RandomStringUtils.random(4, false, true)); 
+//		System.out.println(RandomStringUtils.randomNumeric(4));
+//		
+//		//纯字母，大小写
+//		System.out.println(RandomStringUtils.random(4, true, false)); 
+//		System.out.println(RandomStringUtils.randomAlphabetic(4));
+//		
+//		//大小写字母、数字
+//		System.out.println(RandomStringUtils.random(4, true, true)); 
+//		System.out.println(RandomStringUtils.randomAlphanumeric(4));
+//		
+//		//ascii
+//		System.out.println(RandomStringUtils.randomAscii(4));
 //	}
 }
