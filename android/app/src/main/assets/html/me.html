@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<TITLE>知途 > 我的</TITLE>
+	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-toast.all.css" />
+	<link rel="stylesheet" type="text/css" href="css/material-icons.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-loading.all.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-message.all.css" />
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
+
+	<script src="js/jquery.min-1.11.3.js"></script>
+	<script src="js/JSConstants.js"></script>
+	<script src="js/JSBridge.js"></script>
+	<script src="js/JSBridgeExt.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/vue.min.js"></script>
+	<script src="js/mint.min.js"></script>
+	<script src="js/muse-ui.js"></script>
+	<script src="js/muse-ui-toast.js"></script>
+	<script src="js/muse-ui-loading.js"></script>
+	<script src="js/muse-ui-message.js"></script>
+
+	<style type="text/css">
+
+	</style>
+</HEAD>
+<BODY>
+	<div id="app" class="vue-mint-container">
+		<mt-header fixed title="我的"></mt-header>
+
+		<div @click="exitApp" style="margin-top:10px; color:blue; text-align:center; font-weight:600;">
+			<mt-cell title="退出应用"></mt-cell>
+		</div>
+
+		<table class="tabbar" width="100%">
+			<tr>
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('main.html')">
+					<img src="images/home.jpg">
+					<div>主页</div>
+				</td>
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('contact.html')">
+					<img src="images/alert.jpg">
+					<div>紧急</div>
+				</td>
+				<td width="25%" align="center" class="tabbar-item">
+					<img style="position:absolute; top:-15px; left:50%; margin-left:-25;" src="images/location.png">
+					<div>&nbsp;</div>
+				</td>
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('messages.html')">
+					<img src="images/message.jpg">
+					<div>消息</div>
+				</td>
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('me.html')">
+					<img src="images/person.jpg">
+					<div class="tabbar-item-selected">我的</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<script>
+		var vm = new Vue({
+			el: '#app',
+			data: {
+
+			},
+			methods: {
+				changeTabPage: function(pageURL){
+					transferPage(pageURL);
+				},
+				exitApp: function(){
+					if(confirm("确定要退出应用？")){
+						jsBridge.dispatchAction(actionNames.ExitApp, "", "");
+					}
+				}
+			}
+		})
+	</script>
+
+	<script type="text/javascript">
+        function pageFinishCallback(){
+
+        }
+    </script>
+</BODY>
+</HTML>

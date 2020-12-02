@@ -53,6 +53,9 @@ public class LocationBean {
         this.time = time;
     }
 
+    /**
+     * 该字段不进行序列化
+     */
     @JSONField(serialize = false)
     public LatLng getLatLng(){
         LatLng latLng = new LatLng(this.latitude, this.longitude);

@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.CookieJar;
+import okhttp3.FormBody;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -35,7 +37,7 @@ public class OkHttpClientHelper {
         DefaultCookieJar cookieJar = new DefaultCookieJar(new MemoryCookieStore());
 
         builder.connectTimeout(DEFAULT_CONNECT_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
-        	.readTimeout(DEFAULT_READ_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
+        	    .readTimeout(DEFAULT_READ_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
                 .cookieJar(cookieJar);
     }
     
@@ -63,6 +65,16 @@ public class OkHttpClientHelper {
         builder.cookieJar(cookieJar);
         return this;
     }
+
+    public OkHttpClientHelper addInterceptor(Interceptor interceptor){
+        builder.addInterceptor(interceptor);
+        return this;
+    }
+
+    public OkHttpClientHelper addNetworkInterceptor(Interceptor interceptor){
+        builder.addNetworkInterceptor(interceptor);
+        return this;
+    }
     
     public void build(){
     	okHttpClient = builder.build();
@@ -73,63 +85,60 @@ public class OkHttpClientHelper {
      * @param url
      * @return
      */
-    public String synGet(String url){
+    public String synGet(String url)throws Exception{
     	String result = null;
+        Response response = null;
         try {
-            Request request = new Request.Builder().url(url).build();
-            Response response = okHttpClient.newCall(request).execute();
-            if(response.isSuccessful()){
-            	result = response.body().string();
+            Request request = createGetRequest(url);
+            response = okHttpClient.newCall(request).execute();
+            if (response.isSuccessful()) {
+                result = response.body().string();
             }
-            response.close();
-            
-        }catch (Exception ex){
-            logger.error("synGet error", ex);
+        }finally {
+    	    if(response != null){
+                response.close();
+            }
         }
         return result;
     }
 
-    public String synGet(String url, Map<String, String> params){
-        String result = null;
-        try {
-            StringBuilder builder = new StringBuilder(url);
-            int i = 0;
-            if(params != null && params.size() > 0){
-                builder.append("?");
-                for(String key : params.keySet()) {
-                    String value = params.get(key);
-                    if (i != 0) {
-                        builder.append('&');
-                    }
+    public String synGet(String url, Map<String, String> params)throws Exception{
+        StringBuilder sb = new StringBuilder(url);
 
-                    builder.append(key);
-                    builder.append('=');
-                    builder.append(URLEncoder.encode(value, "utf-8"));
-
-                    i++;
+        int i = 0;
+        if(params != null && params.size() > 0){
+            sb.append("?");
+            for(String key : params.keySet()) {
+                String value = params.get(key);
+                if (i != 0) {
+                    sb.append('&');
                 }
+
+                sb.append(key);
+                sb.append('=');
+                sb.append(URLEncoder.encode(value, "utf-8"));
+
+                i++;
             }
-
-            result = synGet(builder.toString());
-
-        }catch (Exception ex){
-            logger.error("synGet error", ex);
         }
-        return result;
+
+        return synGet(sb.toString());
     }
     
-    public byte[] synGetBytes(String url){
+    public byte[] synGetBytes(String url)throws Exception{
     	byte[] result = null;
-        try {
-            Request request = new Request.Builder().url(url).build();
-            Response response = okHttpClient.newCall(request).execute();
+        Response response = null;
+
+        try{
+            Request request = createGetRequest(url);
+            response = okHttpClient.newCall(request).execute();
             if(response.isSuccessful()){
-            	result = response.body().bytes();
+                result = response.body().bytes();
             }
-            response.close();
-            
-        }catch (Exception ex){
-            logger.error("synGetBytes error: " + ex.toString());
+        }finally {
+            if(response != null){
+                response.close();
+            }
         }
         return result;
     }
@@ -140,7 +149,7 @@ public class OkHttpClientHelper {
      * @param listener
      */
     public void asynGet(String url, HttpClientListener listener){
-        Request request = new Request.Builder().url(url).build();
+        Request request = createGetRequest(url);
         okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
     }
     
@@ -152,30 +161,29 @@ public class OkHttpClientHelper {
      */
     public void postJSON(String url, String jsonData, HttpClientListener listener){
 		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    	RequestBody body = RequestBody.create(JSON, jsonData);
-        Request request = new Request.Builder().url(url).post(body).build();
+    	RequestBody body = FormBody.create(JSON, jsonData);
+        Request request = createPostRequest(url, body);
         okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
     }
 
     /**
-     * 异步post
-     * @param request
-     * @param listener
+     * post
      */
-    public void post(Request request, HttpClientListener listener){
-        okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
-    }
-
     public String post(Request request)throws Exception{
-        Response response = okHttpClient.newCall(request).execute();
-        if(response.isSuccessful()){
-            String value = response.body().string();
-            response.close();
-            return value;
-        }else{
-            response.close();
-            logger.error(response.message());
-            return "";
+        Response response = null;
+        try{
+            response = okHttpClient.newCall(request).execute();
+            if(response.isSuccessful()){
+                String value = response.body().string();
+                return value;
+            }else{
+                logger.error(response.message());
+                return "";
+            }
+        }finally {
+            if(response != null){
+                response.close();
+            }
         }
     }
 
@@ -187,24 +195,29 @@ public class OkHttpClientHelper {
      * @throws Exception
      */
     public String postJSON(String url, String jsonData)throws Exception{
-		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    	RequestBody body = RequestBody.create(JSON, jsonData);
-        Request request = new Request.Builder().url(url).post(body).build();
-        Response response = okHttpClient.newCall(request).execute();
-        
-        if(response.isSuccessful()){
-            String value = response.body().string();
-            response.close();
-            return value;
-        }else{
-            response.close();
-            logger.error(response.message());
-            return "";
+        Response response = null;
+        try{
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            RequestBody body = FormBody.create(JSON, jsonData);
+            Request request = createPostRequest(url, body);
+            response = okHttpClient.newCall(request).execute();
+
+            if(response.isSuccessful()){
+                String value = response.body().string();
+                return value;
+            }else{
+                logger.error(response.message());
+                return "";
+            }
+        }finally {
+            if(response != null){
+                response.close();
+            }
         }
     }
     
     public void download(String url, final String destFilePath){
-    	Request request = new Request.Builder().url(url).build();
+    	Request request = createGetRequest(url);
     	okHttpClient.newCall(request).enqueue(new DefaultCallback(new HttpClientListener() {
 			@Override
 			public void onReponse(Response response) {
@@ -215,6 +228,15 @@ public class OkHttpClientHelper {
 				}
 			}
 		}));
+    }
+
+    private Request createPostRequest(String url, RequestBody body){
+        RequestBuilder builder = new RequestBuilder().url(url).requestBody(body);
+        return builder.build();
+    }
+
+    private Request createGetRequest(String url){
+        return new Request.Builder().url(url).build();
     }
 
 }

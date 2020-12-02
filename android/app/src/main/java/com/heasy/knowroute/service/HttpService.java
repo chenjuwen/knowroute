@@ -6,9 +6,15 @@ import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.http.OkHttpClientHelper;
+import com.heasy.knowroute.http.RequestBuilder;
+import com.heasy.knowroute.http.interceptors.GenericHeaderInterceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.util.Map;
 
 import okhttp3.Request;
 
@@ -18,13 +24,17 @@ import okhttp3.Request;
 public class HttpService {
     private static final Logger logger = LoggerFactory.getLogger(HttpService.class);
     private static OkHttpClientHelper okHttpClientHelper;
-    private  static  String apiAddress;
+    private  static  String apiRootAddress;
 
     private static OkHttpClientHelper getOkHttpClientHelper(){
         if(okHttpClientHelper == null){
             okHttpClientHelper = new OkHttpClientHelper();
-            okHttpClientHelper.build();
+
+            okHttpClientHelper
+                    .addNetworkInterceptor(new GenericHeaderInterceptor())
+                    .build();
         }
+
         return okHttpClientHelper;
     }
 
@@ -33,28 +43,39 @@ public class HttpService {
      * @param heasyContext
      * @return
      */
-    public static String getApiAddress(HeasyContext heasyContext) {
-        if(StringUtil.isEmpty(apiAddress)){
-            apiAddress = heasyContext.getServiceEngine().getConfigurationService().getConfigBean().getApiAddress();
-            logger.debug("apiAddress=" + apiAddress);
+    public static String getApiRootAddress(HeasyContext heasyContext) {
+        if(StringUtil.isEmpty(apiRootAddress)){
+            apiRootAddress = heasyContext.getServiceEngine().getConfigurationService().getConfigBean().getApiAddress();
+            logger.debug("apiRootAddress=" + apiRootAddress);
         }
-        return apiAddress;
+        return apiRootAddress;
     }
 
     public static ResponseBean httpGet(HeasyContext heasyContext, String requestUrl){
-        String result = getOkHttpClientHelper().synGet(getApiAddress(heasyContext) + requestUrl);
+        try {
+            String result = getOkHttpClientHelper().synGet(getApiRootAddress(heasyContext) + requestUrl);
 
-        if(StringUtil.isEmpty(result)){
-            return ResponseBean.failure(ResponseCode.SERVICE_CALL_ERROR);
+            if (StringUtil.isNotEmpty(result)) {
+                ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
+                logger.debug("httpGet response:" + FastjsonUtil.object2String(responseBean));
+                return responseBean;
+            }
+
+        }catch (SocketTimeoutException | SocketException ex){
+            return ResponseBean.failure(ResponseCode.NETWORK_ERROR);
+        }catch (Exception ex){
+            logger.error("", ex);
         }
-
-        ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
-        logger.debug("httpGet response:" + FastjsonUtil.object2String(responseBean));
-        return responseBean;
+        return ResponseBean.failure(ResponseCode.SERVICE_CALL_ERROR);
     }
 
-    public static ResponseBean httpPost(Request request){
+    public static ResponseBean httpPost(String url, Map<String,String> params){
         try {
+            Request request = new RequestBuilder()
+                    .url(url)
+                    .setFormParamMap(params)
+                    .build();
+
             String result = getOkHttpClientHelper().post(request);
             logger.debug("httpPost response:" + result);
 
@@ -63,6 +84,8 @@ public class HttpService {
                 return responseBean;
             }
 
+        }catch (SocketTimeoutException | SocketException ex){
+            return ResponseBean.failure(ResponseCode.NETWORK_ERROR);
         }catch (Exception ex){
             logger.error("", ex);
         }
@@ -71,7 +94,7 @@ public class HttpService {
 
     public static ResponseBean httpPost(HeasyContext heasyContext, String requestUrl, String jsonData){
         try {
-            String result = getOkHttpClientHelper().postJSON(getApiAddress(heasyContext) + requestUrl, jsonData);
+            String result = getOkHttpClientHelper().postJSON(getApiRootAddress(heasyContext) + requestUrl, jsonData);
             logger.debug("httpPost response:" + result);
 
             if(StringUtil.isNotEmpty(result)){
@@ -79,6 +102,8 @@ public class HttpService {
                 return responseBean;
             }
 
+        }catch (SocketTimeoutException | SocketException ex){
+            return ResponseBean.failure(ResponseCode.NETWORK_ERROR);
         }catch (Exception ex){
             logger.error("", ex);
         }

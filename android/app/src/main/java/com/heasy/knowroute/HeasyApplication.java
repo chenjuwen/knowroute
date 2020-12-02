@@ -7,6 +7,9 @@ import android.support.multidex.MultiDexApplication;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
+import com.heasy.knowroute.map.HeasyLocationService;
+import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.LoginServiceImpl;
 
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +18,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by Administrator on 2017/9/14.
  */
 public class HeasyApplication extends MultiDexApplication {
+    /**
+     * Android8 SDK_INT is 26
+     */
+    public static final int ANDROID8_SDK_INT = 26;
+
     private static HeasyApplication instance;
     private ConcurrentHashMap<String, Activity> activities = new ConcurrentHashMap<>();
 
@@ -50,15 +58,32 @@ public class HeasyApplication extends MultiDexApplication {
     public void exit(){
         instance = null;
 
+        try{
+            Activity activity = getMainActivity();
+            Intent serviceIntent = new Intent(activity, HeasyLocationService.class);
+            stopService(serviceIntent);
+            System.out.print("HeasyLocationService stoped!");
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
         finishAllActivity();
 
         try {
+            //清除登录信息
+            LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+            if(loginService != null){
+                loginService.cleanCache();
+            }
+
             ServiceEngineFactory.getServiceEngine().close();
+            System.out.print("ServiceEngine closed!");
         }catch (Exception ex){
             ex.printStackTrace();
         }
 
         System.exit(0);
+        System.out.print("app exit!");
     }
 
     public static HeasyApplication getInstance(){

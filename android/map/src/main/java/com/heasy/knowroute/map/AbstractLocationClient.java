@@ -1,5 +1,6 @@
 package com.heasy.knowroute.map;
 
+import android.app.Notification;
 import android.content.Context;
 
 import com.baidu.location.BDAbstractLocationListener;
@@ -67,6 +68,24 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
         option.setIgnoreKillProcess(false); ///可选，默认true，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认不杀死
         option.setNeedNewVersionRgc(true); //是否需要最新版本的地址信息
         return option;
+    }
+
+    public void enableLocInForeground(Notification notification){
+        if(mLocationClient != null) {
+            mLocationClient.enableLocInForeground(2001, notification);
+        }
+    }
+
+    public void disableLocInForeground(){
+        if(mLocationClient != null) {
+            mLocationClient.disableLocInForeground(true);
+        }
+    }
+
+    public void restart(){
+        if(mLocationClient != null) {
+            mLocationClient.restart();
+        }
     }
 
     public void destroy(){

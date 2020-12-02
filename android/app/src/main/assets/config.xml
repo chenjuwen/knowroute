@@ -16,6 +16,7 @@
 	<mainPage>main.html</mainPage>
 
 	<!-- 后端API服务地址 -->
+	<!-- www.knowroute.cn   180.215.209.100 -->
 	<apiAddress>http://www.knowroute.cn/knowroute/</apiAddress>
 
 </root>

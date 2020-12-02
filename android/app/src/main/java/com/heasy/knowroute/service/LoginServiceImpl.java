@@ -10,6 +10,7 @@ import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.service.AbstractService;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.FileUtil;
+import com.heasy.knowroute.core.utils.ParameterUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.http.RequestBuilder;
 
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Map;
 
 import okhttp3.Request;
 
@@ -75,21 +77,14 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     @Override
     public String doLogin(String phone, String captche) {
         try {
-            Request request = new RequestBuilder()
-                    .url(HttpService.getApiAddress(getHeasyContext()) + "user/login")
-                    .addFormParam("phone", phone)
-                    .addFormParam("captche", captche)
-                    .build();
-
-            ResponseBean responseBean = HttpService.httpPost(request);
+            Map<String, String> params = ParameterUtil.toParamMap("phone", phone, "captche", captche);
+            ResponseBean responseBean = HttpService.httpPost(HttpService.getApiRootAddress(getHeasyContext()) + "user/login", params);
 
             if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
                 this.userPhone = phone;
                 this.userId = FastjsonUtil.string2JSONObject((String)responseBean.getData()).getIntValue("id");
 
-                //write authority file
-                String accessFilePath = getAccessFilePath();
-                FileUtil.writeFile(this.userId + "," + this.userPhone, accessFilePath);
+                addAuthorityFile();
 
                 return Constants.SUCCESS;
             }else{
@@ -99,6 +94,11 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
             logger.error("", ex);
             return "登录出错！";
         }
+    }
+
+    private void addAuthorityFile() {
+        String accessFilePath = getAccessFilePath();
+        FileUtil.writeFile(this.userId + "," + this.userPhone, accessFilePath);
     }
 
     @Override

@@ -122,11 +122,11 @@
 					<img style="position:absolute; top:-15px; left:50%; margin-left:-25;" src="images/location.png">
 					<div>&nbsp;</div>
 				</td>
-				<td width="25%" align="center" class="tabbar-item">
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('messages.html')">
 					<img src="images/message.jpg">
 					<div>消息</div>
 				</td>
-				<td width="25%" align="center" class="tabbar-item">
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('me.html')">
 					<img src="images/person.jpg">
 					<div>我的</div>
 				</td>
@@ -219,9 +219,7 @@
 			},
 			methods: {
 				changeTabPage: function(pageURL){
-					const loading = this.$loading();
 					transferPage(pageURL);
-					loading.close();
 				},
 				addContact: function(){
 					this.contact_name = "";

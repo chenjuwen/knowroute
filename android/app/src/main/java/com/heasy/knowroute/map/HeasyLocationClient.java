@@ -100,7 +100,7 @@ public class HeasyLocationClient extends AbstractLocationClient {
                     if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
                         logger.debug("位置信息已上传：" + FastjsonUtil.object2String(locationBean));
                     }else{
-                        logger.error(HttpService.getFailureMessage(responseBean));
+                        logger.error("位置信息无法上传：" + HttpService.getFailureMessage(responseBean));
                     }
                 }catch (Exception ex){
                     logger.error("", ex);

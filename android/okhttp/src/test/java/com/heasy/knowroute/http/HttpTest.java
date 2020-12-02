@@ -66,16 +66,8 @@ public class HttpTest {
             OkHttpClientHelper okHttpClientHelper = new OkHttpClientHelper();
             okHttpClientHelper.build();
 
-            okHttpClientHelper.post(request, new HttpClientListener() {
-                @Override
-                public void onReponse(Response response) {
-                    try {
-                        System.out.println(response.body().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            String result = okHttpClientHelper.post(request);
+            System.out.println(result);
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -94,17 +86,8 @@ public class HttpTest {
         OkHttpClientHelper okHttpClientHelper = new OkHttpClientHelper();
         okHttpClientHelper.build();
 
-        okHttpClientHelper.post(request, new HttpClientListener() {
-            @Override
-            public void onReponse(Response response) {
-                try {
-                    String content = response.body().string();
-                    System.out.println(content);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        String result = okHttpClientHelper.post(request);
+        System.out.println(result);
     }
 
 }

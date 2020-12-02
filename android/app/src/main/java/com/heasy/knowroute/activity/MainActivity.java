@@ -1,10 +1,11 @@
 package com.heasy.knowroute.activity;
 
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 import com.heasy.knowroute.HeasyApplication;
 import com.heasy.knowroute.ServiceEngineFactory;
@@ -24,7 +25,6 @@ import java.util.List;
 public class MainActivity extends BaseActivity{
     private static final Logger logger = LoggerFactory.getLogger(MainActivity.class);
     private WebViewWrapper webViewWrapper;
-    private long exitTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +44,19 @@ public class MainActivity extends BaseActivity{
         if(!serviceRunning()) {
             logger.info("start HeasyLocationService...");
             Intent serviceIntent = new Intent(MainActivity.this, HeasyLocationService.class);
-            startService(serviceIntent);
+
+            if(Build.VERSION.SDK_INT >= HeasyApplication.ANDROID8_SDK_INT) {
+                doStartService(serviceIntent);
+            }else{
+                startService(serviceIntent);
+            }
         }
         logger.info("MainActivity Created");
+    }
+
+    @TargetApi(26)
+    private void doStartService(Intent serviceIntent ){
+        startForegroundService(serviceIntent);
     }
 
     /**
@@ -87,6 +97,14 @@ public class MainActivity extends BaseActivity{
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        if(HeasyLocationService.getHeasyLocationClient() != null){
+            HeasyLocationService.getHeasyLocationClient().restart();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -106,16 +124,11 @@ public class MainActivity extends BaseActivity{
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void exitApp(ExitAppEvent exitAppEvent){
-        if(exitAppEvent != null) {
-            logger.debug(exitAppEvent.getSource().getClass().getName());
-        }
-
         //finish和按back键处理过程一样：onPause、onStop、onDestory
         //finish();
-        finishAffinity();
 
-        System.exit(0);
-        logger.info("App exit");
+        HeasyApplication heasyApplication = (HeasyApplication)getApplication();
+        heasyApplication.exit();
     }
 
 }

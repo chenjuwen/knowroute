@@ -51,49 +51,47 @@
 		}
 
 		.position-info .track{
-			font-size: 14px;
-			width: 60px;
-			height: 35px;
+			font-size: 12px;
+			width: 75px;
+			height: 30px;
 		}
 
-		/** button **/
-		.add-care-person{
-			font-size: 15px;
-			width: 200px;
+		.position-info .setting {
+			font-size: 12px;
+			width: 75px;
+			height: 30px;
+			margin-top: 5px;
 		}
 	</style>
 </HEAD>
 <BODY>
 	<div id="app" class="vue-mint-container">
-		<mt-header fixed title="我关心的人"></mt-header>
+		<mt-header fixed title="我关心的人">
+			<mt-button slot="right" @click="addFriend">
+				<img src="images/add.png" width="20" height="20">
+			</mt-button>
+		</mt-header>
 
 		<div class="position-info">
-			<table width="100%" border="0">
+			<table width="100%" border="0" v-for="(item,index) in friendList" style="border-top:1px solid #eee;">
 				<tr>
 					<td rowspan="2" width="50" align="center" class="head">
 						<img src="images/head1.png" width="48" height="48" alt="头像">
 					</td>
-					<td class="nickname">&nbsp;我自己</td>
-					<td rowspan="2" width="80" align="center">
-						<mt-button type="primary" size="normal" class="track" @click="viewTrack('me','我自己')">轨迹</mt-button>
+					<td class="nickname">&nbsp;{{ item.nickname }}</td>
+					<td rowspan="3" width="80" align="center">
+						<mt-button type="primary" size="normal" class="track" @click="viewTrack(item.relatedUserId,item.nickname)">轨迹</mt-button>
+						<mt-button v-if="item.id != 0" type="primary" plain size="normal" class="setting">好友设置</mt-button>
 					</td>
 				</tr>
 				<tr>
-					<td class="times">&nbsp;{{ locationInfo.time }}</td>
+					<td class="times">&nbsp;{{ item.positionTimes }}</td>
 				</tr>
 				<tr>
-					<td colspan="3" class="address">&nbsp;{{ locationInfo.address }}</td>
+					<td colspan="2" class="address">&nbsp;{{ item.address }}</td>
 				</tr>
 			</table>
 		</div>
-
-		<table width="100%">
-			<tr>
-				<td align="center" height="60">
-					<mt-button type="primary" size="normal" class="add-care-person" @click="addFriend()">添加要关心的人</mt-button>
-				</td>
-			</tr>
-		</table>
 
 		<table class="tabbar" width="100%">
 			<tr>
@@ -109,11 +107,11 @@
 					<img style="position:absolute; top:-15px; left:50%; margin-left:-25;" src="images/location.png">
 					<div>&nbsp;</div>
 				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('museui-test.html')">
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('messages.html')">
 					<img src="images/message.jpg">
 					<div>消息</div>
 				</td>
-				<td width="25%" align="center" class="tabbar-item">
+				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('me.html')">
 					<img src="images/person.jpg">
 					<div>我的</div>
 				</td>
@@ -140,8 +138,10 @@
 		var vm = new Vue({
 			el: '#app',
 			data: {
-				//广东省云浮市罗定市大路口附近
-				locationInfo: {address:"", time:nowDate}
+				friendList: [
+					//{id:0, userId:5, relatedUserId:5, phone:"13798189352", nickname:"我自己", longitude:111.563127, latitude:22.617793, address:"广东省云浮市罗定市罗平镇大路口附近", positionTimes:"2020-10-14 14:29:35"},
+					//{id:4, userId:5, relatedUserId:10, phone:"18218324742", nickname:"1821832", longitude:111.563128, latitude:22.617794, address:"广东省云浮市罗定市大路口附近", positionTimes:"2020-10-15 14:29:35"}
+				]
 			},
 			methods: {
 				changeTabPage: function(pageURL){
@@ -159,12 +159,8 @@
 
 	<script type="text/javascript">
         function pageFinishCallback(){
-			setInterval(function(){
-				try{
-					var obj = jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "getCurrentPosition");
-					vm.locationInfo = jQuery.parseJSON(obj);
-				}catch(e){ }
-			}, 2 * 1000);
+        	var dataArr = jsBridge.dispatchAction("FriendAction", JSON.stringify({}), "getFriendList");
+			vm.friendList = jQuery.parseJSON(dataArr);
         }
     </script>
 </BODY>

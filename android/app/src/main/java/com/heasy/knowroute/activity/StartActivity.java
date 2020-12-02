@@ -42,6 +42,8 @@ public class StartActivity extends BaseActivity {
         TextView textView = (TextView) findViewById(R.id.versionRelease);
         textView.setText("版本：" + VersionUtil.getVersionName(getApplicationContext()));
 
+        logger.debug(String.valueOf(Build.VERSION.SDK_INT));
+
         handler = new Handler(){
             @Override
             public void handleMessage(Message message) {
@@ -74,7 +76,7 @@ public class StartActivity extends BaseActivity {
      */
     @TargetApi(23)
     private void checkAndRequestPermission(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT >= 23) { //Android6.0以上
             ArrayList<String> permissions = new ArrayList<String>();
 
             if(checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED){
@@ -106,6 +108,9 @@ public class StartActivity extends BaseActivity {
 
             if(checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.READ_PHONE_STATE);
+            }
+            if(checkSelfPermission(Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED){
+                permissions.add(Manifest.permission.FOREGROUND_SERVICE);
             }
             if(checkSelfPermission(Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
                 permissions.add(Manifest.permission.SEND_SMS);

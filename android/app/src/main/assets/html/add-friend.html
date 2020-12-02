@@ -84,8 +84,8 @@
 							<td style="background-color:#eee; padding:8px;" width="100">
 								<div v-show="showArr[0]" @click="selectContact" style="font-size:16px; color:#4169E1;">通讯录</div>
 								<div v-show="showArr[1]" @click="doInvite" style="font-size:16px; color:#4169E1;">短信邀请</div>
-								<div v-show="showArr[2]" style="color:red;">短信已发送</div>
-								<div v-show="showArr[3]" style="color:red;">本机号</div>
+								<div v-show="showArr[2]" style="color:black;">已发送</div>
+								<div v-show="showArr[3]" style="color:black;">本机号</div>
 								<div v-show="showArr[4]" @click="addFriend" style="font-size:16px; color:#4169E1;">添加好友</div>
 								<div v-show="showArr[5]" @click="startLocate" style="font-size:16px; color:#4169E1;">立即定位</div>
 							</td>
@@ -136,9 +136,9 @@
 						type: "info"
 					}).then(({ result }) => {
 						if (result) {
-						 	var result = jsBridge.dispatchAction("LocationAction", JSON.stringify({"phone": this.phone}), "invite");
+						 	var result = jsBridge.dispatchAction("FriendAction", JSON.stringify({"phone": this.phone}), "invite");
 							if(result == "success"){
-								this.$toast.success('短信已成功发送');
+								this.showArr = getShowArray(2);
 							}else{
 								this.$toast.error(result);
 							}
@@ -146,7 +146,18 @@
       				});
 				},
 				addFriend: function(){
-
+					this.$confirm('确定要添加为好友？', '提示', {
+						type: "info"
+					}).then(({ result }) => {
+						if (result) {
+						 	var result = jsBridge.dispatchAction("FriendAction", JSON.stringify({"phone": this.phone}), "add");
+							if(result == "success"){
+								this.showArr = getShowArray(2);
+							}else{
+								this.$toast.error(result);
+							}
+						}
+      				});
 				},
 				startLocate: function(){
 					var result = jsBridge.dispatchAction("LocationAction", JSON.stringify({"phone": this.phone}), "startLocate");
@@ -172,7 +183,7 @@
 		}
 
 		function doFriendCheck(){
-			var result = jsBridge.dispatchAction("LocationAction", JSON.stringify({"phone": vm.phone}), "checkFriend");
+			var result = jsBridge.dispatchAction("FriendAction", JSON.stringify({"phone": vm.phone}), "checkFriend");
 
 			if("NOT_INVITED" == result){
 				vm.showArr = getShowArray(1);
@@ -180,8 +191,10 @@
 				vm.showArr = getShowArray(2);
 			}else if("SELF" == result){
 				vm.showArr = getShowArray(3);
-			}else if("NOT_FRIEND" == result){
+			}else if("NOT_FRIEND__NOTADD" == result){
 				vm.showArr = getShowArray(4);
+			}else if("NOT_FRIEND__ADDED" == result){
+				vm.showArr = getShowArray(2);
 			}else if("ALREADY_FRIEND" == result){
 				vm.showArr = getShowArray(5);
 			}else{

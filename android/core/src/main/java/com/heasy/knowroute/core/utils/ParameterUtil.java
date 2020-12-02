@@ -2,6 +2,7 @@ package com.heasy.knowroute.core.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -47,6 +48,9 @@ public class ParameterUtil {
         return sb.toString();
     }
 
+    /**
+     * ParamString
+     */
     public static String toParamString(String key, String value){
         StringBuilder sb = new StringBuilder();
         sb.append(key + "=" + value);
@@ -96,6 +100,53 @@ public class ParameterUtil {
         sb.append("&" + key5 + "=" + value5);
         sb.append("&" + key6 + "=" + value6);
         return sb.toString();
+    }
+
+    /**
+     * ParamMap
+     */
+    public static Map<String, String> toParamMap(String key, String value){
+        Map<String, String> params = new HashMap<>();
+        params.put(key, value);
+        return params;
+    }
+
+    public static Map<String, String> toParamMap(String key1, String value1, String key2, String value2){
+        Map<String, String> params = new HashMap<>();
+        params.put(key1, value1);
+        params.put(key2, value2);
+        return params;
+    }
+
+    public static Map<String, String> toParamMap(String key1, String value1, String key2, String value2,
+                                                 String key3, String value3){
+        Map<String, String> params = new HashMap<>();
+        params.put(key1, value1);
+        params.put(key2, value2);
+        params.put(key3, value3);
+        return params;
+    }
+
+    public static Map<String, String> toParamMap(String key1, String value1, String key2, String value2,
+                                                 String key3, String value3, String key4, String value4){
+        Map<String, String> params = new HashMap<>();
+        params.put(key1, value1);
+        params.put(key2, value2);
+        params.put(key3, value3);
+        params.put(key4, value4);
+        return params;
+    }
+
+    public static Map<String, String> toParamMap(String key1, String value1, String key2, String value2,
+                                                 String key3, String value3, String key4, String value4,
+                                                 String key5, String value5){
+        Map<String, String> params = new HashMap<>();
+        params.put(key1, value1);
+        params.put(key2, value2);
+        params.put(key3, value3);
+        params.put(key4, value4);
+        params.put(key5, value5);
+        return params;
     }
 
 }
