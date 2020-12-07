@@ -20,6 +20,8 @@ abstract class BaseActivity extends AppCompatActivity {
      * 隐藏actionBar
      */
     protected void hideActionBar(){
-        getSupportActionBar().hide();
+		if(getSupportActionBar() != null){
+			getSupportActionBar().hide();
+		}
     }
 }
