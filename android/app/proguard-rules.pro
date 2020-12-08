@@ -153,10 +153,22 @@
     <init>(java.lang.Throwable);
 }
 
-#baiduMap
+#third jar
+-keep class com.alibaba.** {*;}
+-dontwarn com.alibaba.**
+
 -keep class com.baidu.** {*;}
--keep class mapsdkvi.com.** {*;}
 -dontwarn com.baidu.**
+-keep class mapsdkvi.com.** {*;}
+-dontwarn mapsdkvi.com.**
+
+-keep class com.example.** {*;}
+-dontwarn com.example.**
+
+-keep class com.googlecode.** {*;}
+-dontwarn com.googlecode.**
+-keep class com.google.** {*;}
+-dontwarn com.google.**
 
 -keep class rx.** {*;}
 -dontwarn rx.**
@@ -164,13 +176,6 @@
 -keep class org.** {*;}
 -dontwarn org.**
 
--keep class com.googlecode.** {*;}
--dontwarn com.googlecode.**
-
--keep class com.google.** {*;}
--dontwarn com.google.**
-
-#OkHttp3混淆配置
 -keep class okhttp3.** {*;}
 -dontwarn okhttp3.**
 
@@ -179,9 +184,6 @@
 
 -keep class ch.** {*;}
 -dontwarn ch.**
-
--keep class com.alibaba.** {*;}
--dontwarn com.alibaba.**
 
 -keep class de.** {*;}
 -dontwarn de.**

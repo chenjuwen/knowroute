@@ -5,9 +5,9 @@ import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
-import com.heasy.knowroute.http.OkHttpClientHelper;
-import com.heasy.knowroute.http.RequestBuilder;
-import com.heasy.knowroute.http.interceptors.GenericHeaderInterceptor;
+import com.heasy.knowroute.okhttp.OkHttpClientHelper;
+import com.heasy.knowroute.okhttp.RequestBuilder;
+import com.heasy.knowroute.okhttp.interceptors.GenericHeaderInterceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

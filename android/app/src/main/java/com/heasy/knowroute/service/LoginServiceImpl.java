@@ -12,7 +12,7 @@ import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.FileUtil;
 import com.heasy.knowroute.core.utils.ParameterUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
-import com.heasy.knowroute.http.RequestBuilder;
+import com.heasy.knowroute.okhttp.RequestBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

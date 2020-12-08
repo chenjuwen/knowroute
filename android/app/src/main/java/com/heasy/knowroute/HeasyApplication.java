@@ -2,6 +2,7 @@ package com.heasy.knowroute;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 

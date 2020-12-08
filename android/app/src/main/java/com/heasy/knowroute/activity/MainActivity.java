@@ -30,6 +30,8 @@ public class MainActivity extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        hideActionBar();
+
         //HeasyApplication
         HeasyApplication heasyApplication = (HeasyApplication)getApplication();
         heasyApplication.addActivity(this); //后面需要用到MainActivity
