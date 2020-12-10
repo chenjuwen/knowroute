@@ -43,7 +43,7 @@ public class ContactsAction implements Action {
                         "contactName", contact_name,
                         "contactPhone", contact_phone);
 
-                ResponseBean responseBean = HttpService.httpPost(heasyContext, url, data);
+                ResponseBean responseBean = HttpService.postJson(heasyContext, url, data);
                 if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
                     return Constants.SUCCESS;
                 }else{
@@ -70,7 +70,7 @@ public class ContactsAction implements Action {
                         "contactName", contact_name,
                         "contactPhone", contact_phone);
 
-                ResponseBean responseBean = HttpService.httpPost(heasyContext, url, data);
+                ResponseBean responseBean = HttpService.postJson(heasyContext, url, data);
                 if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
                     return Constants.SUCCESS;
                 }else{
@@ -86,7 +86,7 @@ public class ContactsAction implements Action {
                 String id = FastjsonUtil.getString(jsonObject, "id");
                 String url = "contact/delete?id=" + id;
 
-                ResponseBean responseBean = HttpService.httpGet(heasyContext, url);
+                ResponseBean responseBean = HttpService.get(heasyContext, url);
                 if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
                     return Constants.SUCCESS;
                 } else {
@@ -100,7 +100,7 @@ public class ContactsAction implements Action {
         }else if("getAll".equalsIgnoreCase(extend)){
             try {
                 String url = "contact/getAll?userId=" + loginService.getUserId();
-                ResponseBean responseBean = HttpService.httpGet(heasyContext, url);
+                ResponseBean responseBean = HttpService.get(heasyContext, url);
                 if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
                     return (String) responseBean.getData();
                 }

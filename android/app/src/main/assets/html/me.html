@@ -23,6 +23,30 @@
 	<script src="js/muse-ui-message.js"></script>
 
 	<style type="text/css">
+		.mint-cell-wrapper{
+			background-image:none;
+		}
+		.mint-cell:last-child{
+			background-image:none;
+		}
+
+		.menu-item{
+			margin-top:10px;
+			padding-left:20px;
+			border-bottom:1px solid #ddd;
+		}
+
+		.cancel-exit{
+
+		}
+
+		.cancel-exit .mu-dialog-actions button{
+			margin: 0 auto;
+  			display: block;
+			font-size: 14px;
+			background-color: #C63300;
+			color: #fff;
+		}
 
 	</style>
 </HEAD>
@@ -30,8 +54,26 @@
 	<div id="app" class="vue-mint-container">
 		<mt-header fixed title="我的"></mt-header>
 
-		<div @click="exitApp" style="margin-top:10px; color:blue; text-align:center; font-weight:600;">
-			<mt-cell title="退出应用"></mt-cell>
+		<div class="menu-item">
+			<mt-cell title="用户协议" is-link></mt-cell>
+		</div>
+
+		<div class="menu-item">
+			<mt-cell title="隐私政策" is-link></mt-cell>
+		</div>
+
+		<div class="menu-item">
+			<mt-cell title="版本更新" is-link>
+				<span style="color:#999;padding-right:20px;">{{ currentVersion }}</span>
+			</mt-cell>
+		</div>
+
+		<div @click="cancelAccount" class="menu-item">
+			<mt-cell title="永久销户" is-link></mt-cell>
+		</div>
+
+		<div @click="exitApp" style="margin-top:30px; color:blue; text-align:center; font-weight:600;">
+			<mt-cell title="退出登录"></mt-cell>
 		</div>
 
 		<table class="tabbar" width="100%">
@@ -64,16 +106,47 @@
 		var vm = new Vue({
 			el: '#app',
 			data: {
-
+				currentVersion: ""
 			},
 			methods: {
 				changeTabPage: function(pageURL){
 					transferPage(pageURL);
 				},
+				cancelAccount: function(){
+					var message = "销户会彻底删除您的会员信息、位置信息、好友信息及关联的所有信息，确认是否销户？";
+					this.$confirm(message, '销户提示', {
+						okLabel: "销户",
+						maxWidth: '80%'
+					}).then(({ result }) => {
+						if (result) {
+						  	this.$confirm("销户会删除用户所有的信息，您是否真的确认销户？", '销户再次提示', {
+
+							}).then(({ result }) => {
+								if (result) {
+									var result = jsBridge.dispatchAction("UserAction", "", "cancelAccount");
+									if(result == "success"){
+										this.$alert("您的账户已成功注销，可正常退出应用！", "温馨提示", {
+											okLabel: "退出",
+											className: "cancel-exit"
+										}).then(() => {
+											jsBridge.dispatchAction(actionNames.ExitApp, "", "");
+										});
+									}else{
+										this.$toast.error("销户失败！");
+									}
+								}
+							});
+						}
+      				});
+				},
 				exitApp: function(){
-					if(confirm("确定要退出应用？")){
-						jsBridge.dispatchAction(actionNames.ExitApp, "", "");
-					}
+					this.$confirm("确定要退出应用？", '提示', {
+
+					}).then(({ result }) => {
+						if (result) {
+							jsBridge.dispatchAction(actionNames.ExitApp, "", "");
+						}
+					});
 				}
 			}
 		})
@@ -81,7 +154,7 @@
 
 	<script type="text/javascript">
         function pageFinishCallback(){
-
+			vm.currentVersion = jsBridge.dispatchAction("VersionAction", "", "");
         }
     </script>
 </BODY>

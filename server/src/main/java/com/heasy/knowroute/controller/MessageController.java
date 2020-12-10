@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.heasy.knowroute.api.ResponseCode;
 import com.heasy.knowroute.api.WebResponse;
 import com.heasy.knowroute.bean.MessageBean;
-import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.utils.JsonUtil;
 
@@ -26,24 +24,9 @@ public class MessageController extends BaseController{
 	@RequestMapping(value="/insert", method=RequestMethod.POST)
 	public WebResponse insert(@RequestBody MessageBean messageBean){
 		try {
-			//邀请好友
-			if(EnumConstants.MessageCategory.INVITE_FRIEND.name().equals(messageBean.getCategory())) {
-				MessageBean bean = messageService.getMessage(
-						messageBean.getSender(), messageBean.getReceiver(), messageBean.getCategory());
-				//邀请信息已发送
-				if(bean != null){
-					return WebResponse.failure(ResponseCode.FAILURE, "重复邀请");
-				}else {
-					int id = messageService.insert(messageBean);
-					if(id > 0) {
-						return WebResponse.success(JsonUtil.toJSONString("id", String.valueOf(id)));
-					}
-				}
-			}else {
-				int id = messageService.insert(messageBean);
-				if(id > 0) {
-					return WebResponse.success(JsonUtil.toJSONString("id", String.valueOf(id)));
-				}
+			int id = messageService.insert(messageBean);
+			if(id > 0) {
+				return WebResponse.success(JsonUtil.toJSONString("id", String.valueOf(id)));
 			}
 		}catch(Exception ex) {
 			logger.error("", ex);

@@ -15,4 +15,5 @@ public interface UserService{
     boolean updateNickname(int id, String newNickname);
     boolean updateLastLoginDate(int id);
     boolean updatePositionInfo(int id, double longitude, double latitude, String address, Date positionTimes);
+    boolean cancelAccount(int id, String phone);
 }

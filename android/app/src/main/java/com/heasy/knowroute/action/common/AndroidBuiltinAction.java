@@ -53,7 +53,7 @@ public class AndroidBuiltinAction implements Action {
                 @Override
                 public void run() {
                     try {
-                        TimeUnit.SECONDS.sleep(10);
+                        TimeUnit.SECONDS.sleep(20);
                         dismissProgress();
                     } catch (Exception e) {
 

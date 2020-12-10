@@ -159,7 +159,10 @@
 
 	<script type="text/javascript">
         function pageFinishCallback(){
+        	jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({message:"正在加载..."}), "showProgress");
         	var dataArr = jsBridge.dispatchAction("FriendAction", JSON.stringify({}), "getFriendList");
+        	jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({}), "dismissProgress");
+
 			vm.friendList = jQuery.parseJSON(dataArr);
         }
     </script>

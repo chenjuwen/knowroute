@@ -132,19 +132,17 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 	@Override
 	public boolean insert(int userId, String phone) {
 		try{
-			String result = checkFriend(userId, phone);
-			if(EnumConstants.FriendStatusCode.NOT_FRIEND__ADDED.name().equals(result)) {
-				UserBean userBean = userService.getUser(phone);
+			FriendBean friendBean = getFriend(userId, phone);
+			if(friendBean == null) {
+				UserBean userBean = userService.getUser(phone); //好友
 				if(userBean != null) {
 					String sql = "insert into friends(user_id,related_user_id,nickname) values (?,?,?)";
 		        	jdbcTemplate.update(sql, userId, userBean.getId(), userBean.getNickname());
-		        	logger.debug("添加好友关系： " + userId + " >> " + phone);
+		        	logger.info("添加好友关系： " + userId + " >> " + phone);
 		            return true;
 				}else {
 					logger.warn("好友 " + phone + " 不在系统中");
 				}
-			}else {
-				logger.warn("insert friend status code: " + result);
 			}
         }catch (Exception ex){
             logger.error("", ex);

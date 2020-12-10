@@ -51,7 +51,7 @@ public class LocationAction extends AbstractAction {
             String phone = FastjsonUtil.getString(jsonObject, "phone");
 
             String requestUrl = "user/getByPhone?phone=" + phone;
-            ResponseBean responseBean = HttpService.httpGet(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
+            ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
             if(responseBean.getCode() == ResponseCode.SUCCESS.code()) {
                 UserBean userBean = FastjsonUtil.string2JavaBean((String) responseBean.getData(), UserBean.class);
 

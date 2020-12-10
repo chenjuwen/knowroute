@@ -6,7 +6,6 @@ import com.heasy.knowroute.action.AbstractAction;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
-import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.annotation.JSActionAnnotation;
@@ -36,7 +35,7 @@ public class FriendAction extends AbstractAction {
         if("getFriendList".equalsIgnoreCase(extend)){
             try {
                 String url = "friend/list?userId=" + loginService.getUserId();
-                ResponseBean responseBean = HttpService.httpGet(heasyContext, url);
+                ResponseBean responseBean = HttpService.get(heasyContext, url);
                 if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
                     return (String) responseBean.getData();
                 }
@@ -50,7 +49,7 @@ public class FriendAction extends AbstractAction {
                 String phone = FastjsonUtil.getString(jsonObject, "phone");
                 String url = "friend/check?userId=" + loginService.getUserId() + "&phone=" + phone;
 
-                ResponseBean responseBean = HttpService.httpGet(heasyContext, url);
+                ResponseBean responseBean = HttpService.get(heasyContext, url);
                 if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
                     JSONObject obj = FastjsonUtil.string2JSONObject((String)responseBean.getData());
                     String result = FastjsonUtil.getString(obj, "result");
@@ -68,16 +67,11 @@ public class FriendAction extends AbstractAction {
                 if(HeasyLocationService.getHeasyLocationClient() != null){
                     LocationBean locationBean = HeasyLocationService.getHeasyLocationClient().getCurrentLocation();
                     if(locationBean != null){
-                        //发送邀请好友的系统消息
-                        String requestUrl = "message/insert";
-                        String bodyData = FastjsonUtil.toJSONString(
-                                "content", "请求添加您为好友",
-                                "category", EnumConstants.MessageCategory.INVITE_FRIEND.name(),
-                                "sender", String.valueOf(loginService.getUserId()),
-                                "receiver", phone,
-                                "status", "0");
+                        String requestURL = "friend/invite";
+                        String data = FastjsonUtil.toJSONString("userId", String.valueOf(loginService.getUserId()),
+                                "phone", phone);
 
-                        ResponseBean responseBean = HttpService.httpPost(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl, bodyData);
+                        ResponseBean responseBean = HttpService.postJson(heasyContext, requestURL, data);
                         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
                             String mid = FastjsonUtil.getString(FastjsonUtil.string2JSONObject((String)responseBean.getData()), "id");
 
@@ -110,17 +104,11 @@ public class FriendAction extends AbstractAction {
                 return "用户不存在";
             }
 
-            //发送添加好友的系统消息
-            String requestUrl = "message/insert";
-            String bodyData = FastjsonUtil.toJSONString(
-                    "content", "请求添加您为好友",
-                    "category", EnumConstants.MessageCategory.ADD_FRIEND.name(),
-                    "sender", String.valueOf(loginService.getUserId()),
-                    "receiver", phone,
-                    "owner",String.valueOf(friendUserId),
-                    "status", "0");
+            String requestURL = "friend/add";
+            String data = FastjsonUtil.toJSONString("userId", String.valueOf(loginService.getUserId()),
+                    "phone", phone, "friendUserId", String.valueOf(friendUserId));
 
-            ResponseBean responseBean = HttpService.httpPost(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl, bodyData);
+            ResponseBean responseBean = HttpService.postJson(heasyContext, requestURL, data);
             if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
                 return Constants.SUCCESS;
             }else{
@@ -133,7 +121,7 @@ public class FriendAction extends AbstractAction {
 
     private int getUserId(String phone){
         String requestUrl = "user/getByPhone?phone=" + phone;
-        ResponseBean responseBean = HttpService.httpGet(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
+        ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()) {
             UserBean userBean = FastjsonUtil.string2JavaBean((String) responseBean.getData(), UserBean.class);
             return userBean.getId();

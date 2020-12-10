@@ -232,4 +232,29 @@ public class UserServiceImpl extends BaseService implements UserService {
 			return bean;
     	}
     }
+    
+    @Override
+    public boolean cancelAccount(int id, String phone) {
+    	try {
+    		String sql = "delete from contacts where user_id=?";
+    		jdbcTemplate.update(sql, id);
+    		
+    		sql = "delete from friends where user_id=? or related_user_id=?";
+    		jdbcTemplate.update(sql, id, id);
+    		
+    		sql = "delete from messages where sender=? or owner=? or receiver=?";
+    		jdbcTemplate.update(sql, id, id, phone);
+    		
+    		sql = "delete from positions where user_id=?";
+    		jdbcTemplate.update(sql, id);
+    		
+    		sql = "delete from users where id=?";
+    		jdbcTemplate.update(sql, id);
+    		
+    		return true;
+		}catch(Exception ex) {
+			logger.error("", ex);
+		}
+		return false;
+    }
 }

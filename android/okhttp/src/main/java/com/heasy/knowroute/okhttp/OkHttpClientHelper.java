@@ -28,6 +28,8 @@ public class OkHttpClientHelper {
     private static final int DEFAULT_CONNECT_TIMEOUT_MILLSECONDS = 10000;
     private static final int DEFAULT_READ_TIMEOUT_MILLSECONDS = 60000;
 
+    public static final MediaType MEDIA_TYPE_JSON =  MediaType.parse("application/json; charset=utf-8");
+
     private OkHttpClient.Builder builder;
     private OkHttpClient okHttpClient;
 
@@ -160,8 +162,7 @@ public class OkHttpClientHelper {
      * @param listener
      */
     public void postJSON(String url, String jsonData, HttpClientListener listener){
-		MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    	RequestBody body = FormBody.create(JSON, jsonData);
+    	RequestBody body = FormBody.create(MEDIA_TYPE_JSON, jsonData);
         Request request = createPostRequest(url, body);
         okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
     }
@@ -197,8 +198,7 @@ public class OkHttpClientHelper {
     public String postJSON(String url, String jsonData)throws Exception{
         Response response = null;
         try{
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-            RequestBody body = FormBody.create(JSON, jsonData);
+            RequestBody body = FormBody.create(MEDIA_TYPE_JSON, jsonData);
             Request request = createPostRequest(url, body);
             response = okHttpClient.newCall(request).execute();
 

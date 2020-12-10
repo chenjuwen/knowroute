@@ -96,7 +96,7 @@ public class HeasyLocationClient extends AbstractLocationClient {
                             "address", locationBean.getAddress(),
                             "times", locationBean.getTime());
 
-                    ResponseBean responseBean = HttpService.httpPost(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl, jsonData);
+                    ResponseBean responseBean = HttpService.postJson(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl, jsonData);
                     if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
                         logger.debug("位置信息已上传：" + FastjsonUtil.object2String(locationBean));
                     }else{

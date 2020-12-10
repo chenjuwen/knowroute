@@ -12,15 +12,12 @@ import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.FileUtil;
 import com.heasy.knowroute.core.utils.ParameterUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
-import com.heasy.knowroute.okhttp.RequestBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
-
-import okhttp3.Request;
 
 /**
  * Created by Administrator on 2020/9/26.
@@ -61,7 +58,7 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
         try {
             String requestUrl = "user/getCaptche?phone=" + phone;
 
-            ResponseBean responseBean = HttpService.httpGet(getHeasyContext(), requestUrl);
+            ResponseBean responseBean = HttpService.get(getHeasyContext(), requestUrl);
             if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
                 JSONObject obj = FastjsonUtil.string2JSONObject((String)responseBean.getData());
                 return FastjsonUtil.getString(obj, "captche");
@@ -78,7 +75,7 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     public String doLogin(String phone, String captche) {
         try {
             Map<String, String> params = ParameterUtil.toParamMap("phone", phone, "captche", captche);
-            ResponseBean responseBean = HttpService.httpPost(HttpService.getApiRootAddress(getHeasyContext()) + "user/login", params);
+            ResponseBean responseBean = HttpService.post(HttpService.getApiRootAddress(getHeasyContext()) + "user/login", params);
 
             if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
                 this.userPhone = phone;

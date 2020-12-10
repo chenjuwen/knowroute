@@ -125,7 +125,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
             @Override
             public void run() {
                 String requestUrl = "user/getById?id=" + userId;
-                ResponseBean responseBean = HttpService.httpGet(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
+                ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
                 if(responseBean.getCode() == ResponseCode.SUCCESS.code()) {
                     userBean = FastjsonUtil.string2JavaBean((String) responseBean.getData(), UserBean.class);
                     doLocate();
@@ -248,7 +248,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
                 + "&startDate=" + ParameterUtil.encodeParamValue(DatetimeUtil.formatDate(startDate, DatetimeUtil.DEFAULT_PATTERN_DT2))
                 + "&endDate=" + ParameterUtil.encodeParamValue(DatetimeUtil.formatDate(endDate, DatetimeUtil.DEFAULT_PATTERN_DT2));
 
-        ResponseBean responseBean = HttpService.httpGet(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
+        ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
             JSONArray jsonArray = FastjsonUtil.string2JSONArray((String)responseBean.getData());
 

@@ -132,7 +132,7 @@
 					jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({}), "getContactInfo");
 				},
 				doInvite: function(){
-					this.$confirm('确定要邀请？', '提示', {
+					this.$confirm('确定要邀请TA为好友？', '提示', {
 						type: "info"
 					}).then(({ result }) => {
 						if (result) {

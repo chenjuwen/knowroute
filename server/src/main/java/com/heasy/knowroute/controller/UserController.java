@@ -105,4 +105,16 @@ public class UserController extends BaseController{
 		}
 	}
 	
+	@RequestMapping(value="/cancel", method=RequestMethod.GET)
+	public WebResponse cancel(@RequestParam(value="id") Integer id){
+		UserBean bean = userService.getUser(id);
+		if(bean != null) {
+			boolean b = userService.cancelAccount(id, bean.getPhone());
+			if(b) {
+				return WebResponse.success();
+			}
+		}
+		return WebResponse.failure();
+	}
+	
 }

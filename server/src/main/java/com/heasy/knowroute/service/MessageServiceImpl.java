@@ -54,7 +54,7 @@ public class MessageServiceImpl extends BaseService implements MessageService {
 	@Override
 	public MessageBean getMessage(String sender, String receiver, String category) {
 		try{
-			String sql = "select * from messages where status=0 and sender=? and receiver=? and category=?";
+			String sql = "select * from messages where status=0 and sender=? and receiver=? and category=? order by create_date desc";
         	List<MessageBean> list = jdbcTemplate.query(sql, new MessageRowMapper(), sender, receiver, category);
         	if(!CollectionUtils.isEmpty(list)) {
         		return list.get(0);

@@ -51,7 +51,7 @@ public class HttpService {
         return apiRootAddress;
     }
 
-    public static ResponseBean httpGet(HeasyContext heasyContext, String requestUrl){
+    public static ResponseBean get(HeasyContext heasyContext, String requestUrl){
         try {
             String result = getOkHttpClientHelper().synGet(getApiRootAddress(heasyContext) + requestUrl);
 
@@ -69,7 +69,7 @@ public class HttpService {
         return ResponseBean.failure(ResponseCode.SERVICE_CALL_ERROR);
     }
 
-    public static ResponseBean httpPost(String url, Map<String,String> params){
+    public static ResponseBean post(String url, Map<String,String> params){
         try {
             Request request = new RequestBuilder()
                     .url(url)
@@ -92,7 +92,7 @@ public class HttpService {
         return ResponseBean.failure(ResponseCode.SERVICE_CALL_ERROR);
     }
 
-    public static ResponseBean httpPost(HeasyContext heasyContext, String requestUrl, String jsonData){
+    public static ResponseBean postJson(HeasyContext heasyContext, String requestUrl, String jsonData){
         try {
             String result = getOkHttpClientHelper().postJSON(getApiRootAddress(heasyContext) + requestUrl, jsonData);
             logger.debug("httpPost response:" + result);
