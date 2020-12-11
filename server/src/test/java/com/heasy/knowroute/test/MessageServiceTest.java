@@ -40,4 +40,9 @@ public class MessageServiceTest {
 		System.out.println(id);
 	}
 	
+	@Test
+	public void confirmMessage() {
+		boolean b = messageService.confirmMessage(16, "已忽略");
+		System.out.println(b);
+	}
 }

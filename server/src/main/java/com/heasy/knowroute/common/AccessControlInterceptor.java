@@ -22,11 +22,11 @@ public class AccessControlInterceptor extends HandlerInterceptorAdapter{
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
 			Object handler) throws Exception {
-		Enumeration<String> e = request.getHeaderNames();
-		while(e.hasMoreElements()) {
-			String name = e.nextElement();
-			System.out.println(name + "=" + request.getHeader(name));
-		}
+//		Enumeration<String> e = request.getHeaderNames();
+//		while(e.hasMoreElements()) {
+//			String name = e.nextElement();
+//			System.out.println(name + "=" + request.getHeader(name));
+//		}
 		
 		System.out.println("user-agent=" + request.getHeader("user-agent"));
 		

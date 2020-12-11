@@ -74,7 +74,7 @@ public class UserController extends BaseController{
 	
 	@RequestMapping(value="/getById", method=RequestMethod.GET)
 	public WebResponse getById(@RequestParam(value="id") Integer id){
-		UserBean bean = userService.getUser(id);
+		UserBean bean = userService.getUserById(id);
 		if(bean != null) {
 			String data = JsonUtil.object2String(bean);
 			return new WebResponse(ResponseCode.SUCCESS, data);
@@ -85,7 +85,7 @@ public class UserController extends BaseController{
 	
 	@RequestMapping(value="/getByPhone", method=RequestMethod.GET)
 	public WebResponse getByPhone(@RequestParam(value="phone") String phone){
-		UserBean bean = userService.getUser(phone);
+		UserBean bean = userService.getUserByPhone(phone);
 		if(bean != null) {
 			String data = JsonUtil.object2String(bean);
 			return new WebResponse(ResponseCode.SUCCESS, data);
@@ -105,9 +105,13 @@ public class UserController extends BaseController{
 		}
 	}
 	
+	/**
+	 * 注销账户
+	 * @param id 用户ID
+	 */
 	@RequestMapping(value="/cancel", method=RequestMethod.GET)
 	public WebResponse cancel(@RequestParam(value="id") Integer id){
-		UserBean bean = userService.getUser(id);
+		UserBean bean = userService.getUserById(id);
 		if(bean != null) {
 			boolean b = userService.cancelAccount(id, bean.getPhone());
 			if(b) {

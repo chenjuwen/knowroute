@@ -28,14 +28,14 @@ public class UserServiceTest {
 
 	@Test
 	public void getUser(){
-		UserBean bean = userService.getUser("13798189352");
+		UserBean bean = userService.getUserByPhone("13798189352");
 		if(bean != null) {
 			System.out.println(JSONObject.fromObject(bean).toString(2));
 		}else {
 			System.out.println("user not found");
 		}
 		
-		bean = userService.getUser(8);
+		bean = userService.getUserById(8);
 		if(bean != null) {
 			System.out.println(DatetimeUtil.formatDate(bean.getCreateDate()));
 			System.out.println(DatetimeUtil.formatDate(bean.getLastLoginDate()));
@@ -52,7 +52,7 @@ public class UserServiceTest {
 	
 	@Test
 	public void updateUser() {
-		UserBean bean = userService.getUser("13798189356");
+		UserBean bean = userService.getUserByPhone("13798189356");
 		if(bean != null) {
 			userService.updateNickname(bean.getId(), "张三");
 			userService.updateLastLoginDate(bean.getId());

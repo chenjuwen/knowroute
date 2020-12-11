@@ -40,7 +40,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 			return EnumConstants.FriendStatusCode.INVALID_PHONE.name();
 		}
 		
-		UserBean userBean = userService.getUser(phone);
+		UserBean userBean = userService.getUserByPhone(phone);
 		
 		//不是系统用户
 		if(userBean == null) {
@@ -134,7 +134,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 		try{
 			FriendBean friendBean = getFriend(userId, phone);
 			if(friendBean == null) {
-				UserBean userBean = userService.getUser(phone); //好友
+				UserBean userBean = userService.getUserByPhone(phone); //好友
 				if(userBean != null) {
 					String sql = "insert into friends(user_id,related_user_id,nickname) values (?,?,?)";
 		        	jdbcTemplate.update(sql, userId, userBean.getId(), userBean.getNickname());

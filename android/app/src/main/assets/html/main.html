@@ -23,7 +23,6 @@
 	<script src="js/muse-ui-message.js"></script>
 
 	<style type="text/css">
-		/** position-info **/
 		.position-info{
 			margin:3px;
 			padding: 3px;
@@ -159,9 +158,9 @@
 
 	<script type="text/javascript">
         function pageFinishCallback(){
-        	jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({message:"正在加载..."}), "showProgress");
+        	//jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({message:"正在加载..."}), "showProgress");
         	var dataArr = jsBridge.dispatchAction("FriendAction", JSON.stringify({}), "getFriendList");
-        	jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({}), "dismissProgress");
+        	//jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({}), "dismissProgress");
 
 			vm.friendList = jQuery.parseJSON(dataArr);
         }

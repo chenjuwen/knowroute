@@ -23,12 +23,59 @@
 	<script src="js/muse-ui-message.js"></script>
 
 	<style type="text/css">
+		.message-item{
+			border: 1px solid #ddd;
+			margin-top: 5px;
+			border-radius: 5px;
+		}
 
+		.message-item td{
+			font-size: 13px;
+			color: #666;
+			padding: 3px;
+			line-height: 25px;
+		}
+
+		.message-item .title{
+			font-weight: 600;
+		}
+
+		.message-item .action-button {
+			font-size: 13px;
+			width: 65px;
+			height: 30px;
+			margin-top: 5px;
+		}
 	</style>
 </HEAD>
 <BODY>
 	<div id="app" class="vue-mint-container">
 		<mt-header fixed title="消息"></mt-header>
+
+		<table class="message-item" align="center" width="99%" border="0" v-for="(item,index) in messageList">
+			<tr>
+				<td width="55%" class="title">{{ item.title }}</td>
+				<td width="45%">{{ item.createDate }}</td>
+			</tr>
+
+			<!-- 添加好友 -->
+			<tr v-if="item.category==='ADD_FRIEND'">
+				<td>{{ item.senderPhone }}【{{ item.senderNickname }}】</td>
+				<td align="">
+					<mt-button v-if="item.status == 1" type="default" disabled plain size="normal" class="action-button">{{ item.result }}</mt-button>
+
+					<mt-button v-if="item.status == 0" type="danger" size="normal" class="action-button" @click="confirmAddFriend(item.id, 'no')">忽略</mt-button>&nbsp;&nbsp;
+					<mt-button v-if="item.status == 0" type="primary" size="normal" class="action-button" @click="confirmAddFriend(item.id, 'yes')">同意</mt-button>
+				</td>
+			</tr>
+
+			<!-- 通用 -->
+			<tr v-if="item.category==='GENERAL'">
+				<td colspan="2">
+					{{ item.content}}
+				</td>
+			</tr>
+		</table>
 
 		<table class="tabbar" width="100%">
 			<tr>
@@ -60,11 +107,23 @@
 		var vm = new Vue({
 			el: '#app',
 			data: {
-
+				messageList: [
+					//{"owner": 12,"result": "","senderPhone": "13798189352","senderNickname": "1379818","receiver": "18318400143","sender": "5","id": 16,"category": "ADD_FRIEND","title": "请求添加您为好友", "content": "","createDate": "2020-12-10 18:13:52","status": 0},
+					//{"owner": 12,"result": "已忽略","senderPhone": "13798189353","senderNickname": "1379818","receiver": "18318400144","sender": "5","id": 17,"category": "ADD_FRIEND","title": "请求添加您为好友", "content": "","createDate": "2020-12-10 18:13:52","status": 1},
+					//{"owner": 12,"result": "","senderPhone": "13798189353","senderNickname": "1379818","receiver": "18318400144","sender": "5","id": 17,"category": "GENERAL","title": "好友提醒", "content": "18218324742到达您附近，距离您19.5米","createDate": "2020-12-10 18:13:52","status": 1}
+				]
 			},
 			methods: {
 				changeTabPage: function(pageURL){
 					transferPage(pageURL);
+				},
+				confirmAddFriend: function(id, pass){
+					var result = jsBridge.dispatchAction("FriendAction", JSON.stringify({"id": id, "pass":pass}), "confirm_add");
+					if(result == "success"){
+						transferPage("messages.html");
+					}else{
+						this.$toast.error(result);
+					}
 				}
 			}
 		})
@@ -72,7 +131,8 @@
 
 	<script type="text/javascript">
         function pageFinishCallback(){
-
+        	var dataArr = jsBridge.dispatchAction("MessageAction", JSON.stringify({}), "list");
+			vm.messageList = jQuery.parseJSON(dataArr);
         }
     </script>
 </BODY>

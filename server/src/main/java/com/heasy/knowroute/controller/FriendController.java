@@ -17,9 +17,12 @@ import com.heasy.knowroute.api.ResponseCode;
 import com.heasy.knowroute.api.WebResponse;
 import com.heasy.knowroute.bean.FriendBean;
 import com.heasy.knowroute.bean.MessageBean;
+import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.service.FriendService;
 import com.heasy.knowroute.service.MessageService;
+import com.heasy.knowroute.service.UserService;
+import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
 
@@ -35,7 +38,15 @@ public class FriendController extends BaseController{
 	
 	@Autowired
 	private MessageService messageService;
+	
+	@Autowired
+	private UserService userService;
     
+	/**
+	 *  好友状态检查
+	 * @param userId
+	 * @param phone 好友的手机号
+	 */
 	@RequestMapping(value="/check", method=RequestMethod.GET)
 	public WebResponse check(@RequestParam(value="userId") Integer userId,
 			@RequestParam(value="phone") String phone){
@@ -48,6 +59,9 @@ public class FriendController extends BaseController{
 		return WebResponse.failure();
 	}
 	
+	/**
+	 * 好友列表数据
+	 */
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public WebResponse list(@RequestParam(value="userId") Integer userId){
 		try {
@@ -61,6 +75,9 @@ public class FriendController extends BaseController{
 		return WebResponse.success("[]");
 	}
 
+	/**
+	 * 邀请好友的站内消息
+	 */
 	@RequestMapping(value="/invite", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse invite(@RequestBody Map<String,String> map) {
 		String userId = map.get("userId");
@@ -78,7 +95,7 @@ public class FriendController extends BaseController{
 		}
 
 		MessageBean bean = new MessageBean();
-		bean.setContent("请求添加您为好友");
+		bean.setTitle("邀请添加您为好友");
 		bean.setCategory(category);
 		bean.setSender(userId);
 		bean.setReceiver(phone);
@@ -92,31 +109,93 @@ public class FriendController extends BaseController{
 		return WebResponse.failure();
 	}
 	
+	/**
+	 * 添加好友的站内消息
+	 */
 	@RequestMapping(value="/add", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse add(@RequestBody Map<String,String> map) {
 		String userId = map.get("userId");
-		String phone = map.get("phone");
 		String friendUserId = map.get("friendUserId");
+		String phone = map.get("phone");
 		
-		if(StringUtil.isEmpty(userId) || StringUtil.isEmpty(phone) || StringUtil.isEmpty(friendUserId)) {
+		if(StringUtil.isEmpty(userId) || StringUtil.isEmpty(friendUserId) || StringUtil.isEmpty(phone)) {
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);
 		}
 		
 		String category = EnumConstants.MessageCategory.ADD_FRIEND.name();
 
 		MessageBean bean = new MessageBean();
-		bean.setContent("请求添加您为好友");
+		bean.setTitle("请求添加您为好友");
 		bean.setCategory(category);
 		bean.setSender(userId);
 		bean.setReceiver(phone);
 		bean.setOwner(Integer.parseInt(friendUserId));
 		bean.setStatus(0);
 		
+		UserBean userBean = userService.getUserById(Integer.parseInt(userId));
+		if(userBean != null) {
+			bean.setSenderNickname(userBean.getNickname());
+			bean.setSenderPhone(userBean.getPhone());
+		}
+		
 		int id = messageService.insert(bean);
 		if(id > 0) {
 			return WebResponse.success(JsonUtil.toJSONString("id", String.valueOf(id)));
 		}
         
+		return WebResponse.failure();
+	}
+	
+	/**
+	 * 确认是否加为好友
+	 */
+	@RequestMapping(value="/confirmAdd", method=RequestMethod.POST, consumes="application/json")
+	public WebResponse confirmAdd(@RequestBody Map<String,String> map) {
+		String id = map.get("id");
+		String pass = map.get("pass");
+		
+		if(StringUtil.isEmpty(id) || StringUtil.isEmpty(pass)) {
+			return WebResponse.failure(ResponseCode.PARAM_INVALID);
+		}
+
+		MessageBean messageBean = messageService.getMessage(Integer.parseInt(id));
+		if(messageBean != null) {
+			if(pass.equalsIgnoreCase("yes")) {
+				messageService.confirmMessage(Integer.parseInt(id), "已同意");
+				
+				//添加好友关系
+				UserBean receiverUser = userService.getUserByPhone(messageBean.getReceiver());
+				friendService.insert(Integer.parseInt(messageBean.getSender()), messageBean.getReceiver());
+				friendService.insert(receiverUser.getId(), messageBean.getSenderPhone());
+				
+				//添加站内消息
+				MessageBean bean = new MessageBean();
+				bean.setTitle("好友提醒");
+				bean.setContent(messageBean.getReceiver() + "同意了您的好友邀请");
+				bean.setCategory(EnumConstants.MessageCategory.GENERAL.name());
+				bean.setCreateDate(DatetimeUtil.nowDate());
+				bean.setOwner(new Integer(messageBean.getSender()));
+				bean.setStatus(1);
+				messageService.insert(bean);
+				
+				return WebResponse.success();
+			}else {
+				messageService.confirmMessage(Integer.parseInt(id), "已忽略");
+				
+				//添加站内消息
+				MessageBean bean = new MessageBean();
+				bean.setTitle("好友提醒");
+				bean.setContent(messageBean.getReceiver() + "拒绝了您的好友邀请");
+				bean.setCategory(EnumConstants.MessageCategory.GENERAL.name());
+				bean.setCreateDate(DatetimeUtil.nowDate());
+				bean.setOwner(new Integer(messageBean.getSender()));
+				bean.setStatus(1);
+				messageService.insert(bean);
+				
+				return WebResponse.success();
+			}
+		}
+		
 		return WebResponse.failure();
 	}
 	

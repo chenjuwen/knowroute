@@ -106,7 +106,20 @@ public class FriendAction extends AbstractAction {
 
             String requestURL = "friend/add";
             String data = FastjsonUtil.toJSONString("userId", String.valueOf(loginService.getUserId()),
-                    "phone", phone, "friendUserId", String.valueOf(friendUserId));
+                    "friendUserId", String.valueOf(friendUserId), "phone", phone);
+
+            ResponseBean responseBean = HttpService.postJson(heasyContext, requestURL, data);
+            if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
+                return Constants.SUCCESS;
+            }else{
+                return HttpService.getFailureMessage(responseBean);
+            }
+        }else if("confirm_add".equalsIgnoreCase(extend)){
+            String id = FastjsonUtil.getString(jsonObject, "id");
+            String pass = FastjsonUtil.getString(jsonObject, "pass");
+
+            String requestURL = "friend/confirmAdd";
+            String data = FastjsonUtil.toJSONString("id", id, "pass", pass);
 
             ResponseBean responseBean = HttpService.postJson(heasyContext, requestURL, data);
             if(responseBean.getCode() == ResponseCode.SUCCESS.code()){

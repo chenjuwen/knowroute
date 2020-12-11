@@ -44,6 +44,10 @@ public class JsonUtil {
     public static String object2ArrayString(Object object) {
     	return JSONArray.fromObject(object).toString(2);
     }
+    
+    public static String object2ArrayString(Object object, JsonConfig jsonConfig) {
+    	return JSONArray.fromObject(object, jsonConfig).toString(2);
+    }
 
     public static String object2String(Object object){
         return object2String(object, getJsonConfigOfDate());

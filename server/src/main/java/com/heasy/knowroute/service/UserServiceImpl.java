@@ -40,7 +40,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     @Override
     public int login(String phone) {
         try {
-        	UserBean userBean = getUser(phone);
+        	UserBean userBean = getUserByPhone(phone);
         	if(userBean == null) {
         		//新用户注册
         		String inviteCode = StringUtil.getUUIDString();
@@ -51,7 +51,7 @@ public class UserServiceImpl extends BaseService implements UserService {
             		//此用户为同意邀请的新用户，且多人邀请了TA
             		if(CollectionUtils.isNotEmpty(msgList)){
             			msgList.stream().forEach(bean -> {
-            				UserBean inviter = getUser(Integer.parseInt(bean.getSender()));
+            				UserBean inviter = getUserById(Integer.parseInt(bean.getSender()));
                 			if(inviter != null) {
                     			//添加好友关系，双向的
                     			friendService.insert(Integer.parseInt(bean.getSender()), phone);
@@ -79,7 +79,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 	 * 根据id获取用户信息
 	 */
 	@Override
-	public UserBean getUser(int id) {
+	public UserBean getUserById(int id) {
 		try {
         	String sql = "select * from users where id=?";
         	List<UserBean> list = jdbcTemplate.query(sql, new UserRowMapper(), id);
@@ -96,7 +96,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 	 * 根据手机号获取用户信息
 	 */
     @Override
-    public UserBean getUser(String phone) {
+    public UserBean getUserByPhone(String phone) {
         try {
         	String sql = "select * from users where phone=?";
         	List<UserBean> list = jdbcTemplate.query(sql, new UserRowMapper(), phone);
@@ -119,7 +119,7 @@ public class UserServiceImpl extends BaseService implements UserService {
      */
     @Override
     public int insert(String phone, String inviteCode) {
-    	UserBean bean = getUser(phone);
+    	UserBean bean = getUserByPhone(phone);
     	if(bean != null) {
     		logger.warn("用户 " + phone + " 已存在");
     		return 0;

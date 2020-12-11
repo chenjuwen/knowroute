@@ -39,7 +39,7 @@ public class MapController extends BaseController{
 		Double latitude = null;
 		String address = "";
 		
-		UserBean userBean = userService.getUser(Integer.parseInt(userId));
+		UserBean userBean = userService.getUserById(Integer.parseInt(userId));
 		if(userBean != null) {
 			if(userBean.getPhone().equals(phone)) {
 				longitude = userBean.getLongitude();
@@ -69,7 +69,7 @@ public class MapController extends BaseController{
 			@RequestParam(value="lng") double longitude, @RequestParam(value="lat") double latitude) {
 		MessageBean messageBean = messageService.getMessage(mid);
 		if(messageBean != null) {
-			UserBean userBean = userService.getUser(Integer.parseInt(messageBean.getSender()));
+			UserBean userBean = userService.getUserById(Integer.parseInt(messageBean.getSender()));
 			if(userBean != null) {
 				String senderPhone = userBean.getPhone();
 

@@ -7,10 +7,13 @@ import java.util.Date;
  */
 public class MessageBean {
 	private int id;
+	private String title;
 	private String content;
 	private String category;
 	private String result;
 	private String sender;
+	private String senderNickname;
+	private String senderPhone;
 	private String receiver;
 	private Integer owner;
 	private Date createDate;
@@ -27,6 +30,14 @@ public class MessageBean {
 		this.id = id;
 	}
 	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 	public String getContent() {
 		return content;
 	}
@@ -59,6 +70,22 @@ public class MessageBean {
 		this.sender = sender;
 	}
 	
+	public String getSenderNickname() {
+		return senderNickname;
+	}
+
+	public void setSenderNickname(String senderNickname) {
+		this.senderNickname = senderNickname;
+	}
+
+	public String getSenderPhone() {
+		return senderPhone;
+	}
+
+	public void setSenderPhone(String senderPhone) {
+		this.senderPhone = senderPhone;
+	}
+
 	public String getReceiver() {
 		return receiver;
 	}
