@@ -11,6 +11,8 @@ import com.heasy.knowroute.core.webview.Action;
 import com.heasy.knowroute.service.HttpService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
+import com.heasy.knowroute.service.VersionService;
+import com.heasy.knowroute.service.VersionServiceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ public class UserAction implements Action {
     public String execute(HeasyContext heasyContext, String jsonData, String extend) {
         JSONObject jsonObject = FastjsonUtil.string2JSONObject(jsonData);
         LoginService loginService = heasyContext.getServiceEngine().getService(LoginServiceImpl.class);
+        VersionService versionService = heasyContext.getServiceEngine().getService(VersionServiceImpl.class);
 
         if ("cancelAccount".equalsIgnoreCase(extend)){
             try {
@@ -35,6 +38,21 @@ public class UserAction implements Action {
                 logger.error("", ex);
             }
             return "销户失败";
+        }else if("my-info".equalsIgnoreCase(extend)){
+            try {
+                String currentVersion = "V" + versionService.getCurrentVersion(); //当前版本
+                String downloadURL = versionService.getLastedVersionDownloadURL(); //最新版本下载地址
+                String nickname = loginService.getNickname();
+
+                String jsonStr = FastjsonUtil.toJSONString("currentVersion", currentVersion,
+                        "downloadURL", downloadURL, "nickname", nickname);
+                logger.debug(jsonStr);
+
+                return jsonStr;
+            }catch (Exception ex){
+                logger.error("", ex);
+            }
+            return "{}";
         }
 
         return Constants.SUCCESS;

@@ -24,8 +24,10 @@ import java.util.Map;
  */
 public class LoginServiceImpl extends AbstractService implements LoginService {
     private static final Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
-    private String userPhone = "";
+
     private int userId = 0;
+    private String userPhone = "";
+    private String userNickname = "";
 
     @Override
     public void init() {
@@ -37,7 +39,8 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
                 String[] arr = text.split(",");
                 this.userId = Integer.parseInt(arr[0]);
                 this.userPhone = arr[1];
-                logger.debug("userId=" + this.userId + ", userPhone=" + this.userPhone);
+                this.userNickname = arr[2];
+                logger.debug("userId=" + this.userId + ", userPhone=" + this.userPhone + ", userNickname=" + userNickname);
             }
 
             successInit = true;
@@ -49,8 +52,9 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     @Override
     public void unInit() {
         super.unInit();
-        userPhone = "";
         userId = 0;
+        userPhone = "";
+        userNickname = "";
     }
 
     @Override
@@ -78,13 +82,19 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
             ResponseBean responseBean = HttpService.post(HttpService.getApiRootAddress(getHeasyContext()) + "user/login", params);
 
             if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
+                String data = (String)responseBean.getData();
+                this.userId = FastjsonUtil.string2JSONObject(data).getIntValue("id");
                 this.userPhone = phone;
-                this.userId = FastjsonUtil.string2JSONObject((String)responseBean.getData()).getIntValue("id");
+                this.userNickname = FastjsonUtil.string2JSONObject(data).getString("nickname");
 
                 addAuthorityFile();
 
                 return Constants.SUCCESS;
             }else{
+                this.userId = 0;
+                this.userPhone = "";
+                this.userNickname = "";
+
                 return HttpService.getFailureMessage(responseBean);
             }
         }catch(Exception ex){
@@ -95,7 +105,7 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
 
     private void addAuthorityFile() {
         String accessFilePath = getAccessFilePath();
-        FileUtil.writeFile(this.userId + "," + this.userPhone, accessFilePath);
+        FileUtil.writeFile(this.userId + "," + this.userPhone + "," + this.userNickname, accessFilePath);
     }
 
     @Override
@@ -106,6 +116,11 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     @Override
     public String getPhone() {
         return this.userPhone;
+    }
+
+    @Override
+    public String getNickname() {
+        return this.userNickname;
     }
 
     @Override

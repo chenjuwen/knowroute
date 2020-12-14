@@ -97,7 +97,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
         initViewComponents();
 
         mMapView = ((MapView) findViewById(R.id.mapView));
-        initBaiduMap();
+        initBaiduMap(null);
         initPosition();
     }
 
@@ -162,7 +162,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btnBack:
-                goback();
+                finish();
                 break;
             case R.id.txtStartDate:
                 selectStartDate();
@@ -174,10 +174,6 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
                 doViewTrack();
                 break;
         }
-    }
-
-    private void goback(){
-        finish();
     }
 
     private void selectStartDate(){

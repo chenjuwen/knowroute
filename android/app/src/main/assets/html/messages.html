@@ -25,14 +25,14 @@
 	<style type="text/css">
 		.message-item{
 			border: 1px solid #ddd;
-			margin-top: 5px;
+			margin-top: 8px;
 			border-radius: 5px;
 		}
 
 		.message-item td{
 			font-size: 13px;
 			color: #666;
-			padding: 3px;
+			padding: 1px 5px 3px 5px;
 			line-height: 25px;
 		}
 
@@ -40,10 +40,15 @@
 			font-weight: 600;
 		}
 
+		.message-item .time{
+			float: right;
+			margin-right: 5px;
+		}
+
 		.message-item .action-button {
 			font-size: 13px;
 			width: 65px;
-			height: 30px;
+			height: 25px;
 			margin-top: 5px;
 		}
 	</style>
@@ -54,20 +59,30 @@
 
 		<table class="message-item" align="center" width="99%" border="0" v-for="(item,index) in messageList">
 			<tr>
-				<td width="55%" class="title">{{ item.title }}</td>
-				<td width="45%">{{ item.createDate }}</td>
+				<td colspan="2">
+					<span class="title">{{ item.title }}</span>
+					<span class="time">{{ item.createDate }}</span>
+				</td>
 			</tr>
 
 			<!-- 添加好友 -->
 			<tr v-if="item.category==='ADD_FRIEND'">
 				<td>{{ item.senderPhone }}【{{ item.senderNickname }}】</td>
-				<td align="">
+				<td width="100" align="center">
 					<mt-button v-if="item.status == 1" type="default" disabled plain size="normal" class="action-button">{{ item.result }}</mt-button>
 
-					<mt-button v-if="item.status == 0" type="danger" size="normal" class="action-button" @click="confirmAddFriend(item.id, 'no')">忽略</mt-button>&nbsp;&nbsp;
+					<mt-button v-if="item.status == 0" type="danger" size="normal" class="action-button" @click="confirmAddFriend(item.id, 'no')">忽略</mt-button>&nbsp;<br>
 					<mt-button v-if="item.status == 0" type="primary" size="normal" class="action-button" @click="confirmAddFriend(item.id, 'yes')">同意</mt-button>
 				</td>
 			</tr>
+
+            <!-- 紧急求助 -->
+            <tr v-if="item.category==='SEEK_HELP'">
+                <td style="color:red; font-weight:600;">{{ item.content }}</td>
+                <td width="100" align="center">
+                    <mt-button type="primary" size="normal" class="action-button" @click="helpMap(item.sender)">详情</mt-button>
+                </td>
+            </tr>
 
 			<!-- 通用 -->
 			<tr v-if="item.category==='GENERAL'">
@@ -110,7 +125,7 @@
 				messageList: [
 					//{"owner": 12,"result": "","senderPhone": "13798189352","senderNickname": "1379818","receiver": "18318400143","sender": "5","id": 16,"category": "ADD_FRIEND","title": "请求添加您为好友", "content": "","createDate": "2020-12-10 18:13:52","status": 0},
 					//{"owner": 12,"result": "已忽略","senderPhone": "13798189353","senderNickname": "1379818","receiver": "18318400144","sender": "5","id": 17,"category": "ADD_FRIEND","title": "请求添加您为好友", "content": "","createDate": "2020-12-10 18:13:52","status": 1},
-					//{"owner": 12,"result": "","senderPhone": "13798189353","senderNickname": "1379818","receiver": "18318400144","sender": "5","id": 17,"category": "GENERAL","title": "好友提醒", "content": "18218324742到达您附近，距离您19.5米","createDate": "2020-12-10 18:13:52","status": 1}
+					//{"owner": 12,"result": "","senderPhone": "13798189353","senderNickname": "1379818","receiver": "18318400144","sender": "5","id": 17,"category": "SEEK_HELP","title": "好友提醒", "content": "您的朋友13798189352向您发起了紧急求助，点击详情查看TA的位置","createDate": "2020-12-10 18:13:52","status": 1}
 				]
 			},
 			methods: {
@@ -124,6 +139,9 @@
 					}else{
 						this.$toast.error(result);
 					}
+				},
+				helpMap: function(userId){
+					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": userId}), "helpMap");
 				}
 			}
 		})

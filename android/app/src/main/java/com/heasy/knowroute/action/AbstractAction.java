@@ -3,7 +3,6 @@ package com.heasy.knowroute.action;
 import android.app.Activity;
 import android.content.Intent;
 
-import com.heasy.knowroute.DatetimeActivity;
 import com.heasy.knowroute.HeasyApplication;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.webview.Action;
@@ -28,7 +27,7 @@ public abstract class AbstractAction implements Action{
      * 打开Activity
      * @param heasyContext
      * @param targetActivityClass
-     * @param params
+     * @param params 参数
      */
     protected void startActivity(HeasyContext heasyContext, Class targetActivityClass, Map<String, String> params){
         HeasyApplication application = (HeasyApplication)heasyContext.getServiceEngine().getAndroidContext();

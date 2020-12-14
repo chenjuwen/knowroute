@@ -141,8 +141,12 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
             //两点间隔一定距离才处理
             //计算两点之间的距离，单位为 米
             long distance = new Double(DistanceUtil.getDistance(getCurrentLocation().getLatLng(), locationBean.getLatLng())).longValue();
-            if(distance >= acceptMinDistance){
+
+            if(distance > 0) {
                 logger.debug("distance=" + distance);
+            }
+
+            if(distance >= acceptMinDistance){
                 setCurrentLocation(locationBean);
                 handleReceiveLocation(dbLocation, locationBean);
             }

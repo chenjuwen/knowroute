@@ -4,6 +4,7 @@ import com.heasy.knowroute.action.ActionScanner;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.configuration.AbstractComponentScanner;
 import com.heasy.knowroute.core.webview.DefaultActionDispatcher;
+import com.heasy.knowroute.core.webview.DefaultDownloadListener;
 import com.heasy.knowroute.core.webview.DefaultWebChromeClient;
 import com.heasy.knowroute.core.webview.DefaultWebViewClient;
 import com.heasy.knowroute.core.webview.JSInterfaceImpl;
@@ -51,6 +52,7 @@ public class WebViewWrapperFactory {
         webViewWrapper = new WebViewWrapper.Builder(app.getMainActivity())
                 .setWebViewClient(webViewClient)
                 .setWebChromeClient(new DefaultWebChromeClient(app.getMainActivity()))
+                .setDownloadListener(new DefaultDownloadListener(app.getMainActivity()))
                 .setJSInterface(jsInterface)
                 .setHtmlBasePath(htmlLoadBasePath)
                 .build();

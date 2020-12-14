@@ -121,7 +121,19 @@ public class ContactsAction implements Action {
                     String[] arr = phones.split(",");
                     for (int i = 0; i < arr.length; i++) {
                         String phone = arr[i];
+
+                        //短信通知
                         AndroidBuiltinService.sendSMS(phone, message);
+
+                        try {
+                            //站内信通知
+                            String requestURL = "contact/notify";
+                            String data = FastjsonUtil.toJSONString("userId", String.valueOf(loginService.getUserId()),
+                                    "helpPhone", loginService.getPhone(), "friendPhone", phone);
+                            HttpService.postJson(heasyContext, requestURL, data);
+                        }catch (Exception ex){
+
+                        }
                     }
                     return Constants.SUCCESS;
                 } else {

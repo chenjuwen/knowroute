@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.baidu.mapapi.map.BaiduMap;
+import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
@@ -46,7 +47,9 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }
 
-    protected void initBaiduMap() {
+    protected void initBaiduMap(BitmapDescriptor locationIcon) {
+        mMapView.showZoomControls(false); //缩放按钮
+
         // 地图初始化
         mBaiduMap = mMapView.getMap();
 
@@ -55,7 +58,7 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
 
         //定位模式为普通LocationMode.NORMAL、默认图标
         MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(
-                MyLocationConfiguration.LocationMode.NORMAL, true, null);
+                MyLocationConfiguration.LocationMode.NORMAL, true, locationIcon);
         mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
     }
 

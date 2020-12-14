@@ -5,12 +5,14 @@ import com.heasy.knowroute.ServiceEngineFactory;
 import com.heasy.knowroute.action.AbstractAction;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
+import com.heasy.knowroute.activity.HelpMapActivity;
 import com.heasy.knowroute.activity.RouteTrackActivity;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.annotation.JSActionAnnotation;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
+import com.heasy.knowroute.core.utils.ParameterUtil;
 import com.heasy.knowroute.service.HttpService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
@@ -65,6 +67,9 @@ public class LocationAction extends AbstractAction {
 
                 startActivity(heasyContext, RouteTrackActivity.class, params);
             }
+        }else if("helpMap".equalsIgnoreCase(extend)){
+            String userId = FastjsonUtil.getString(jsonObject, "userId");
+            startActivity(heasyContext, HelpMapActivity.class, ParameterUtil.toParamMap("userId", userId));
         }
 
         return Constants.SUCCESS;

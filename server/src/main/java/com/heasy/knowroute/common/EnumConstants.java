@@ -18,7 +18,12 @@ public final class EnumConstants {
 		/**
 		 * 添加好友
 		 */
-		ADD_FRIEND
+		ADD_FRIEND,
+		
+		/**
+		 * 紧急求助
+		 */
+		SEEK_HELP
 	}
 	
 	/**

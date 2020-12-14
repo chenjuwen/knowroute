@@ -3,6 +3,7 @@ package com.heasy.knowroute.core.webview;
 import android.content.Context;
 import android.os.Build;
 import android.view.View;
+import android.webkit.DownloadListener;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -133,6 +134,11 @@ public class WebViewWrapper {
 
         public Builder setWebChromeClient(WebChromeClient webChromeClient){
             webView.setWebChromeClient(webChromeClient);
+            return this;
+        }
+
+        public Builder setDownloadListener(DownloadListener downloadListener){
+            webView.setDownloadListener(downloadListener);
             return this;
         }
 

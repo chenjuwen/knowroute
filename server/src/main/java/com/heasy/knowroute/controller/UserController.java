@@ -1,10 +1,13 @@
 package com.heasy.knowroute.controller;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,7 +69,9 @@ public class UserController extends BaseController{
 		int id = userService.login(phone);
 		if(id > 0) {
 			captcheService.delete(phone);
-			return WebResponse.success(JsonUtil.toJSONString("id", String.valueOf(id)));
+			UserBean newUser = userService.getUserById(id);
+			String data = JsonUtil.toJSONString("id", String.valueOf(id), "nickname", newUser.getNickname());
+			return WebResponse.success(data);
 		}else {
 			return WebResponse.failure(ResponseCode.LOGIN_ERROR);
 		}
@@ -94,10 +99,12 @@ public class UserController extends BaseController{
 		}
 	}
 	
-	@RequestMapping(value="/updateNickname", method=RequestMethod.GET)
-	public WebResponse updateNickname(@RequestParam(value="userId") int userId, 
-			@RequestParam(value="newNickname") String newNickname){
-		boolean b = userService.updateNickname(userId, newNickname);
+	@RequestMapping(value="/updateNickname", method=RequestMethod.POST, consumes="application/json")
+	public WebResponse updateNickname(@RequestBody Map<String,String> map){
+		String userId = map.get("userId");
+		String newNickname = map.get("newNickname");
+		
+		boolean b = userService.updateNickname(Integer.parseInt(userId), newNickname);
 		if(b) {
 			return WebResponse.success();
 		}else {

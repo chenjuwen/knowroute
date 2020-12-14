@@ -43,7 +43,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         	UserBean userBean = getUserByPhone(phone);
         	if(userBean == null) {
         		//新用户注册
-        		String inviteCode = StringUtil.getUUIDString();
+        		String inviteCode = StringUtil.getUUIDString(); //邀请码
         		int id = insert(phone, inviteCode);
         		
         		if(id > 0) {
@@ -137,7 +137,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 				public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
 					PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 					ps.setString(1, phone);
-					ps.setString(2, phone.substring(0, 7));
+					ps.setString(2, phone.substring(0, 3) + "****" + phone.substring(7));
 					ps.setString(3, inviteCode);
 					ps.setString(4, date);
 					ps.setString(5, date);

@@ -10,29 +10,13 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-    <!-- Android9使用前台服务的权限 -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
-    <!-- 发送短信 -->
-    <uses-permission android:name="android.permission.SEND_SMS" />
-    <!-- 读通讯录 -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-
-    <!-- 定位 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- Android9使用前台服务的权限 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- 发送短信 -->
+    <uses-permission android:name="android.permission.SEND_SMS" /> <!-- 读通讯录 -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" /> <!-- 定位 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
-    <!--
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-
-
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.camera.autofocus" />
-    -->
     <application
         android:name=".HeasyApplication"
         android:allowBackup="true"
@@ -44,16 +28,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:theme">
+        <activity android:name=".activity.HelpMapActivity"></activity>
+
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="KgOrbWK9B03DoNBsLKaYPz9uWpXGpXv3" />
-
-        <!-- hardwareAccelerated: 在webview下用video播放视频，需要开启硬件加速 -->
+            android:value="KgOrbWK9B03DoNBsLKaYPz9uWpXGpXv3" /> <!-- hardwareAccelerated: 在webview下用video播放视频，需要开启硬件加速 -->
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask" />
         <activity
             android:name=".activity.StartActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
@@ -71,9 +55,7 @@
 
         <receiver
             android:name=".map.NotificationReceiver"
-            android:process=":push" />
-
-        <!-- Service -->
+            android:process=":push" /> <!-- Service -->
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
@@ -84,7 +66,7 @@
             android:exported="false" />
 
         <activity android:name=".activity.RouteTrackActivity" />
-        <activity android:name=".DatetimeActivity"></activity>
+        <activity android:name=".activity.DatetimeActivity" />
     </application>
 
 </manifest>

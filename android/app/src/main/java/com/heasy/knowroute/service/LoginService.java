@@ -10,6 +10,7 @@ public interface LoginService extends Service{
     String doLogin(String phone, String captche);
     int getUserId();
     String getPhone();
+    String getNickname();
     boolean isLogin();
     boolean cleanCache();
 }

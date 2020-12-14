@@ -48,11 +48,43 @@
 			color: #fff;
 		}
 
+		.me-info{
+			background-color: #4682B4;
+		}
+
+		.me-info .nickname{
+		    color: white;
+		}
+
+        .me-info .edit-button{
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-left: 15px;
+        }
+
+		.mu-avatar img{
+		    width: 48px;
+		    height: 48px;
+		}
 	</style>
 </HEAD>
 <BODY>
-	<div id="app" class="vue-mint-container">
-		<mt-header fixed title="我的"></mt-header>
+	<div id="app">
+		<table width="100%" border="0" class="me-info">
+			<tr>
+				<td width="80" height="80" align="center">
+					<mu-avatar>
+						<img src="images/head1.png" width="48" height="48" alt="头像">
+					</mu-avatar>
+				</td>
+                <td class="nickname">{{ nickname }} <span class="edit-button">&gt;</span></td>
+			</tr>
+		</table>
+
+		<div class="menu-item" @click="viewTrack">
+			<mt-cell title="我的轨迹" is-link></mt-cell>
+		</div>
 
 		<div class="menu-item">
 			<mt-cell title="用户协议" is-link></mt-cell>
@@ -62,9 +94,10 @@
 			<mt-cell title="隐私政策" is-link></mt-cell>
 		</div>
 
-		<div class="menu-item">
+		<div class="menu-item" @click="getLastedVersion">
 			<mt-cell title="版本更新" is-link>
-				<span style="color:#999;padding-right:20px;">{{ currentVersion }}</span>
+				<span style="color:#999;padding-right:20px;">当前版本: {{ currentVersion }}</span>
+                <mu-badge content="news" color="secondary" v-show="hasLastedVersion"></mu-badge>
 			</mt-cell>
 		</div>
 
@@ -103,14 +136,34 @@
 	</div>
 
 	<script>
+	    var downloadURL = "";
+
 		var vm = new Vue({
 			el: '#app',
 			data: {
-				currentVersion: ""
+				nickname: "",
+				currentVersion: "",
+				hasLastedVersion: false
 			},
 			methods: {
 				changeTabPage: function(pageURL){
 					transferPage(pageURL);
+				},
+				viewTrack: function(){
+					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": "me", "nickName":"我自己"}), "viewTrack");
+				},
+				getLastedVersion: function(){
+                    if(downloadURL == ""){
+                        this.$toast.message("当前已是最新版本");
+                    }else{
+                        this.$confirm("有新版本，是否要更新？", '提示', {
+                            okLabel: "下载"
+                        }).then(({ result }) => {
+                            if (result) {
+                                window.open(downloadURL);
+                            }
+                        });
+                    }
 				},
 				cancelAccount: function(){
 					var message = "销户会彻底删除您的会员信息、位置信息、好友信息及关联的所有信息，确认是否销户？";
@@ -154,7 +207,13 @@
 
 	<script type="text/javascript">
         function pageFinishCallback(){
-			vm.currentVersion = jsBridge.dispatchAction("VersionAction", "", "");
+            var jsonStr = jsBridge.dispatchAction("UserAction", "", "my-info");
+            var jsonObject = jQuery.parseJSON(jsonStr);
+
+            vm.nickname = jsonObject.nickname;
+			vm.currentVersion = jsonObject.currentVersion;
+            downloadURL = jsonObject.downloadURL;
+            vm.hasLastedVersion = (downloadURL != "");
         }
     </script>
 </BODY>
