@@ -67,6 +67,22 @@
 		    width: 48px;
 		    height: 48px;
 		}
+
+		.mu-appbar {
+		    height: 40px;
+		}
+
+		.mu-appbar-title{
+			font-size: 16px;
+		}
+
+		.dialog-form-item{
+		    height: 60px;
+		}
+
+		.dialog-form-button{
+		    height: 40px;
+		}
 	</style>
 </HEAD>
 <BODY>
@@ -78,7 +94,7 @@
 						<img src="images/head1.png" width="48" height="48" alt="头像">
 					</mu-avatar>
 				</td>
-                <td class="nickname">{{ nickname }} <span class="edit-button">&gt;</span></td>
+                <td class="nickname" @click="editNickname">{{ nickname }} <span class="edit-button">&gt;</span></td>
 			</tr>
 		</table>
 
@@ -133,6 +149,29 @@
 				</td>
 			</tr>
 		</table>
+
+
+
+        <mu-dialog transition="slide-left" width="260"
+                   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openEditDialog">
+            <mu-appbar color="primary" title="修改昵称">
+                <mu-button slot="right" flat  @click="closeEditDialog">关闭</mu-button>
+            </mu-appbar>
+
+            <table class="dialog-form-container">
+                <tr class="dialog-form-item">
+                    <td width="70" align="right">昵称：</td>
+                    <td>
+                        <input type="text" size="15" maxlength="20" v-model.trim="new_nickname"/>
+                    </td>
+                </tr>
+                <tr class="dialog-form-button">
+                    <td colspan="2" align="center">
+                        <mt-button type="primary" size="small" @click="saveNickname">保存</mt-button>
+                    </td>
+                </tr>
+            </table>
+        </mu-dialog>
 	</div>
 
 	<script>
@@ -143,7 +182,10 @@
 			data: {
 				nickname: "",
 				currentVersion: "",
-				hasLastedVersion: false
+				hasLastedVersion: false,
+
+				openEditDialog: false,
+				new_nickname: ""
 			},
 			methods: {
 				changeTabPage: function(pageURL){
@@ -151,6 +193,33 @@
 				},
 				viewTrack: function(){
 					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": "me", "nickName":"我自己"}), "viewTrack");
+				},
+				editNickname: function(){
+				    this.new_nickname = this.nickname;
+					this.openEditDialog = true;
+				},
+				closeEditDialog: function(){
+				    this.new_nickname = "";
+					this.openEditDialog = false;
+				},
+				saveNickname: function(){
+                    if(this.new_nickname == ""){
+						this.$toast.message('请输入新的昵称');
+						return;
+					}
+
+					const loading = this.$loading();
+					var obj = {"new_nickname": this.new_nickname};
+					var result = jsBridge.dispatchAction("UserAction", JSON.stringify(obj), "updateNickname");
+					loading.close();
+
+					if(result == "success"){
+						this.nickname = this.new_nickname;
+						this.$toast.message('保存成功');
+						this.closeEditDialog();
+					}else{
+						this.$toast.message(result);
+					}
 				},
 				getLastedVersion: function(){
                     if(downloadURL == ""){

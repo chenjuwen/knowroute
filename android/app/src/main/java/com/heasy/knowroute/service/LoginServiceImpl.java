@@ -124,6 +124,12 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     }
 
     @Override
+    public void setNickname(String nickname) {
+        this.userNickname = nickname;
+        addAuthorityFile();
+    }
+
+    @Override
     public boolean isLogin() {
         return this.userId > 0;
     }

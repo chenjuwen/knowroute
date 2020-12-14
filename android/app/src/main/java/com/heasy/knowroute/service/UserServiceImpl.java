@@ -27,6 +27,9 @@ public class UserServiceImpl extends AbstractService implements UserService {
 
         ResponseBean responseBean = HttpService.postJson(getHeasyContext(), requestURL, data);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
+            LoginService loginService = getHeasyContext().getServiceEngine().getService(LoginServiceImpl.class);
+            loginService.setNickname(newNickname);
+
             return Constants.SUCCESS;
         }else{
             return HttpService.getFailureMessage(responseBean);

@@ -11,6 +11,8 @@ import com.heasy.knowroute.core.webview.Action;
 import com.heasy.knowroute.service.HttpService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
+import com.heasy.knowroute.service.UserService;
+import com.heasy.knowroute.service.UserServiceImpl;
 import com.heasy.knowroute.service.VersionService;
 import com.heasy.knowroute.service.VersionServiceImpl;
 
@@ -25,7 +27,6 @@ public class UserAction implements Action {
     public String execute(HeasyContext heasyContext, String jsonData, String extend) {
         JSONObject jsonObject = FastjsonUtil.string2JSONObject(jsonData);
         LoginService loginService = heasyContext.getServiceEngine().getService(LoginServiceImpl.class);
-        VersionService versionService = heasyContext.getServiceEngine().getService(VersionServiceImpl.class);
 
         if ("cancelAccount".equalsIgnoreCase(extend)){
             try {
@@ -40,6 +41,7 @@ public class UserAction implements Action {
             return "销户失败";
         }else if("my-info".equalsIgnoreCase(extend)){
             try {
+                VersionService versionService = heasyContext.getServiceEngine().getService(VersionServiceImpl.class);
                 String currentVersion = "V" + versionService.getCurrentVersion(); //当前版本
                 String downloadURL = versionService.getLastedVersionDownloadURL(); //最新版本下载地址
                 String nickname = loginService.getNickname();
@@ -53,6 +55,16 @@ public class UserAction implements Action {
                 logger.error("", ex);
             }
             return "{}";
+        }else if("updateNickname".equalsIgnoreCase(extend)){
+            try {
+                String newNickname = FastjsonUtil.getString(jsonObject, "new_nickname");
+                UserService userService = heasyContext.getServiceEngine().getService(UserServiceImpl.class);
+                String result = userService.updateNickname(loginService.getUserId(), newNickname);
+                return result;
+            }catch (Exception ex){
+                logger.error("", ex);
+                return ResponseCode.FAILURE.message();
+            }
         }
 
         return Constants.SUCCESS;
