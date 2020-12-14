@@ -68,16 +68,16 @@
 		    height: 48px;
 		}
 
-		.mu-appbar {
-		    height: 40px;
-		}
 
-		.mu-appbar-title{
-			font-size: 16px;
-		}
+        .mu-dialog-body{
+            padding: 20px 10px;
+        }
 
+        .dialog-form-title{
+            font-weight: 600;
+        }
 		.dialog-form-item{
-		    height: 60px;
+		    height: 70px;
 		}
 
 		.dialog-form-button{
@@ -154,20 +154,19 @@
 
         <mu-dialog transition="slide-left" width="260"
                    :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openEditDialog">
-            <mu-appbar color="primary" title="修改昵称">
-                <mu-button slot="right" flat  @click="closeEditDialog">关闭</mu-button>
-            </mu-appbar>
-
-            <table class="dialog-form-container">
+            <table class="dialog-form-container" width="100%" border="0">
+                <tr>
+                    <td align="center" class="dialog-form-title">修改昵称</td>
+                </tr>
                 <tr class="dialog-form-item">
-                    <td width="70" align="right">昵称：</td>
-                    <td>
-                        <input type="text" size="15" maxlength="20" v-model.trim="new_nickname"/>
+                    <td align="center">
+                        <input type="text" style="height:35px;" size="20" maxlength="20" v-model.trim="new_nickname"/>
                     </td>
                 </tr>
                 <tr class="dialog-form-button">
-                    <td colspan="2" align="center">
-                        <mt-button type="primary" size="small" @click="saveNickname">保存</mt-button>
+                    <td align="center">
+                        <mt-button type="default" size="small" @click="closeEditDialog" style="width:80px;">取消</mt-button>&nbsp;&nbsp;
+                        <mt-button type="primary" size="small" @click="saveNickname" style="width:80px;">保存</mt-button>
                     </td>
                 </tr>
             </table>
@@ -208,10 +207,8 @@
 						return;
 					}
 
-					const loading = this.$loading();
 					var obj = {"new_nickname": this.new_nickname};
 					var result = jsBridge.dispatchAction("UserAction", JSON.stringify(obj), "updateNickname");
-					loading.close();
 
 					if(result == "success"){
 						this.nickname = this.new_nickname;
