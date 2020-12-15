@@ -87,7 +87,7 @@
 				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openEditDialog">
 			<table width="100%" border="0">
 				<tr>
-					<td align="center" class="dialog-form-title">修改昵称</td>
+					<td align="center" class="dialog-form-title">修改好友昵称</td>
 				</tr>
 				<tr class="dialog-form-item">
 					<td align="center">
@@ -147,7 +147,7 @@
 				},
 				saveNickname: function(){
                     if(this.new_nickname == ""){
-						this.$toast.message('请输入新昵称');
+						this.$toast.message('请输入好友新昵称');
 						return;
 					}
 
