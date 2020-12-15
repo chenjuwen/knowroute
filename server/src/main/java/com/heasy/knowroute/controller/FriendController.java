@@ -7,6 +7,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -198,5 +199,35 @@ public class FriendController extends BaseController{
 		
 		return WebResponse.failure();
 	}
+	
+	@RequestMapping(value="/updateNickname", method=RequestMethod.POST, consumes="application/json")
+	public WebResponse updateNickname(@RequestBody Map<String,String> map) {
+		try {
+			String id = map.get("id");
+			String newNickname = map.get("newNickname");
+			
+			boolean b = friendService.updateNickname(Integer.parseInt(id), newNickname);
+			if(b) {
+				return WebResponse.success();
+			}
+		}catch(Exception ex) {
+			logger.error("", ex);
+		}
+		return WebResponse.failure();
+	}
+	
+	@RequestMapping(value="/delete/{id}", method=RequestMethod.POST, consumes="application/json")
+	public WebResponse updateNickname(@PathVariable Integer id) {
+		try {
+			boolean b = friendService.delete(id);
+			if(b) {
+				return WebResponse.success();
+			}
+		}catch(Exception ex) {
+			logger.error("", ex);
+		}
+		return WebResponse.failure();
+	}
+	
 	
 }

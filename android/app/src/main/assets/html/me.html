@@ -2,6 +2,8 @@
 <HTML>
 <HEAD>
 	<TITLE>知途 > 我的</TITLE>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
 	<link rel="stylesheet" type="text/css" href="css/muse-ui.css" />
 	<link rel="stylesheet" type="text/css" href="css/muse-ui-toast.all.css" />
@@ -36,11 +38,7 @@
 			border-bottom:1px solid #ddd;
 		}
 
-		.cancel-exit{
-
-		}
-
-		.cancel-exit .mu-dialog-actions button{
+		.alert-button .mu-dialog-actions button{
 			margin: 0 auto;
   			display: block;
 			font-size: 14px;
@@ -68,19 +66,23 @@
 		    height: 48px;
 		}
 
-
-        .mu-dialog-body{
-            padding: 20px 10px;
+		/** dialog css **/
+        .nickname-edit-dialog .mu-dialog-body{
+            padding: 0px 0px 10px 0;
         }
 
-        .dialog-form-title{
+        .nickname-edit-dialog .dialog-form-title{
             font-weight: 600;
+            height: 45px;
+			background-color: #2196f3;
+			color: #fff;
         }
-		.dialog-form-item{
+
+		.nickname-edit-dialog .dialog-form-item{
 		    height: 70px;
 		}
 
-		.dialog-form-button{
+		.nickname-edit-dialog .dialog-form-button{
 		    height: 40px;
 		}
 	</style>
@@ -89,7 +91,7 @@
 	<div id="app">
 		<table width="100%" border="0" class="me-info">
 			<tr>
-				<td width="80" height="80" align="center">
+				<td width="80" height="100" align="center">
 					<mu-avatar>
 						<img src="images/head1.png" width="48" height="48" alt="头像">
 					</mu-avatar>
@@ -150,11 +152,9 @@
 			</tr>
 		</table>
 
-
-
-        <mu-dialog transition="slide-left" width="260"
+        <mu-dialog transition="slide-left" width="260" dialog-class="nickname-edit-dialog"
                    :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openEditDialog">
-            <table class="dialog-form-container" width="100%" border="0">
+            <table width="100%" border="0">
                 <tr>
                     <td align="center" class="dialog-form-title">修改昵称</td>
                 </tr>
@@ -203,7 +203,7 @@
 				},
 				saveNickname: function(){
                     if(this.new_nickname == ""){
-						this.$toast.message('请输入新的昵称');
+						this.$toast.message('请输入新昵称');
 						return;
 					}
 
@@ -246,7 +246,7 @@
 									if(result == "success"){
 										this.$alert("您的账户已成功注销，可正常退出应用！", "温馨提示", {
 											okLabel: "退出",
-											className: "cancel-exit"
+											className: "alert-button"
 										}).then(() => {
 											jsBridge.dispatchAction(actionNames.ExitApp, "", "");
 										});

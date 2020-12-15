@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<TITLE>好友设置</TITLE>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-toast.all.css" />
+	<link rel="stylesheet" type="text/css" href="css/material-icons.css" />
+	<link rel="stylesheet" type="text/css" href="css/muse-ui-message.all.css" />
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
+
+	<script src="js/jquery.min-1.11.3.js"></script>
+	<script src="js/JSConstants.js"></script>
+	<script src="js/JSBridge.js"></script>
+	<script src="js/JSBridgeExt.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/vue.min.js"></script>
+	<script src="js/mint.min.js"></script>
+	<script src="js/muse-ui.js"></script>
+	<script src="js/muse-ui-toast.js"></script>
+	<script src="js/muse-ui-message.js"></script>
+
+	<style type="text/css">
+		.mint-cell-wrapper{
+			background-image:none;
+		}
+		.mint-cell:last-child{
+			background-image:none;
+		}
+
+		.menu-item{
+			margin-top:10px;
+			padding-left:20px;
+			border-top:1px solid #ddd;
+			border-bottom:1px solid #ddd;
+		}
+
+		/** dialog css **/
+        .nickname-edit-dialog .mu-dialog-body{
+            padding: 0px 0px 10px 0;
+        }
+
+        .nickname-edit-dialog .dialog-form-title{
+            font-weight: 600;
+            height: 45px;
+			background-color: #2196f3;
+			color: #fff;
+        }
+
+		.nickname-edit-dialog .dialog-form-item{
+		    height: 70px;
+		}
+
+		.nickname-edit-dialog .dialog-form-button{
+		    height: 40px;
+		}
+
+		.mu-alert-dialog .mu-dialog-actions button{
+			margin: 0 auto;
+  			display: block;
+			font-size: 14px;
+			background-color: #2196f3;
+			color: #fff;
+		}
+	</style>
+</HEAD>
+<BODY>
+	<div id="app" class="vue-mint-container">
+		<mt-header fixed title="好友设置">
+			<mt-button icon="back" slot="left" @click="goBack">&nbsp;</mt-button>
+		</mt-header>
+
+		<div @click="editNickname" class="menu-item">
+			<mt-cell title="昵称" is-link>
+				<span style="color:#999;padding-right:20px;">{{ nickname }}</span>
+			</mt-cell>
+		</div>
+
+		<div @click="deleteFriend" style="margin-top:30px; color:red; text-align:center; font-weight:600;">
+			<mt-cell title="删除好友"></mt-cell>
+		</div>
+
+
+		<mu-dialog transition="slide-left" width="260" dialog-class="nickname-edit-dialog"
+				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openEditDialog">
+			<table width="100%" border="0">
+				<tr>
+					<td align="center" class="dialog-form-title">修改昵称</td>
+				</tr>
+				<tr class="dialog-form-item">
+					<td align="center">
+						<input type="text" style="height:35px;" size="20" maxlength="20" v-model.trim="new_nickname"/>
+					</td>
+				</tr>
+				<tr class="dialog-form-button">
+					<td align="center">
+						<mt-button type="default" size="small" @click="closeEditDialog" style="width:80px;">取消</mt-button>&nbsp;&nbsp;
+						<mt-button type="primary" size="small" @click="saveNickname" style="width:80px;">保存</mt-button>
+					</td>
+				</tr>
+			</table>
+		</mu-dialog>
+	</div>
+
+	<script>
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				id: "",
+				nickname: "",
+
+				openEditDialog: false,
+				new_nickname: ""
+			},
+			methods: {
+				goBack: function(){
+					transferPage("main.html");
+				},
+				deleteFriend: function(){
+					this.$confirm("删除好友后将不能看到对方的任何信息。确定要删除吗？", '删除提示', {
+						okLabel: "狠心删除"
+					}).then(({ result }) => {
+						if (result) {
+							var response = jsBridge.dispatchAction("FriendAction", JSON.stringify({"id":this.id}), "delete");
+							if(response == "success"){
+								vm.$alert("好友已删除", '提示', {
+									type: "success",
+									className: "mu-alert-dialog"
+								}).then(() => {
+									vm.goBack();
+								});
+							}else{
+								this.$toast.message(result);
+							}
+						}
+					});
+				},
+				editNickname: function(){
+				    this.new_nickname = this.nickname;
+					this.openEditDialog = true;
+				},
+				closeEditDialog: function(){
+				    this.new_nickname = "";
+					this.openEditDialog = false;
+				},
+				saveNickname: function(){
+                    if(this.new_nickname == ""){
+						this.$toast.message('请输入新昵称');
+						return;
+					}
+
+					var obj = {"id": this.id, "newNickname": this.new_nickname};
+					var result = jsBridge.dispatchAction("FriendAction", JSON.stringify(obj), "updateNickname");
+
+					if(result == "success"){
+						this.nickname = this.new_nickname;
+						this.$toast.message('保存成功');
+						this.closeEditDialog();
+					}else{
+						this.$toast.message(result);
+					}
+				}
+			}
+		})
+	</script>
+
+	<script type="text/javascript">
+        function pageFinishCallback(){
+			vm.id = getPageParameter("id");
+			vm.nickname = getPageParameter("nickname");
+        }
+    </script>
+</BODY>
+</HTML>

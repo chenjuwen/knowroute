@@ -35,39 +35,44 @@ public class FriendServiceImpl extends BaseService implements FriendService {
      */
 	@Override
 	public String checkFriend(int userId, String phone) {
-		//无效的手机号码
-		if(!StringUtil.isMobile(phone)) {
-			return EnumConstants.FriendStatusCode.INVALID_PHONE.name();
-		}
-		
-		UserBean userBean = userService.getUserByPhone(phone);
-		
-		//不是系统用户
-		if(userBean == null) {
-			MessageBean messageBean = messageService.getMessage(String.valueOf(userId), 
-					phone, EnumConstants.MessageCategory.INVITE_FRIEND.name());
-			if(messageBean != null) {
-				return EnumConstants.FriendStatusCode.INVITED.name();
-			}else {
-				return EnumConstants.FriendStatusCode.NOT_INVITED.name();
+		try {
+			//无效的手机号码
+			if(!StringUtil.isMobile(phone)) {
+				return EnumConstants.FriendStatusCode.INVALID_PHONE.name();
 			}
-		}else {
-			if(userBean.getId() == userId) {
-				return EnumConstants.FriendStatusCode.SELF.name();
-			}else {
-				FriendBean friendBean = getFriend(userId, phone);
-				if(friendBean != null) {
-					return EnumConstants.FriendStatusCode.ALREADY_FRIEND.name();
+			
+			UserBean userBean = userService.getUserByPhone(phone);
+			
+			//不是系统用户
+			if(userBean == null) {
+				MessageBean messageBean = messageService.getMessage(String.valueOf(userId), 
+						phone, EnumConstants.MessageCategory.INVITE_FRIEND.name());
+				if(messageBean != null) {
+					return EnumConstants.FriendStatusCode.INVITED.name();
 				}else {
-					MessageBean messageBean = messageService.getMessage(String.valueOf(userId), 
-							phone, EnumConstants.MessageCategory.ADD_FRIEND.name());
-					if(messageBean != null) {
-						return EnumConstants.FriendStatusCode.NOT_FRIEND__ADDED.name();
+					return EnumConstants.FriendStatusCode.NOT_INVITED.name();
+				}
+			}else {
+				if(userBean.getId() == userId) {
+					return EnumConstants.FriendStatusCode.SELF.name();
+				}else {
+					FriendBean friendBean = getFriend(userId, phone);
+					if(friendBean != null) {
+						return EnumConstants.FriendStatusCode.ALREADY_FRIEND.name();
 					}else {
-						return EnumConstants.FriendStatusCode.NOT_FRIEND__NOTADD.name();
+						MessageBean messageBean = messageService.getMessage(String.valueOf(userId), 
+								phone, EnumConstants.MessageCategory.ADD_FRIEND.name());
+						if(messageBean != null) {
+							return EnumConstants.FriendStatusCode.NOT_FRIEND__ADDED.name();
+						}else {
+							return EnumConstants.FriendStatusCode.NOT_FRIEND__NOTADD.name();
+						}
 					}
 				}
 			}
+		}catch(Exception ex) {
+			logger.error("", ex);
+			return EnumConstants.FriendStatusCode.UNKNOW.name();
 		}
 	}
 	
@@ -86,6 +91,26 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 			sb.append(" where a.user_id=? and b.phone=? ");
         	
         	List<FriendBean> list = jdbcTemplate.query(sb.toString(), new FriendRowMapper(), userId, phone);
+        	
+        	if(!CollectionUtils.isEmpty(list)) {
+        		return list.get(0);
+        	}
+        }catch (Exception ex){
+            logger.error("", ex);
+        }
+        return null;
+	}
+	
+	@Override
+	public FriendBean getFriend(int id) {
+		try{
+			StringBuffer sb = new StringBuffer();
+			sb.append(" select a.id,a.user_id,a.related_user_id,b.phone,a.nickname ");
+			sb.append(" ,b.longitude,b.latitude,b.address,b.position_times ");
+			sb.append(" from friends a left join users b on a.related_user_id=b.id ");
+			sb.append(" where a.id=? ");
+        	
+        	List<FriendBean> list = jdbcTemplate.query(sb.toString(), new FriendRowMapper(), id);
         	
         	if(!CollectionUtils.isEmpty(list)) {
         		return list.get(0);
@@ -154,19 +179,31 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 	public boolean updateNickname(int id, String newNickname) {
 		try{
         	String sql = "update friends set nickname=? where id=?";
-        	jdbcTemplate.update(sql, newNickname, id);
-            return true;
+        	int i = jdbcTemplate.update(sql, newNickname, id);
+            return (i>0);
         }catch (Exception ex){
             logger.error("", ex);
             return false;
         }
 	}
 
+	/**
+	 * 删除好友关系
+	 */
 	@Override
 	public boolean delete(int id) {
 		try{
-        	String sql = "delete from friends where id=?";
-        	jdbcTemplate.update(sql, id);
+			FriendBean bean = getFriend(id);
+			if(bean != null) {
+				int userId = bean.getUserId();
+				int relatedUserId = bean.getRelatedUserId();
+				
+	        	String sql = "delete from friends where user_id=? and related_user_id=?";
+	        	jdbcTemplate.update(sql, userId, relatedUserId);
+	        	
+	        	sql = "delete from friends where user_id=? and related_user_id=?";
+	        	jdbcTemplate.update(sql, relatedUserId, userId);
+			}
             return true;
         }catch (Exception ex){
             logger.error("", ex);

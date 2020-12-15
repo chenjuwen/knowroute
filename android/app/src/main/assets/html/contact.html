@@ -2,6 +2,8 @@
 <HTML>
 <HEAD>
 	<TITLE>知途 > 紧急求助</TITLE>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
 	<link rel="stylesheet" type="text/css" href="css/muse-ui.css" />
 	<link rel="stylesheet" type="text/css" href="css/muse-ui-toast.all.css" />
@@ -51,6 +53,13 @@
 			border: 0;
 			border-bottom: 1px solid #ccc;
 		}
+
+        .dialog-form-title{
+            font-weight: 600;
+            height: 45px;
+			background-color: #2196f3;
+			color: #fff;
+        }
 
 		.dialog-form-item{
 			height: 60px;
@@ -135,11 +144,10 @@
 
 		<mu-dialog transition="slide-left" width="260"
 				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openAddContactDialog">
-			<mu-appbar color="primary" title="添加紧急联系人">
-				<mu-button slot="right" flat  @click="closeAddContactDialog">关闭</mu-button>
-			</mu-appbar>
-
 			<table class="dialog-form-container">
+				<tr>
+					<td colspan="2" align="center" class="dialog-form-title">添加紧急联系人</td>
+				</tr>
 				<tr class="dialog-form-item">
 					<td width="70" align="right">姓名：</td>
 					<td>
@@ -158,7 +166,8 @@
 				</tr>
 				<tr class="dialog-form-item">
 					<td colspan="2" align="center">
-						<mt-button type="primary" id="btnSaveContact" size="small" @click="saveContact">保存</mt-button>
+						<mt-button type="default" size="small" @click="closeAddContactDialog" style="width:60px;">取消</mt-button>&nbsp;
+						<mt-button type="primary" id="btnSaveContact" size="small" @click="saveContact" style="width:60px;">保存</mt-button>
 					</td>
 				</tr>
 			</table>
@@ -167,11 +176,10 @@
 
 		<mu-dialog transition="slide-left" width="260"
 				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openEditContactDialog">
-			<mu-appbar color="primary" title="修改紧急联系人">
-				<mu-button slot="right" flat  @click="closeEditContactDialog">关闭</mu-button>
-			</mu-appbar>
-
 			<table class="dialog-form-container">
+				<tr>
+					<td colspan="2" align="center" class="dialog-form-title">修改紧急联系人</td>
+				</tr>
 				<tr class="dialog-form-item">
 					<td width="70" align="right">姓名：</td>
 					<td>
@@ -190,8 +198,9 @@
 				</tr>
 				<tr class="dialog-form-item">
 					<td colspan="2" align="center">
-						<mt-button type="primary" id="btnUpdateContact" size="small" @click="updateContact">保存</mt-button>
-						<mt-button type="danger" id="btnDeleteContact" size="small" @click="deleteContact">删除联系人</mt-button>
+						<mt-button type="primary" id="btnUpdateContact" size="small" @click="updateContact" style="width:60px;">保存</mt-button>&nbsp;
+						<mt-button type="danger" id="btnDeleteContact" size="small" @click="deleteContact" style="width:60px;">删除</mt-button>&nbsp;
+						<mt-button type="default" size="small" @click="closeEditContactDialog" style="width:60px;">取消</mt-button>&nbsp;&nbsp;
 					</td>
 				</tr>
 			</table>

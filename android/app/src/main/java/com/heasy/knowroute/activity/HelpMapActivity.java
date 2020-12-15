@@ -60,7 +60,8 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
         initViewComponents();
 
         mMapView = ((MapView) findViewById(R.id.mapView));
-        initBaiduMap(null);
+        //initBaiduMap(null);
+        initBaiduMap(BitmapDescriptorFactory.fromResource(R.drawable.icon_location_1));
         initPosition();
     }
 
@@ -97,7 +98,7 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
         //定位数据，显示默认的定位Marker
         MyLocationData locationData = new MyLocationData.Builder()
                 .accuracy(1.0f)
-                .direction(direction)  // 方向信息，顺时针0-360
+                .direction(0)  // 方向信息，顺时针0-360
                 .longitude(userBean.getLongitude())
                 .latitude(userBean.getLatitude())
                 .build();

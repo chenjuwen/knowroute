@@ -63,6 +63,11 @@ public final class EnumConstants {
 		/**
 		 * 已是好友
 		 */
-		ALREADY_FRIEND
+		ALREADY_FRIEND,
+		
+		/**
+		 * 未知
+		 */
+		UNKNOW
 	}
 }

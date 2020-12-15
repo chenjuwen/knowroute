@@ -127,6 +127,28 @@ public class FriendAction extends AbstractAction {
             }else{
                 return HttpService.getFailureMessage(responseBean);
             }
+        }else if("delete".equalsIgnoreCase(extend)){
+            String id = FastjsonUtil.getString(jsonObject, "id");
+            String requestURL = "friend/delete/" + id;
+            ResponseBean responseBean = HttpService.postJson(heasyContext, requestURL, "");
+            if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
+                return Constants.SUCCESS;
+            }else{
+                return HttpService.getFailureMessage(responseBean);
+            }
+
+        }else if("updateNickname".equalsIgnoreCase(extend)){
+            String id = FastjsonUtil.getString(jsonObject, "id");
+            String newNickname = FastjsonUtil.getString(jsonObject, "newNickname");
+
+            String requestURL = "friend/updateNickname";
+            String data = FastjsonUtil.toJSONString("id", id, "newNickname", newNickname);
+            ResponseBean responseBean = HttpService.postJson(heasyContext, requestURL, data);
+            if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
+                return Constants.SUCCESS;
+            }else{
+                return HttpService.getFailureMessage(responseBean);
+            }
         }
 
         return Constants.SUCCESS;
