@@ -2,7 +2,8 @@ apply plugin: 'com.android.application'
 
 repositories {
     flatDir {
-        dir '../libs'
+        //告诉gradle，编译时从指定的目录获取jar包
+        dirs '../libs'
     }
 }
 
@@ -20,18 +21,16 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     signingConfigs {
         release {
-            try {
-                keyAlias 'knowroute'
-                keyPassword KEY_PASSWORD
-                storeFile file('../knowroute.keystore')
-                storePassword STORE_PASSWORD
-            } catch (ex) {
-                throw new InvalidUserDataException("You should define KEY_PASSWORD and STORE_PASSWORD in gradle.properties.")
-            }
+            keyAlias 'knowroute'
+            keyPassword KEY_PASSWORD
+            storeFile file('../knowroute.keystore')
+            storePassword STORE_PASSWORD
         }
     }
+
     buildTypes {
         debug {
             minifyEnabled true
@@ -45,9 +44,17 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            //so文件的存储目录
+            jniLibs.srcDir 'libs'
+        }
+    }
+
     dexOptions {
         javaMaxHeapSize "2g"
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

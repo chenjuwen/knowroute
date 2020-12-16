@@ -217,7 +217,7 @@ public class FriendController extends BaseController{
 	}
 	
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse updateNickname(@PathVariable Integer id) {
+	public WebResponse delete(@PathVariable Integer id) {
 		try {
 			boolean b = friendService.delete(id);
 			if(b) {
