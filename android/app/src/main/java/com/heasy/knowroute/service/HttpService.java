@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 import okhttp3.Request;
@@ -61,7 +62,7 @@ public class HttpService {
                 return responseBean;
             }
 
-        }catch (SocketTimeoutException | SocketException ex){
+        }catch (SocketTimeoutException | SocketException | UnknownHostException ex){
             return ResponseBean.failure(ResponseCode.NETWORK_ERROR);
         }catch (Exception ex){
             logger.error("", ex);
@@ -84,7 +85,7 @@ public class HttpService {
                 return responseBean;
             }
 
-        }catch (SocketTimeoutException | SocketException ex){
+        }catch (SocketTimeoutException | SocketException | UnknownHostException ex){
             return ResponseBean.failure(ResponseCode.NETWORK_ERROR);
         }catch (Exception ex){
             logger.error("", ex);
@@ -102,7 +103,7 @@ public class HttpService {
                 return responseBean;
             }
 
-        }catch (SocketTimeoutException | SocketException ex){
+        }catch (SocketTimeoutException | SocketException | UnknownHostException ex){
             return ResponseBean.failure(ResponseCode.NETWORK_ERROR);
         }catch (Exception ex){
             logger.error("", ex);

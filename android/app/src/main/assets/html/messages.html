@@ -104,9 +104,9 @@
 					<img src="images/alert.jpg">
 					<div>求助</div>
 				</td>
-				<td width="25%" align="center" class="tabbar-item">
-					<img style="position:absolute; top:-15px; left:50%; margin-left:-25;" src="images/location.png">
-					<div>&nbsp;</div>
+				<td width="25%" align="center" class="tabbar-item" @click="pointNavigation">
+					<img src="images/navigation.png">
+					<div>定点导航</div>
 				</td>
 				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('messages.html')">
 					<img src="images/message.jpg">
@@ -133,6 +133,9 @@
 			methods: {
 				changeTabPage: function(pageURL){
 					transferPage(pageURL);
+				},
+				pointNavigation: function(){
+					jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
 				},
 				confirmAddFriend: function(id, pass){
 					var result = jsBridge.dispatchAction("FriendAction", JSON.stringify({"id": id, "pass":pass}), "confirm_add");

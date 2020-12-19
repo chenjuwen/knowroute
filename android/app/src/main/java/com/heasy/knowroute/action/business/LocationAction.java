@@ -6,6 +6,7 @@ import com.heasy.knowroute.action.AbstractAction;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.activity.HelpMapActivity;
+import com.heasy.knowroute.activity.FixedPointNavigationActivity;
 import com.heasy.knowroute.activity.RouteTrackActivity;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.Constants;
@@ -70,6 +71,8 @@ public class LocationAction extends AbstractAction {
         }else if("helpMap".equalsIgnoreCase(extend)){
             String userId = FastjsonUtil.getString(jsonObject, "userId");
             startActivity(heasyContext, HelpMapActivity.class, ParameterUtil.toParamMap("userId", userId));
+        }else if("pointNavigation".equalsIgnoreCase(extend)){ //定点导航
+            startActivity(heasyContext, FixedPointNavigationActivity.class, null);
         }
 
         return Constants.SUCCESS;

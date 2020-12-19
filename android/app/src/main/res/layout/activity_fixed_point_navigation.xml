@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 主视图区 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <!-- 工具条区 -->
+        <RelativeLayout
+            android:id="@+id/navigation_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#FFFFFF">
+
+            <Button
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/button_shape2"
+                android:textSize="18dp"
+                android:text="&lt;"/>
+
+            <TextView
+                android:id="@+id/selectedCategory"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="#666"
+                android:textStyle="bold"
+                android:textSize="17dp"
+                android:text=""/>
+
+            <ImageButton
+                android:id="@+id/btnShowMenu"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginRight="15dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/button_shape2"
+                app:srcCompat="@drawable/icon_list" />
+        </RelativeLayout>
+
+        <!-- 内容区 -->
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/mapView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:clickable="true" />
+    </LinearLayout>
+
+    <!-- 导航菜单区 -->
+    <LinearLayout
+        android:id="@+id/menu_fragment"
+        android:background="#ffffff"
+        android:orientation="vertical"
+        android:layout_width="120dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="end">
+
+        <TextView
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:textSize="17dp"
+            android:textStyle="bold"
+            android:background="@color/bgcolor1"
+            android:textColor="@color/white"
+            android:text="位置分类" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/list_view" />
+    </LinearLayout>
+</android.support.v4.widget.DrawerLayout>
