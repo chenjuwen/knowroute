@@ -3,11 +3,11 @@ package com.heasy.knowroute.service;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.core.HeasyContext;
+import com.heasy.knowroute.core.okhttp.GenericHeaderInterceptor;
+import com.heasy.knowroute.core.okhttp.OkHttpClientHelper;
+import com.heasy.knowroute.core.okhttp.RequestBuilder;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
-import com.heasy.knowroute.okhttp.OkHttpClientHelper;
-import com.heasy.knowroute.okhttp.RequestBuilder;
-import com.heasy.knowroute.okhttp.interceptors.GenericHeaderInterceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

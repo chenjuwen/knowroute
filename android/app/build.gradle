@@ -86,7 +86,6 @@ dependencies {
     }
     implementation 'io.reactivex:rxjava:1.1.0'
     implementation project(path: ':core')
-    implementation project(path: ':okhttp')
     implementation project(path: ':map')
     implementation files('../libs/fastjson-1.2.40.jar')
     implementation files('../libs/slf4j-api-1.7.25.jar')

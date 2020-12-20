@@ -1,9 +1,9 @@
-package com.heasy.knowroute.okhttp;
-
-import java.io.IOException;
+package com.heasy.knowroute.core.okhttp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
