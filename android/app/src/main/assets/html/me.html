@@ -33,9 +33,9 @@
 		}
 
 		.menu-item{
-			margin-top:10px;
-			padding-left:20px;
-			border-bottom:1px solid #ddd;
+			margin-top: 0px;
+			padding-left: 10px;
+			border-bottom: 1px solid #ddd;
 		}
 
 		.alert-button .mu-dialog-actions button{
@@ -102,6 +102,10 @@
 
 		<div class="menu-item" @click="viewTrack">
 			<mt-cell title="我的轨迹" is-link></mt-cell>
+		</div>
+
+		<div class="menu-item" @click="fixedPointCategory">
+			<mt-cell title="定点位置类别设置" is-link></mt-cell>
 		</div>
 
 		<div class="menu-item">
@@ -195,6 +199,9 @@
 				},
 				viewTrack: function(){
 					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": "me", "nickName":"我自己"}), "viewTrack");
+				},
+				fixedPointCategory: function(){
+					transferPage("fixed_point_category_list.html");
 				},
 				editNickname: function(){
 				    this.new_nickname = this.nickname;

@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<TITLE>定点位置类别</TITLE>
+	<link rel="stylesheet" type="text/css" href="css/mint.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
+    <link rel="stylesheet" type="text/css" href="css/muse-ui.css" />
+    <link rel="stylesheet" type="text/css" href="css/muse-ui-toast.all.css" />
+    <link rel="stylesheet" type="text/css" href="css/material-icons.css" />
+    <link rel="stylesheet" type="text/css" href="css/muse-ui-message.all.css" />
+
+	<script src="js/jquery.min-1.11.3.js"></script>
+	<script src="js/JSConstants.js"></script>
+	<script src="js/JSBridge.js"></script>
+	<script src="js/JSBridgeExt.js"></script>
+	<script src="js/vue.min.js"></script>
+	<script src="js/mint.min.js"></script>
+    <script src="js/muse-ui.js"></script>
+    <script src="js/muse-ui-toast.js"></script>
+    <script src="js/muse-ui-message.js"></script>
+
+	<style type="text/css">
+		/** data list **/
+		.data-container {
+			border-top: 1px solid #d9d9d9;
+			border-bottom: 1px solid #d9d9d9;
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 15px;
+		}
+
+		.data-container .header{
+		    height: 40px;
+			border-bottom: 1px solid #ddd;
+			font-weight: 600;
+			padding-left: 10px;
+		}
+
+		.data-container .data-tr{
+			height: 40px;
+		}
+
+		.data-container .data-name{
+			border-bottom: 1px solid #ddd;
+			padding-left: 10px;
+		}
+
+		.data-container .data-topping{
+			border-bottom: 1px solid #ddd;
+			padding-right: 10px;
+			font-size: 15px;
+			color: #FF44AA;
+		}
+
+        /** dialog **/
+        .category-dialog .mu-dialog-body{
+            padding: 0px 0px 5px 0;
+        }
+
+		.category-dialog .dialog-form-container{
+			width: 100%;
+		}
+
+		.category-dialog .dialog-form-container input{
+			border: 0;
+			height: 35px;
+			border-bottom: 1px solid #ccc;
+		}
+
+        .category-dialog .dialog-form-title{
+            font-weight: 600;
+            height: 45px;
+			background-color: #2196f3;
+			color: #fff;
+        }
+
+		.category-dialog .dialog-form-item{
+			height: 60px;
+		}
+	</style>
+</HEAD>
+
+<BODY>
+	<div id="app" class="vue-mint-container">
+		<mt-header fixed title="定点位置类别">
+			<mt-button icon="back" slot="left" @click="goBack">返回</mt-button>
+			<mt-button slot="right" @click="addCategory">
+				<img src="images/add.png" width="20" height="20">
+			</mt-button>
+		</mt-header>
+
+		<table class="data-container" border=0>
+            <tr>
+                <td class="header">名称</td>
+                <td width="60" class="header">置顶</td>
+            </tr>
+			<tr @click.stop="_cell(index)" v-for="(item,index) in dataList" class="data-tr">
+				<td class="data-name">{{ item.name }}</td>
+                <td class="data-topping" align="center"><img v-show="item.topping==1" src="images/topping.png"></td>
+			</tr>
+		</table>
+
+        <div v-show="noData" style="width:100%; position:absolute; top:90px; bottom:0px;">
+            <div style="width:100%; position:absolute; top:50%; text-align:center; font-size:16px;">暂无数据</div>
+        </div>
+
+        <mu-dialog transition="slide-left" width="260" dialog-class="category-dialog"
+                   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openDialog">
+            <table class="dialog-form-container">
+                <tr>
+                    <td colspan="2" align="center" class="dialog-form-title">{{ dialogTitle }}</td>
+                </tr>
+                <tr class="dialog-form-item">
+                    <td width="70" align="right">名称：</td>
+                    <td>
+                        <input type="text" size="15" maxlength="20" v-model.trim="category_name"/>
+                    </td>
+                </tr>
+                <tr class="dialog-form-item">
+                    <td colspan="2" align="center">
+                        <mt-button type="default" size="small" @click="closeDialog" style="width:60px;">取消</mt-button>&nbsp;
+                        <mt-button type="primary" size="small" @click="saveCategory" style="width:60px;">保存</mt-button>
+                    </td>
+                </tr>
+            </table>
+        </mu-dialog>
+
+		<mt-actionsheet :actions="actionSheetData" v-model="sheetVisible" cancel-text=""> </mt-actionsheet>
+	</div>
+
+	<script type="text/javascript">
+		var vm = new Vue({
+			el: '#app',
+			data: {
+			    noData: false,
+				dataList: [
+                    //{id:1, userId:5, name:"祖坟", topping:1, createDate:"2020-12-21 21:19:40"},
+                    //{id:2, userId:5, name:"楼盘", topping:0, createDate:"2020-12-21 21:19:40"}
+				],
+
+                dialogTitle: "",
+				openDialog: false,
+				category_name: "",
+
+				selectedIndex: -1,
+				sheetVisible: false,
+				actionSheetData: [
+					{name:"修改", method: editCategory},
+					{name:"置顶", method: toppingCategory},
+					{name:"取消置顶", method: cancelToppingCategory},
+					{name:"删除", method: deleteCategory}
+				]
+			},
+			methods: {
+				goBack: function(){
+					transferPage("me.html");
+				},
+
+				addCategory: function(){
+				    this.selectedIndex = -1;
+				    this.dialogTitle = "添加类别";
+					this.category_name = "";
+					this.openDialog = true;
+				},
+				closeDialog: function(){
+					this.category_name = "";
+					this.openDialog = false;
+				},
+				saveCategory: function(){
+					if(this.category_name == ""){
+						this.$toast.message('请输入类别名');
+						return;
+					}
+
+                    var result = "";
+                    if(this.selectedIndex == -1){
+					    var obj = {"name": this.category_name};
+					    result = jsBridge.dispatchAction("FixedPointCategoryAction", JSON.stringify(obj), "insert");
+                    }else{
+					    var obj = {"id":this.dataList[this.selectedIndex].id, "name":this.category_name};
+					    result = jsBridge.dispatchAction("FixedPointCategoryAction", JSON.stringify(obj), "update");
+                    }
+
+					if(result == "success"){
+						this.$toast.message('保存成功');
+						this.closeDialog();
+						pageFinishCallback();
+					}else{
+						this.$toast.message(msg);
+					}
+				},
+				_cell: function(index){
+					this.selectedIndex = index;
+					this.sheetVisible = true;
+
+					if(vm.dataList[vm.selectedIndex].topping == 1){
+					    jQuery(".mint-actionsheet-list > li").eq(1).hide();
+					    jQuery(".mint-actionsheet-list > li").eq(2).show();
+					}else{
+					    jQuery(".mint-actionsheet-list > li").eq(1).show();
+					    jQuery(".mint-actionsheet-list > li").eq(2).hide();
+					}
+				}
+			}
+		});
+
+        function editCategory(){
+			vm.sheetVisible = false;
+            vm.dialogTitle = "修改类别";
+            vm.category_name = vm.dataList[vm.selectedIndex].name;
+            vm.openDialog = true;
+        }
+
+        function toppingCategory(){
+			vm.sheetVisible = false;
+			var obj = {"id":vm.dataList[vm.selectedIndex].id};
+            var result = jsBridge.dispatchAction("FixedPointCategoryAction", JSON.stringify(obj), "topping");
+            if(result == "success"){
+                pageFinishCallback();
+            }else{
+                this.$toast.message(msg);
+            }
+        }
+
+        function cancelToppingCategory(){
+			vm.sheetVisible = false;
+			var obj = {"id":vm.dataList[vm.selectedIndex].id};
+            var result = jsBridge.dispatchAction("FixedPointCategoryAction", JSON.stringify(obj), "cancelTopping");
+            if(result == "success"){
+                pageFinishCallback();
+            }else{
+                this.$toast.message(msg);
+            }
+        }
+
+        function deleteCategory(){
+			vm.sheetVisible = false;
+            vm.$confirm("确定要删除？", '提示', {
+
+            }).then(({ result }) => {
+                if (result) {
+                    var obj = {"id":vm.dataList[vm.selectedIndex].id};
+                    var result = jsBridge.dispatchAction("FixedPointCategoryAction", JSON.stringify(obj), "delete");
+                    if(result == "success"){
+						vm.$toast.message('删除成功');
+                        pageFinishCallback();
+                    }else{
+                        this.$toast.message(msg);
+                    }
+                }
+            });
+        }
+
+		function pageFinishCallback(){
+			var dataArr = jsBridge.dispatchAction("FixedPointCategoryAction", JSON.stringify({}), "list");
+			vm.dataList = jQuery.parseJSON(dataArr);
+			if(vm.dataList != null && vm.dataList.length > 0){
+			    vm.noData = false;
+			}else{
+			    vm.noData = true;
+			}
+		}
+	</script>
+
+</BODY>
+</HTML>
