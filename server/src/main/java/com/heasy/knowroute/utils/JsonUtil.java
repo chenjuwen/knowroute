@@ -42,11 +42,11 @@ public class JsonUtil {
     }
     
     public static String object2ArrayString(Object object) {
-    	return JSONArray.fromObject(object).toString(2);
+    	return JSONArray.fromObject(object).toString();
     }
     
     public static String object2ArrayString(Object object, JsonConfig jsonConfig) {
-    	return JSONArray.fromObject(object, jsonConfig).toString(2);
+    	return JSONArray.fromObject(object, jsonConfig).toString();
     }
 
     public static String object2String(Object object){
@@ -59,9 +59,9 @@ public class JsonUtil {
         }
         
         if(jsonConfig != null) {
-        	return JSONObject.fromObject(object, jsonConfig).toString(2);
+        	return JSONObject.fromObject(object, jsonConfig).toString();
         }else {
-        	return JSONObject.fromObject(object).toString(2);
+        	return JSONObject.fromObject(object).toString();
         }
     }
 
@@ -83,14 +83,14 @@ public class JsonUtil {
     public static String toJSONString(String key, String value){
         JSONObject object = new JSONObject();
         object.put(key, value);
-        return object.toString(2);
+        return object.toString();
     }
 
     public static String toJSONString(String key1, String value1, String key2, String value2){
         JSONObject object = new JSONObject();
         object.put(key1, value1);
         object.put(key2, value2);
-        return object.toString(2);
+        return object.toString();
     }
 
     public static String toJSONString(String key1, String value1, String key2, String value2, String key3, String value3){
@@ -98,7 +98,7 @@ public class JsonUtil {
         object.put(key1, value1);
         object.put(key2, value2);
         object.put(key3, value3);
-        return object.toString(2);
+        return object.toString();
     }
 
     public static String toJSONString(String key1, String value1, String key2, String value2, String key3, String value3, String key4, String value4){
@@ -107,7 +107,7 @@ public class JsonUtil {
         object.put(key2, value2);
         object.put(key3, value3);
         object.put(key4, value4);
-        return object.toString(2);
+        return object.toString();
     }
 
     public static String toJSONString(String key1, String value1, String key2, String value2, String key3, String value3, String key4, String value4, String key5, String value5){
@@ -117,7 +117,7 @@ public class JsonUtil {
         object.put(key3, value3);
         object.put(key4, value4);
         object.put(key5, value5);
-        return object.toString(2);
+        return object.toString();
     }
     
     /**

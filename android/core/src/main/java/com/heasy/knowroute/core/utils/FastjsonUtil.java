@@ -3,6 +3,8 @@ package com.heasy.knowroute.core.utils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2017/12/21.
  */
@@ -24,6 +26,13 @@ public class FastjsonUtil {
             return JSONArray.parseArray(jsonData);
         }
         return null;
+    }
+
+    /**
+     * 将数组字符串转成List集合对象
+     */
+    public static <T> List<T> arrayString2List(String arrayString, Class<T> clazz){
+        return JSONObject.parseArray(arrayString, clazz);
     }
 
     /**

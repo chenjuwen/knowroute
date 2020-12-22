@@ -20,6 +20,8 @@ import com.heasy.knowroute.service.FixedPointCategoryService;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
 
+import net.sf.json.JsonConfig;
+
 @RestController
 @RequestMapping("/fixedPointCategory")
 public class FixedPointCategoryController extends BaseController{
@@ -32,7 +34,9 @@ public class FixedPointCategoryController extends BaseController{
     public WebResponse list(@PathVariable Integer userId) {
 		List<FixedPointCategoryBean> list = fixedPointCategoryService.list(userId);
 		if(CollectionUtils.isNotEmpty(list)) {
-			String data = JsonUtil.object2ArrayString(list, JsonUtil.getJsonConfigOfDate());
+			JsonConfig jsonConfig = JsonUtil.getJsonConfigOfDate();
+			jsonConfig.setExcludes(new String[] {"userId", "createDate"}); //忽略字段，不在json字符串中出现
+			String data = JsonUtil.object2ArrayString(list, jsonConfig);
 			logger.debug(data);
 			return WebResponse.success(data);
 		}else {
