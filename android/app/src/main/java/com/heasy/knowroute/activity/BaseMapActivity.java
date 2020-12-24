@@ -1,6 +1,7 @@
 package com.heasy.knowroute.activity;
 
 import android.app.ProgressDialog;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,6 +16,7 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.model.LatLng;
+import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.map.AbstractMapLocationClient;
 
 import org.slf4j.Logger;
@@ -48,7 +50,8 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
     }
 
     protected void initBaiduMap(BitmapDescriptor locationIcon) {
-        mMapView.showZoomControls(false); //缩放按钮
+        //显示缩放按钮
+        //mMapView.showZoomControls(true);
 
         // 地图初始化
         mBaiduMap = mMapView.getMap();
@@ -56,16 +59,36 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
         // 开启定位图层
         mBaiduMap.setMyLocationEnabled(true);
 
+        //开启指南针
+        //mBaiduMap.getUiSettings().setCompassEnabled(true);
+
         //定位模式为普通LocationMode.NORMAL、默认图标
         MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(
                 MyLocationConfiguration.LocationMode.NORMAL, true, locationIcon);
         mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
     }
 
+    /**
+     * 更新地图状态
+     */
     protected void updateMapStatus(LatLng targetLatLng){
         MapStatus.Builder builder = new MapStatus.Builder();
         builder.target(targetLatLng).zoom(AbstractMapLocationClient.DEFAULT_ZOOM); //初始缩放
         mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build())); //定位到指定位置
+    }
+
+    /**
+     * 获取屏幕中心的坐标点经纬度
+     */
+    protected LatLng getScreenCenterLocation(){
+        Point point = AndroidUtil.getDisplaySize(this);
+
+        Point centerPoint = new Point();
+        centerPoint.x = point.x / 2;
+        centerPoint.y = point.y / 2;
+
+        LatLng centerLatLng = mBaiduMap.getProjection().fromScreenLocation(centerPoint);
+        return centerLatLng;
     }
 
     /**

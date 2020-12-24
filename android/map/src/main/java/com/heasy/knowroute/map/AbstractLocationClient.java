@@ -7,8 +7,8 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.utils.DistanceUtil;
-import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.map.bean.LocationBean;
 
@@ -56,7 +56,7 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
     private LocationClientOption getLocationClientOption(){
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true); // 打开gps
-        option.setCoorType("bd09ll"); // 坐标类型：百度经纬度坐标
+        option.setCoorType(CoordType.BD09LL.name()); // 坐标类型：百度经纬度坐标
         option.setScanSpan(scanSpanMillSeconds); //发起定位请求的间隔，单位毫秒ms，默认0，即仅定位一次
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy); //定位模式：高精度
         option.setIsNeedAddress(true); //设置是否需要地址信息

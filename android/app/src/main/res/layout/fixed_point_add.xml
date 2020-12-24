@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="330dp"
+    android:layout_height="match_parent"
+    android:background="#8FBC8F"
+    android:paddingBottom="10dp"
+    android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:gravity="center"
+        android:background="@color/bgcolor1"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:text="添加位置点" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:gravity="center_vertical"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:textColor="@color/textColor1"
+            android:text="定位方式：" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/radioButton1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:textColor="@color/textColor1"
+                android:text="按当前位置" />
+            <RadioButton
+                android:id="@+id/radioButton2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:textColor="@color/textColor1"
+                android:checked="false"
+                android:text="按经纬度" />
+            <RadioButton
+                android:id="@+id/radioButton3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColor1"
+                android:checked="false"
+                android:text="按地址" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:gravity="center_vertical"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:textColor="@color/textColor1"
+            android:text="定位参数：" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:textSize="16dp"
+                android:textColor="@color/textColor1"
+                android:text="经度" />
+
+            <EditText
+                android:id="@+id/txtLongitude"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:textSize="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:textSize="16dp"
+                android:textColor="@color/textColor1"
+                android:text="纬度" />
+
+            <EditText
+                android:id="@+id/txtLatitude"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:textSize="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:textSize="16dp"
+                android:textColor="@color/textColor1"
+                android:text="地址" />
+
+            <EditText
+                android:id="@+id/txtAddress"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnFind"
+            android:layout_width="90dp"
+            android:layout_height="35dp"
+            android:background="#2F4F4F"
+            android:textColor="@color/white"
+            android:layout_marginRight="10dp"
+            android:textSize="16dp"
+            android:text="定位并绘点"/>
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="65dp"
+            android:layout_height="35dp"
+            android:background="#2F4F4F"
+            android:textColor="@color/white"
+            android:layout_marginRight="10dp"
+            android:textSize="16dp"
+            android:text="保存" />
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="65dp"
+            android:layout_height="35dp"
+            android:background="#2F4F4F"
+            android:textColor="@color/white"
+            android:textSize="16dp"
+            android:text="关闭"/>
+    </LinearLayout>
+</LinearLayout>
