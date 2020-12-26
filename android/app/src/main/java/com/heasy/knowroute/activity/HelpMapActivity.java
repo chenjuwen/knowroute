@@ -5,22 +5,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapView;
-import com.baidu.mapapi.map.Marker;
-import com.baidu.mapapi.map.MarkerOptions;
-import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.map.OverlayOptions;
-import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
-import com.heasy.knowroute.ServiceEngineFactory;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.event.ToastEvent;
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.service.HttpService;
 
@@ -61,7 +55,7 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
 
         mMapView = ((MapView) findViewById(R.id.mapView));
         //initBaiduMap(null);
-        initBaiduMap(BitmapDescriptorFactory.fromResource(R.drawable.icon_location_1));
+        initBaiduMap(BitmapDescriptorFactory.fromResource(R.drawable.icon_location_1), null);
         initPosition();
     }
 
@@ -95,25 +89,8 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
         LatLng latLng = new LatLng(userBean.getLatitude(), userBean.getLongitude());
         updateMapStatus(latLng);
 
-        //定位数据，显示默认的定位Marker
-        MyLocationData locationData = new MyLocationData.Builder()
-                .accuracy(1.0f)
-                .direction(0)  // 方向信息，顺时针0-360
-                .longitude(userBean.getLongitude())
-                .latitude(userBean.getLatitude())
-                .build();
-        mBaiduMap.setMyLocationData(locationData);
-
-        //文字
-        /*
-        OverlayOptions mTextOptions = new TextOptions()
-                .text("我在这里")
-                .bgColor(0xffffff00) //黄色
-                .fontSize(30)
-                .fontColor(0xffff0000) //红色
-                .position(latLng);
-        mBaiduMap.addOverlay(mTextOptions);
-         */
+        //定位数据
+        setLocationData(1.0f, 0, userBean.getLongitude(), userBean.getLatitude());
     }
 
     @Override

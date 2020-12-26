@@ -4,31 +4,28 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
-import com.heasy.knowroute.ServiceEngineFactory;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.action.common.FixedPointNavigationEvent;
 import com.heasy.knowroute.bean.FixedPointCategoryBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
+import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
-import com.heasy.knowroute.map.HeasyLocationService;
-import com.heasy.knowroute.map.bean.LocationBean;
+import com.heasy.knowroute.map.DefaultMapMarkerService;
+import com.heasy.knowroute.map.FixedPointAddWindow;
 import com.heasy.knowroute.service.HttpService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
@@ -55,16 +52,8 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     private List<FixedPointCategoryBean> dataList = new ArrayList<>();
     private int selectedIndex = -1;
 
-    //add window
-    private View addView;
-    private RadioGroup radioGroup;
-    private EditText txtLongitude;
-    private EditText txtLatitude;
-    private EditText txtAddress;
-    private Button btnFind;
-    private Button btnSave;
-    private Button btnClose;
-    private int findType; //1按当前位置，2按经纬度，3按地址
+
+    private DefaultMapMarkerService mapMarkerService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +64,11 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
 
         ServiceEngineFactory.getServiceEngine().getEventService().register(this);
 
+        this.mapMarkerService = new DefaultMapMarkerService();
+
         initViews();
-        initBaiduMap(null);
+        initBaiduMap(null, this.mapMarkerService);
         initPosition();
-        initAddWindow();
-        loadData();
     }
 
     private void initViews(){
@@ -148,92 +137,6 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
         }.start();
     }
 
-    private void initAddWindow(){
-        LayoutInflater inflater = LayoutInflater.from(FixedPointNavigationActivity.this);
-        addView = inflater.inflate(R.layout.fixed_point_add, null);
-
-        //Radio
-        radioGroup = (RadioGroup)addView.findViewById(R.id.radioGroup);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (group.getCheckedRadioButtonId()){
-                    case R.id.radioButton1: //当前位置
-                        findType = 1;
-                        LocationBean locationBean = HeasyLocationService.getHeasyLocationClient()!=null ? HeasyLocationService.getHeasyLocationClient().getCurrentLocation() : null;
-                        txtLongitude.setText(String.valueOf(locationBean!=null ? locationBean.getLongitude() : ""));
-                        txtLongitude.setEnabled(false);
-                        txtLatitude.setText(String.valueOf(locationBean!=null ? locationBean.getLatitude() : ""));
-                        txtLatitude.setEnabled(false);
-                        txtAddress.setText(locationBean!=null ? locationBean.getAddress() : "");
-                        txtAddress.setEnabled(false);
-                        break;
-                    case R.id.radioButton2: //经纬度
-                        findType = 2;
-                        txtLongitude.setText("");
-                        txtLongitude.setEnabled(true);
-                        txtLatitude.setText("");
-                        txtLatitude.setEnabled(true);
-                        txtAddress.setText("");
-                        txtAddress.setEnabled(false);
-                        break;
-                    case R.id.radioButton3: //地址
-                        findType = 3;
-                        txtLongitude.setText("");
-                        txtLongitude.setEnabled(false);
-                        txtLatitude.setText("");
-                        txtLatitude.setEnabled(false);
-                        txtAddress.setText("");
-                        txtAddress.setEnabled(true);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-
-        //input
-        txtLongitude = (EditText)addView.findViewById(R.id.txtLongitude);
-        txtLatitude = (EditText)addView.findViewById(R.id.txtLatitude);
-        txtAddress = (EditText)addView.findViewById(R.id.txtAddress);
-
-        //查找
-        btnFind = (Button) addView.findViewById(R.id.btnFind);
-        btnFind.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                switch (findType){
-                    case 1:
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-
-        //保存
-        btnSave = (Button) addView.findViewById(R.id.btnSave);
-        btnSave.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
-        //关闭
-        btnClose = (Button) addView.findViewById(R.id.btnClose);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBaiduMap.hideInfoWindow();
-            }
-        });
-    }
-
     private void loadData(){
         new DefaultDaemonThread(){
             @Override
@@ -244,10 +147,11 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                     ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), url);
                     if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
                         dataList = FastjsonUtil.arrayString2List((String) responseBean.getData(), FixedPointCategoryBean.class);
-                        ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointNavigationEvent(this, "数据加载成功"));
+                        ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointNavigationEvent(this, "success"));
                     }
                 }catch (Exception ex){
                     logger.error("", ex);
+                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointNavigationEvent(this, "error"));
                 }
             }
         }.start();
@@ -256,17 +160,26 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleEvent(final FixedPointNavigationEvent event){
         if(event != null){
-            FixedPointNavigationAdapter adapter = new FixedPointNavigationAdapter(FixedPointNavigationActivity.this, dataList);
-            list_view.setAdapter(adapter);
-            list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    selectedIndex = position;
-                    selectedCategory.setText(dataList.get(position).getName());
-                    btnDrawPoint.setVisibility(View.VISIBLE);
-                    drawer_layout.closeDrawer(Gravity.END);
-                }
-            });
+            if(progressDialog != null){
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+
+            if(dataList != null && dataList.size() > 0) {
+                FixedPointNavigationAdapter adapter = new FixedPointNavigationAdapter(FixedPointNavigationActivity.this, dataList);
+                list_view.setAdapter(adapter);
+                list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        selectedIndex = position;
+                        selectedCategory.setText(dataList.get(position).getName());
+                        btnDrawPoint.setVisibility(View.VISIBLE);
+                        drawer_layout.closeDrawer(Gravity.END);
+                    }
+                });
+
+                openDrawer();
+            }
         }
     }
 
@@ -275,16 +188,20 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
         if(v.getId() == R.id.btnBack){
             finish();
         }else if(v.getId() == R.id.btnDrawPoint){
-            openAddWindow();
+            new FixedPointAddWindow(FixedPointNavigationActivity.this, mapMarkerService).showWindow();
         }else if(v.getId() == R.id.btnShowMenu){
-            drawer_layout.openDrawer(Gravity.END); //左侧菜单
-            unlockDrawerLayout();
+            if(dataList == null || dataList.size() == 0){
+                progressDialog = AndroidUtil.showLoadingDialog(FixedPointNavigationActivity.this, "数据加载中...");
+                loadData();
+            }else{
+                openDrawer();
+            }
         }
     }
 
-    private void openAddWindow(){
-        InfoWindow addWindow = new InfoWindow(addView, getScreenCenterLocation(), 250);
-        mBaiduMap.showInfoWindow(addWindow);
+    private void openDrawer(){
+        drawer_layout.openDrawer(Gravity.END); //左侧菜单
+        unlockDrawerLayout();
     }
 
     private void lockDrawerLayout(){

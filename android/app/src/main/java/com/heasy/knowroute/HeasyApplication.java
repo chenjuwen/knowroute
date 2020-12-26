@@ -8,6 +8,7 @@ import android.support.multidex.MultiDexApplication;
 
 import com.baidu.mapapi.CoordType;
 import com.baidu.mapapi.SDKInitializer;
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.map.HeasyLocationService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;

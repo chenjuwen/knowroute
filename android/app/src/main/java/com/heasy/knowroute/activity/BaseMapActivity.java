@@ -15,9 +15,11 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
+import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.map.AbstractMapLocationClient;
+import com.heasy.knowroute.map.AbstractMapMarkerService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by Administrator on 2020/11/9.
  */
-public class BaseMapActivity extends BaseActivity  implements SensorEventListener {
+public abstract class BaseMapActivity extends BaseActivity  implements SensorEventListener {
     private static final Logger logger = LoggerFactory.getLogger(BaseMapActivity.class);
 
     protected ProgressDialog progressDialog;
@@ -40,6 +42,7 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
     protected BaiduMap mBaiduMap;
 
     private AbstractMapLocationClient mapLocationClient;
+    private AbstractMapMarkerService markerService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,9 +52,11 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }
 
-    protected void initBaiduMap(BitmapDescriptor locationIcon) {
+    protected void initBaiduMap(BitmapDescriptor locationIcon, AbstractMapMarkerService markerService) {
+        this.markerService = markerService;
+
         //显示缩放按钮
-        //mMapView.showZoomControls(true);
+        mMapView.showZoomControls(false);
 
         // 地图初始化
         mBaiduMap = mMapView.getMap();
@@ -60,12 +65,17 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
         mBaiduMap.setMyLocationEnabled(true);
 
         //开启指南针
-        //mBaiduMap.getUiSettings().setCompassEnabled(true);
+        mBaiduMap.getUiSettings().setCompassEnabled(false);
 
         //定位模式为普通LocationMode.NORMAL、默认图标
         MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(
                 MyLocationConfiguration.LocationMode.NORMAL, true, locationIcon);
         mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
+
+        if(this.markerService != null) {
+            this.markerService.setBaiduMap(mBaiduMap);
+            mBaiduMap.setOnMarkerClickListener(this.markerService);
+        }
     }
 
     /**
@@ -89,6 +99,23 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
 
         LatLng centerLatLng = mBaiduMap.getProjection().fromScreenLocation(centerPoint);
         return centerLatLng;
+    }
+
+    /**
+     * 设置定位数据
+     * @param accuracy 定位精度
+     * @param direction GPS定位时方向角度，顺时针0-360
+     * @param longitude 经度坐标
+     * @param latitude 纬度坐标
+     */
+    protected void setLocationData(float accuracy, float direction, double longitude, double latitude){
+        MyLocationData locationData = new MyLocationData.Builder()
+                .accuracy(accuracy)
+                .direction(direction)
+                .longitude(longitude)
+                .latitude(latitude)
+                .build();
+        mBaiduMap.setMyLocationData(locationData);
     }
 
     /**
@@ -146,6 +173,10 @@ public class BaseMapActivity extends BaseActivity  implements SensorEventListene
         }
 
         if(mBaiduMap != null) {
+            if(this.markerService != null) {
+                mBaiduMap.removeMarkerClickListener(this.markerService);
+            }
+
             // 关闭定位图层
             mBaiduMap.setMyLocationEnabled(false);
             mBaiduMap.clear();

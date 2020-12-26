@@ -14,19 +14,18 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
-import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
 import com.heasy.knowroute.R;
 import com.heasy.knowroute.RouteTrackEvent;
-import com.heasy.knowroute.ServiceEngineFactory;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.event.ToastEvent;
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.DatetimeUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
@@ -97,7 +96,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
         initViewComponents();
 
         mMapView = ((MapView) findViewById(R.id.mapView));
-        initBaiduMap(null);
+        initBaiduMap(null, null);
         initPosition();
     }
 
@@ -139,23 +138,8 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
         LatLng latLng = new LatLng(userBean.getLatitude(), userBean.getLongitude());
         updateMapStatus(latLng);
 
-        /*
-        //添加自定义图标的点标注
-        BitmapDescriptor personBitmap = BitmapDescriptorFactory.fromResource(R.drawable.person);
-        OverlayOptions personMarkerOptions = new MarkerOptions()
-                .position(latLng)
-                .icon(personBitmap);
-        mBaiduMap.addOverlay(personMarkerOptions);
-        */
-
-        //定位数据，显示默认的定位Marker
-        MyLocationData locationData = new MyLocationData.Builder()
-                .accuracy(1.0f)
-                .direction(direction)  // 方向信息，顺时针0-360
-                .longitude(userBean.getLongitude())
-                .latitude(userBean.getLatitude())
-                .build();
-        mBaiduMap.setMyLocationData(locationData);
+        //定位数据
+        setLocationData(1.0f, direction, userBean.getLongitude(), userBean.getLatitude());
     }
 
     @Override
