@@ -28,10 +28,10 @@ import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
+import com.heasy.knowroute.core.utils.DoubleUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.event.FixedPointInfoEvent;
-import com.heasy.knowroute.event.FixedPointNavigationEvent;
 import com.heasy.knowroute.map.bean.LocationBean;
 import com.heasy.knowroute.service.HttpService;
 
@@ -40,12 +40,16 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 百度地图覆盖物服务
  */
 public class DefaultMapMarkerService extends AbstractMapMarkerService {
     private static final Logger logger = LoggerFactory.getLogger(DefaultMapMarkerService.class);
+    public static final int DISTANCE_UPDATE_INTERVAL_SECONDS = 5;
 
+    private InfoWindow infoWindow;
     private View view;
     private EditText txtDistance;
     private EditText txtAddress;
@@ -55,6 +59,7 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
     private Activity activity;
     private FixedPointInfoBean bean;
     private ProgressDialog progressDialog;
+    private DistanceUpdater distanceUpdater;
 
     public DefaultMapMarkerService(Activity activity){
         this.activity = activity;
@@ -62,6 +67,9 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
 
     public void init(){
         ServiceEngineFactory.getServiceEngine().getEventService().register(this);
+
+        distanceUpdater = new DistanceUpdater();
+        distanceUpdater.start();
     }
 
     @Override
@@ -73,10 +81,33 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
 
         initWindowView();
 
-        InfoWindow infoWindow = new InfoWindow(view, marker.getPosition(), 350);
+        infoWindow = new InfoWindow(view, marker.getPosition(), 350);
         getBaiduMap().showInfoWindow(infoWindow);
 
         return true;
+    }
+
+    /**
+     * 计算两点之间的直线距离
+     */
+    private String calculateDistance(){
+        String distanceStr = "";
+        try {
+            long distance = 0;
+            LocationBean locationBean = HeasyLocationService.getHeasyLocationClient() != null ? HeasyLocationService.getHeasyLocationClient().getLastedLocation() : null;
+            if (locationBean != null && getCurrentMarker() != null) {
+                distance = new Double(DistanceUtil.getDistance(locationBean.getLatLng(), getCurrentMarker().getPosition())).longValue();
+            }
+
+            if(distance > 1000){
+                distanceStr = DoubleUtil.decimalNum(distance / 1000.0, 3) + "公里";
+            }else{
+                distanceStr = distance + "米";
+            }
+        }catch (Exception ex){
+            logger.error("", ex);
+        }
+        return distanceStr;
     }
 
     private void initWindowView(){
@@ -97,44 +128,14 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
         txtAddress.setText(bean.getAddress());
 
         //距离
-        long distance = 0;
-        LocationBean currentLocationBean = HeasyLocationService.getHeasyLocationClient()!=null ? HeasyLocationService.getHeasyLocationClient().getCurrentLocation() : null;
-        if(currentLocationBean != null) {
-            distance = new Double(DistanceUtil.getDistance(currentLocationBean.getLatLng(), getCurrentMarker().getPosition())).longValue();
-        }
         txtDistance = (EditText)view.findViewById(R.id.txtDistance);
-        txtDistance.setText(distance + " 米");
+        txtDistance.setText(calculateDistance());
 
         txtLabel = (EditText)view.findViewById(R.id.txtLabel);
         txtLabel.setText(bean.getLabel());
 
         txtComments = (EditText)view.findViewById(R.id.txtComments);
         txtComments.setText(bean.getComments());
-
-        /*
-        serviceEngine.getSearchService().reverseGeoCode(marker.getPosition().latitude, marker.getPosition().longitude, new ReverseGeoCodeResultCallback() {
-            @Override
-            public void execute(String address, LatLng latLng) {
-                //距离，单位为米
-                long distance = new Double(DistanceUtil.getDistance(serviceEngine.getLocationService().getPosition(), latLng)).longValue();
-
-                double lat = new BigDecimal(latLng.latitude).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
-                double lon = new BigDecimal(latLng.longitude).setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
-                txtLatitude.setText(String.valueOf(lat));
-                txtLongitude.setText(String.valueOf(lon));
-
-                txtDistance.setText(String.valueOf(distance) + " 米");
-                txtAddress.setText(address);
-
-                if(StringUtil.isNotEmpty(id)){
-                    ConfigBean bean = ConfigService.getConfigMap().get(id);
-                    if(bean != null){
-                        txtComments.setText(bean.getComments());
-                    }
-                }
-            }
-        });
-        */
 
         //保存
         Button btnSave = (Button) view.findViewById(R.id.btnSave);
@@ -164,16 +165,16 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
                                     bundle.putSerializable("bean", bean);
                                     getCurrentMarker().setExtraInfo(bundle);
 
-                                    ServiceEngineFactory.getServiceEngine().getEventService()
-                                            .postEvent(new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.SAVE.name(), ""));
+                                    FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.SAVE.name(), "");
+                                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
                                 } else {
-                                    ServiceEngineFactory.getServiceEngine().getEventService()
-                                            .postEvent(new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.SAVE.name(), HttpService.getFailureMessage(responseBean)));
+                                    FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.SAVE.name(), HttpService.getFailureMessage(responseBean));
+                                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
                                 }
                             }catch (Exception ex){
                                 logger.error("", ex);
-                                ServiceEngineFactory.getServiceEngine().getEventService()
-                                        .postEvent(new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.SAVE.name(), "保存失败"));
+                                FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.SAVE.name(), "保存失败");
+                                ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
                             }
                         }
                     }.start();
@@ -186,8 +187,33 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getCurrentMarker().remove();
-                getBaiduMap().hideInfoWindow();
+                if(bean.getId() > 0){
+                    progressDialog = AndroidUtil.showLoadingDialog(activity, "正在处理...");
+                    new DefaultDaemonThread(){
+                        @Override
+                        public void run() {
+                            try {
+                                String url = "fixedPointInfo/deleteById/" + bean.getUserId() + "/" + bean.getId();
+                                ResponseBean responseBean = HttpService.postJson(ServiceEngineFactory.getServiceEngine().getHeasyContext(), url, "");
+                                if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
+                                    FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.DELETE.name(), "");
+                                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
+                                } else {
+                                    FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.DELETE.name(), HttpService.getFailureMessage(responseBean));
+                                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
+                                }
+                            }catch (Exception ex){
+                                logger.error("", ex);
+                                FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.DELETE.name(), "删除失败");
+                                ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
+                            }
+                        }
+                    }.start();
+                }else{
+                    getCurrentMarker().remove();
+                    closeInfoWindow();
+                    AndroidUtil.showToast(activity, "删除成功");
+                }
             }
         });
 
@@ -196,7 +222,7 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
         btnRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getBaiduMap().hideInfoWindow();
+                closeInfoWindow();
             }
         });
 
@@ -205,9 +231,14 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getBaiduMap().hideInfoWindow();
+                closeInfoWindow();
             }
         });
+    }
+
+    private void closeInfoWindow(){
+        getBaiduMap().hideInfoWindow();
+        infoWindow = null;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -218,14 +249,24 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
         }
 
         if (event != null) {
-            if(StringUtil.isEmpty(event.getMessage())){ //success
-                if(event.getActionName().equalsIgnoreCase(FixedPointInfoEvent.ACTION_NAME.SAVE.name())){//save
-                    updateMarkerLabelDisplayStatus();
-                    updateMarkerIcon();
-                    AndroidUtil.showToast(activity, "保存成功");
+            if(event.getActionName().equalsIgnoreCase(FixedPointInfoEvent.ACTION_NAME.UPDATE_DISTANCE.name())){
+                if(txtDistance != null) {
+                    txtDistance.setText(event.getMessage());
                 }
             }else{
-                AndroidUtil.showToast(activity, event.getMessage());
+                if(StringUtil.isEmpty(event.getMessage())){ //success
+                    if(event.getActionName().equalsIgnoreCase(FixedPointInfoEvent.ACTION_NAME.SAVE.name())){//save
+                        updateMarkerLabelDisplayStatus();
+                        updateMarkerIcon();
+                        AndroidUtil.showToast(activity, "保存成功");
+                    }else if(event.getActionName().equalsIgnoreCase(FixedPointInfoEvent.ACTION_NAME.DELETE.name())){//delete
+                        getCurrentMarker().remove();
+                        closeInfoWindow();
+                        AndroidUtil.showToast(activity, "删除成功");
+                    }
+                }else{
+                    AndroidUtil.showToast(activity, event.getMessage());
+                }
             }
         }
     }
@@ -339,14 +380,49 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
     }
 
     public void destroy(){
-        if(progressDialog != null){
-            progressDialog.dismiss();
-            progressDialog = null;
-        }
+        this.activity = null;
 
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
 
-        this.activity = null;
+        try {
+            if(progressDialog != null){
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+        }catch (Exception ex){
+
+        }
+
+        try {
+            if (distanceUpdater != null) {
+                distanceUpdater.interrupt();
+            }
+        }catch (Exception ex){
+
+        }
+    }
+
+    class DistanceUpdater extends DefaultDaemonThread{
+        @Override
+        public void run() {
+            while (true){
+                try{
+                    TimeUnit.SECONDS.sleep(DISTANCE_UPDATE_INTERVAL_SECONDS);
+
+                    if(infoWindow == null){
+                        continue;
+                    }
+
+                    String distance = calculateDistance();
+                    logger.debug("当前距离目标点距离为 " + distance);
+
+                    FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.UPDATE_DISTANCE.name(), distance);
+                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
+                }catch (Exception ex){
+                    logger.error("", ex);
+                }
+            }
+        }
     }
 
 }

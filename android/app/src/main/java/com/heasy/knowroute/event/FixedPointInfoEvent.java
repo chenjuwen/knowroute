@@ -37,6 +37,7 @@ public class FixedPointInfoEvent extends AbstractEvent {
 
     public enum ACTION_NAME{
         SAVE,
+        UPDATE_DISTANCE,
         DELETE
     }
 }

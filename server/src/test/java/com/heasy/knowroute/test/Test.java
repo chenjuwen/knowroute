@@ -6,8 +6,7 @@ import com.heasy.knowroute.utils.DatetimeUtil;
 
 public class Test {
 	public static void main(String[] args) {
-		String phone = "13798189352";
-		System.out.println(phone.substring(0, 3) + "****" + phone.substring(7));
+		System.out.println(12345 / 1000.0);
 	}
 
 	private static void dt() {
