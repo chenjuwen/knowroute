@@ -9,11 +9,15 @@
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
+        android:minWidth="60dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="距你8米"
         android:textStyle="bold"
+        android:gravity="center"
         android:background="#008080"
+        android:padding="3dp"
+        android:visibility="gone"
         android:textColor="@color/yellow"
         android:textSize="14dp" />
 

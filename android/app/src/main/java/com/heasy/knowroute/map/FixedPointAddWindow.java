@@ -2,7 +2,6 @@ package com.heasy.knowroute.map;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -11,17 +10,24 @@ import android.widget.RadioGroup;
 
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
-import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
+import com.heasy.knowroute.activity.FixedPointNavigationActivity;
 import com.heasy.knowroute.bean.FixedPointInfoBean;
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
+import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.map.bean.LocationBean;
+import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.LoginServiceImpl;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FixedPointAddWindow {
+    private static final Logger logger = LoggerFactory.getLogger(FixedPointAddWindow.class);
     private Activity activity;
     private DefaultMapMarkerService mapMarkerService;
-
     private int findType; //1按当前位置，2按经纬度，3按地址
 
     //add window
@@ -36,6 +42,10 @@ public class FixedPointAddWindow {
     public FixedPointAddWindow(Activity activity, DefaultMapMarkerService mapMarkerService){
         this.activity = activity;
         this.mapMarkerService = mapMarkerService;
+    }
+
+    public void init(){
+        initWindowView();
     }
 
     private void initWindowView(){
@@ -101,10 +111,16 @@ public class FixedPointAddWindow {
                             return;
                         }
 
+                        LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+
                         FixedPointInfoBean bean = new FixedPointInfoBean();
+                        bean.setUserId(loginService.getUserId());
+                        bean.setCategoryId((Integer) ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FixedPointNavigationActivity.FIXED_POINT_CATEGORY_ID));
                         bean.setLongitude(Double.parseDouble(longitude));
                         bean.setLatitude(Double.parseDouble(latitude));
                         bean.setAddress(txtAddress.getText().toString());
+
+                        logger.debug(FastjsonUtil.object2String(bean));
 
                         //add marker
                         Bitmap bitmap = mapMarkerService.getViewBitmap(mapMarkerService.getMapPointView(""));
@@ -132,23 +148,22 @@ public class FixedPointAddWindow {
         });
     }
 
-    /**
-     * 获取屏幕中心的坐标点经纬度
-     */
-    private LatLng getScreenCenterLocation(){
-        Point point = AndroidUtil.getDisplaySize(activity);
-
-        Point centerPoint = new Point();
-        centerPoint.x = point.x / 2;
-        centerPoint.y = point.y / 2;
-
-        LatLng centerLatLng = mapMarkerService.getBaiduMap().getProjection().fromScreenLocation(centerPoint);
-        return centerLatLng;
+    private void reset(){
+        findType = 0;
+        radioGroup.clearCheck();
+        txtLongitude.setText("");
+        txtLatitude.setText("");
+        txtAddress.setText("");
     }
 
     public void showWindow(){
-        initWindowView();
-        InfoWindow infoWindow = new InfoWindow(view, getScreenCenterLocation(), 280);
+        reset();
+        InfoWindow infoWindow = new InfoWindow(view, mapMarkerService.getScreenCenterLocation(activity), 280);
         mapMarkerService.getBaiduMap().showInfoWindow(infoWindow);
+    }
+
+    public void destroy(){
+        mapMarkerService = null;
+        activity = null;
     }
 }

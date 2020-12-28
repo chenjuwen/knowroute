@@ -17,13 +17,13 @@ import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
-import com.heasy.knowroute.action.common.FixedPointNavigationEvent;
 import com.heasy.knowroute.bean.FixedPointCategoryBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
+import com.heasy.knowroute.event.FixedPointNavigationEvent;
 import com.heasy.knowroute.map.DefaultMapMarkerService;
 import com.heasy.knowroute.map.FixedPointAddWindow;
 import com.heasy.knowroute.service.HttpService;
@@ -40,6 +40,7 @@ import java.util.List;
 
 public class FixedPointNavigationActivity extends BaseMapActivity implements View.OnClickListener{
     private static final Logger logger = LoggerFactory.getLogger(FixedPointNavigationActivity.class);
+    public static final String FIXED_POINT_CATEGORY_ID = "fixedPointCategoryId";
 
     private DrawerLayout drawer_layout;
     private Button btnBack;
@@ -50,10 +51,9 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
 
     private UserBean userBean;
     private List<FixedPointCategoryBean> dataList = new ArrayList<>();
-    private int selectedIndex = -1;
-
 
     private DefaultMapMarkerService mapMarkerService;
+    private FixedPointAddWindow fixedPointAddWindow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +64,11 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
 
         ServiceEngineFactory.getServiceEngine().getEventService().register(this);
 
-        this.mapMarkerService = new DefaultMapMarkerService();
+        this.mapMarkerService = new DefaultMapMarkerService(FixedPointNavigationActivity.this);
+        this.mapMarkerService.init();
+
+        this.fixedPointAddWindow = new FixedPointAddWindow(FixedPointNavigationActivity.this, this.mapMarkerService);
+        this.fixedPointAddWindow.init();
 
         initViews();
         initBaiduMap(null, this.mapMarkerService);
@@ -171,7 +175,10 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                 list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        selectedIndex = position;
+                        //categoryId set to cache
+                        Integer categoryId = dataList.get(position).getId();
+                        ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().set(FIXED_POINT_CATEGORY_ID, categoryId);
+
                         selectedCategory.setText(dataList.get(position).getName());
                         btnDrawPoint.setVisibility(View.VISIBLE);
                         drawer_layout.closeDrawer(Gravity.END);
@@ -188,7 +195,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
         if(v.getId() == R.id.btnBack){
             finish();
         }else if(v.getId() == R.id.btnDrawPoint){
-            new FixedPointAddWindow(FixedPointNavigationActivity.this, mapMarkerService).showWindow();
+            fixedPointAddWindow.showWindow();
         }else if(v.getId() == R.id.btnShowMenu){
             if(dataList == null || dataList.size() == 0){
                 progressDialog = AndroidUtil.showLoadingDialog(FixedPointNavigationActivity.this, "数据加载中...");
@@ -215,6 +222,8 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        this.fixedPointAddWindow.destroy();
+        this.mapMarkerService.destroy();
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
     }
 }

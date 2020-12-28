@@ -1,4 +1,4 @@
-package com.heasy.knowroute.action.common;
+package com.heasy.knowroute.event;
 
 import com.heasy.knowroute.core.event.AbstractEvent;
 

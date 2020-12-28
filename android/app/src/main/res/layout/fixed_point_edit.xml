@@ -18,7 +18,7 @@
             android:textSize="16dp"
             android:textStyle="bold"
             android:textColor="@color/white"
-            android:text="位置点属性" />
+            android:text="位置属性" />
         <TextView
             android:id="@+id/tvNewLabel"
             android:layout_width="wrap_content"
