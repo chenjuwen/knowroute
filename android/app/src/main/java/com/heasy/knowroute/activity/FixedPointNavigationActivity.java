@@ -1,5 +1,6 @@
 package com.heasy.knowroute.activity;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
@@ -11,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
@@ -18,11 +20,14 @@ import com.heasy.knowroute.R;
 import com.heasy.knowroute.action.ResponseBean;
 import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.bean.FixedPointCategoryBean;
+import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
+import com.heasy.knowroute.core.utils.StringUtil;
+import com.heasy.knowroute.event.FixedPointCategoryChangeEvent;
 import com.heasy.knowroute.event.FixedPointNavigationEvent;
 import com.heasy.knowroute.map.DefaultMapMarkerService;
 import com.heasy.knowroute.map.FixedPointAddWindow;
@@ -50,7 +55,8 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     private ListView list_view;
 
     private UserBean userBean;
-    private List<FixedPointCategoryBean> dataList = new ArrayList<>();
+    private List<FixedPointCategoryBean> categoryList = new ArrayList<>();
+    private List<FixedPointInfoBean> pointList;
 
     private DefaultMapMarkerService mapMarkerService;
     private FixedPointAddWindow fixedPointAddWindow;
@@ -150,7 +156,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                     String url = "fixedPointCategory/list/" + loginService.getUserId();
                     ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), url);
                     if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                        dataList = FastjsonUtil.arrayString2List((String) responseBean.getData(), FixedPointCategoryBean.class);
+                        categoryList = FastjsonUtil.arrayString2List((String) responseBean.getData(), FixedPointCategoryBean.class);
                         ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointNavigationEvent(this, "success"));
                     }
                 }catch (Exception ex){
@@ -162,30 +168,85 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void handleEvent(final FixedPointNavigationEvent event){
+    public void handleNavigationEvent(final FixedPointNavigationEvent event){
         if(event != null){
             if(progressDialog != null){
                 progressDialog.dismiss();
                 progressDialog = null;
             }
 
-            if(dataList != null && dataList.size() > 0) {
-                FixedPointNavigationAdapter adapter = new FixedPointNavigationAdapter(FixedPointNavigationActivity.this, dataList);
+            if(categoryList != null && categoryList.size() > 0) {
+                FixedPointNavigationAdapter adapter = new FixedPointNavigationAdapter(FixedPointNavigationActivity.this, categoryList);
                 list_view.setAdapter(adapter);
                 list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        //categoryId set to cache
-                        Integer categoryId = dataList.get(position).getId();
-                        ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().set(FIXED_POINT_CATEGORY_ID, categoryId);
-
-                        selectedCategory.setText(dataList.get(position).getName());
                         btnDrawPoint.setVisibility(View.VISIBLE);
                         drawer_layout.closeDrawer(Gravity.END);
+
+                        Integer newCategoryId = categoryList.get(position).getId();
+                        Integer oldCategoryId = (Integer) ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FIXED_POINT_CATEGORY_ID);
+                        if(newCategoryId == oldCategoryId){
+                            return;
+                        }
+
+                        //categoryId set to cache
+                        ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().set(FIXED_POINT_CATEGORY_ID, newCategoryId);
+
+                        selectedCategory.setText(categoryList.get(position).getName());
+
+                        //refresh map
+                        mapMarkerService.getBaiduMap().clear();
+
+                        progressDialog = AndroidUtil.showLoadingDialog(FixedPointNavigationActivity.this, "数据加载中...");
+
+                        new DefaultDaemonThread(){
+                            @Override
+                            public void run() {
+                                try{
+                                    Integer categoryId = (Integer)ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FIXED_POINT_CATEGORY_ID);
+                                    LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+                                    String url = "fixedPointInfo/list/" + loginService.getUserId() + "/" + categoryId;
+                                    ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), url);
+                                    if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
+                                        pointList = FastjsonUtil.arrayString2List((String) responseBean.getData(), FixedPointInfoBean.class);
+                                        ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointCategoryChangeEvent(this, ""));
+                                    }
+                                }catch (Exception ex){
+                                    logger.error("", ex);
+                                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointCategoryChangeEvent(this, "数据加载失败"));
+                                }
+                            }
+                        }.start();
                     }
                 });
 
                 openDrawer();
+            }
+        }
+    }
+
+    /**
+     * 显示某个类别的所有Marker
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleCategoryChangeEvent(final FixedPointCategoryChangeEvent event) {
+        if (event != null) {
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+
+            if(StringUtil.isEmpty(event.getMessage())){//success
+                if(pointList != null && pointList.size() > 0){
+                    for(int i=0; i<pointList.size(); i++){
+                        FixedPointInfoBean bean = pointList.get(i);
+                        Bitmap bitmap = mapMarkerService.getViewBitmap(mapMarkerService.getMapPointView(bean.getLabel()));
+                        mapMarkerService.addMarkerOverlay(bean, BitmapDescriptorFactory.fromBitmap(bitmap));
+                    }
+                }
+            }else{
+                AndroidUtil.showToast(FixedPointNavigationActivity.this, event.getMessage());
             }
         }
     }
@@ -197,7 +258,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
         }else if(v.getId() == R.id.btnDrawPoint){
             fixedPointAddWindow.showWindow();
         }else if(v.getId() == R.id.btnShowMenu){
-            if(dataList == null || dataList.size() == 0){
+            if(categoryList == null || categoryList.size() == 0){
                 progressDialog = AndroidUtil.showLoadingDialog(FixedPointNavigationActivity.this, "数据加载中...");
                 loadData();
             }else{
@@ -222,6 +283,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().delete(FIXED_POINT_CATEGORY_ID);
         this.fixedPointAddWindow.destroy();
         this.mapMarkerService.destroy();
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);

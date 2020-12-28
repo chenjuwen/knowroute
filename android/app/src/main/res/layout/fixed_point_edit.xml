@@ -207,7 +207,7 @@
             android:textColor="@color/black"
             android:layout_marginRight="10dp"
             android:textSize="15dp"
-            android:text="路径规划" />
+            android:text="路线规划" />
 
         <Button
             android:id="@+id/btnClose"
