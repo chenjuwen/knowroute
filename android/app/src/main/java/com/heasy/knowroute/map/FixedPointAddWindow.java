@@ -1,6 +1,7 @@
 package com.heasy.knowroute.map;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,14 +11,18 @@ import android.widget.RadioGroup;
 
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
+import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
 import com.heasy.knowroute.activity.FixedPointNavigationActivity;
 import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
-import com.heasy.knowroute.core.utils.FastjsonUtil;
+import com.heasy.knowroute.core.utils.DoubleUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.map.bean.LocationBean;
+import com.heasy.knowroute.map.geocode.DefaultGetGeoCode;
+import com.heasy.knowroute.map.geocode.DefaultGetReverseGeoCode;
+import com.heasy.knowroute.map.geocode.ReverseGeoCodeResultCallback;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
 
@@ -29,6 +34,10 @@ public class FixedPointAddWindow {
     private Activity activity;
     private DefaultMapMarkerService mapMarkerService;
     private int findType; //1按当前位置，2按经纬度，3按地址
+
+    private DefaultGetReverseGeoCode getReverseGeoCode;
+    private DefaultGetGeoCode getGeoCode;
+    private ProgressDialog progressDialog;
 
     //add window
     private View view;
@@ -45,6 +54,12 @@ public class FixedPointAddWindow {
     }
 
     public void init(){
+        getReverseGeoCode = new DefaultGetReverseGeoCode();
+        getReverseGeoCode.init();
+
+        getGeoCode = new DefaultGetGeoCode();
+        getGeoCode.init();
+
         initWindowView();
     }
 
@@ -102,35 +117,48 @@ public class FixedPointAddWindow {
         btnFind.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                String latitude = "0";
+                String longitude = "0";
+
                 switch (findType){
-                    case 1:
-                        String latitude = txtLatitude.getText().toString();
-                        String longitude = txtLongitude.getText().toString();
+                    case 1: //按当前位置
+                        latitude = StringUtil.trimToEmpty(txtLatitude.getText().toString());
+                        longitude = StringUtil.trimToEmpty(txtLongitude.getText().toString());
                         if(StringUtil.isEmpty(latitude) || StringUtil.isEmpty(longitude)){
                             AndroidUtil.showToast(activity, "经纬度坐标有误");
                             return;
                         }
 
-                        LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
-
-                        FixedPointInfoBean bean = new FixedPointInfoBean();
-                        bean.setUserId(loginService.getUserId());
-                        bean.setCategoryId((Integer) ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FixedPointNavigationActivity.FIXED_POINT_CATEGORY_ID));
-                        bean.setLongitude(Double.parseDouble(longitude));
-                        bean.setLatitude(Double.parseDouble(latitude));
-                        bean.setAddress(txtAddress.getText().toString());
-
-                        logger.debug(FastjsonUtil.object2String(bean));
-
-                        //add marker
-                        Bitmap bitmap = mapMarkerService.getViewBitmap(mapMarkerService.getMapPointView(""));
-                        mapMarkerService.addMarkerOverlay(bean, BitmapDescriptorFactory.fromBitmap(bitmap));
-
-                        mapMarkerService.getBaiduMap().hideInfoWindow();
+                        addMarker(Double.parseDouble(longitude), Double.parseDouble(latitude), txtAddress.getText().toString());
                         break;
-                    case 2:
+                    case 2: //按经纬坐标
+                        latitude = StringUtil.trimToEmpty(txtLatitude.getText().toString());
+                        longitude = StringUtil.trimToEmpty(txtLongitude.getText().toString());
+                        if(StringUtil.isEmpty(latitude) || StringUtil.isEmpty(longitude)){
+                            AndroidUtil.showToast(activity, "经纬度坐标有误");
+                            return;
+                        }
+
+                        LatLng location = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+
+                        progressDialog = AndroidUtil.showLoadingDialog(activity, "正在定位...");
+                        getReverseGeoCode.getReverseGeoCode(location, new ReverseGeoCodeResultCallback() {
+                            @Override
+                            public void execute(String address, LatLng location) {
+                                if(progressDialog != null){
+                                    progressDialog.dismiss();
+                                    progressDialog = null;
+                                }
+
+                                double longitude = DoubleUtil.decimalNum(location.longitude, 6);
+                                double latitude = DoubleUtil.decimalNum(location.latitude, 6);
+
+                                addMarker(longitude, latitude, address);
+                            }
+                        });
                         break;
-                    case 3:
+                    case 3: //按地址
+
                         break;
                     default:
                         break;
@@ -146,6 +174,26 @@ public class FixedPointAddWindow {
                 mapMarkerService.getBaiduMap().hideInfoWindow();
             }
         });
+    }
+
+    private void addMarker(double longitude, double latitude, String address) {
+        LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+
+        FixedPointInfoBean bean = new FixedPointInfoBean();
+        bean.setUserId(loginService.getUserId());
+        bean.setCategoryId((Integer) ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FixedPointNavigationActivity.FIXED_POINT_CATEGORY_ID));
+        bean.setLongitude(longitude);
+        bean.setLatitude(latitude);
+        bean.setAddress(address);
+        bean.setLabel("新增");
+
+        //add marker
+        Bitmap bitmap = mapMarkerService.getViewBitmap(mapMarkerService.getMapPointView(bean.getLabel()));
+        mapMarkerService.addMarkerOverlay(bean, BitmapDescriptorFactory.fromBitmap(bitmap));
+
+        mapMarkerService.updateMapStatus(new LatLng(latitude, longitude));
+
+        mapMarkerService.getBaiduMap().hideInfoWindow();
     }
 
     private void reset(){
@@ -165,5 +213,15 @@ public class FixedPointAddWindow {
     public void destroy(){
         mapMarkerService = null;
         activity = null;
+
+        if(getReverseGeoCode != null){
+            getReverseGeoCode.destroy();
+            getReverseGeoCode = null;
+        }
+
+        if(getGeoCode != null){
+            getGeoCode.destroy();
+            getGeoCode = null;
+        }
     }
 }

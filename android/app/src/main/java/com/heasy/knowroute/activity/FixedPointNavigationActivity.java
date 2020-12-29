@@ -239,11 +239,17 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
 
             if(StringUtil.isEmpty(event.getMessage())){//success
                 if(pointList != null && pointList.size() > 0){
+                    List<LatLng> list = new ArrayList<>();
+
                     for(int i=0; i<pointList.size(); i++){
                         FixedPointInfoBean bean = pointList.get(i);
                         Bitmap bitmap = mapMarkerService.getViewBitmap(mapMarkerService.getMapPointView(bean.getLabel()));
                         mapMarkerService.addMarkerOverlay(bean, BitmapDescriptorFactory.fromBitmap(bitmap));
+                        list.add(new LatLng(bean.getLatitude(), bean.getLongitude()));
                     }
+
+                    //在屏幕显示所有点
+                    mapMarkerService.showAllMarkersInScreen(list);
                 }
             }else{
                 AndroidUtil.showToast(FixedPointNavigationActivity.this, event.getMessage());
@@ -288,4 +294,5 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
         this.mapMarkerService.destroy();
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
     }
+
 }

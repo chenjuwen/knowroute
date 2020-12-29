@@ -73,6 +73,7 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
         mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
 
         if(this.markerService != null) {
+            this.markerService.setMapView(mMapView);
             this.markerService.setBaiduMap(mBaiduMap);
             mBaiduMap.setOnMarkerClickListener(this.markerService);
         }
@@ -126,7 +127,6 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
         double x = sensorEvent.values[SensorManager.DATA_X];
         if (Math.abs(x - lastX) > 1.0) {
             direction = (int) x;
-
             if(mapLocationClient != null) {
                 mapLocationClient.setDirection(direction);
                 mBaiduMap.setMyLocationData(mapLocationClient.getLocationData());

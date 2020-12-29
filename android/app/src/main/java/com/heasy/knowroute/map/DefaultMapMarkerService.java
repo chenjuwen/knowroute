@@ -15,11 +15,14 @@ import android.widget.TextView;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
+import com.baidu.mapapi.map.MapStatusUpdate;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.heasy.knowroute.R;
 import com.heasy.knowroute.action.ResponseBean;
@@ -40,6 +43,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -379,9 +383,24 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
         return centerLatLng;
     }
 
+    /**
+     * 屏幕内显示所有marker
+     */
+    public void showAllMarkersInScreen(List<LatLng> pointList){
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (LatLng latLng : pointList) {
+            builder = builder.include(latLng);
+        }
+        LatLngBounds latlngBounds = builder.build();
+        MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngBounds(latlngBounds, getMapView().getWidth()-50, getMapView().getHeight()-50);
+        getBaiduMap().animateMapStatus(mapStatusUpdate);
+    }
+
     public void destroy(){
         this.activity = null;
-
+        setBaiduMap(null);
+        setMapView(null);
+        setCurrentMarker(null);
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
 
         try {
