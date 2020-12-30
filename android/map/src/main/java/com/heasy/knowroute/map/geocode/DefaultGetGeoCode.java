@@ -25,7 +25,11 @@ public class DefaultGetGeoCode extends AbstractGeoCoder {
         if(geoCodeResult != null && geoCodeResult.error == SearchResult.ERRORNO.NO_ERROR){
             LatLng location = geoCodeResult.getLocation();
             if(geoCodeResultCallback != null){
-                geoCodeResultCallback.execute(location);
+                geoCodeResultCallback.execute(location, null);
+            }
+        }else{
+            if(geoCodeResultCallback != null){
+                geoCodeResultCallback.execute(null, geoCodeResult.error.name());
             }
         }
     }

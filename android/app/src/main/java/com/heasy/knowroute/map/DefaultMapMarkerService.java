@@ -1,7 +1,7 @@
 package com.heasy.knowroute.map;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -62,7 +62,7 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
 
     private Activity activity;
     private FixedPointInfoBean bean;
-    private ProgressDialog progressDialog;
+    private Dialog loadingDialog;
     private DistanceUpdater distanceUpdater;
 
     public DefaultMapMarkerService(Activity activity){
@@ -151,7 +151,7 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
                     bean.setLabel(StringUtil.trimToEmpty(txtLabel.getText().toString()));
                     bean.setComments(StringUtil.trimToEmpty(txtComments.getText().toString()));
 
-                    progressDialog = AndroidUtil.showLoadingDialog(activity, "正在处理...");
+                    loadingDialog = AndroidUtil.showLoadingDialog(activity);
 
                     new DefaultDaemonThread(){
                         @Override
@@ -192,7 +192,8 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
             @Override
             public void onClick(View v) {
                 if(bean.getId() > 0){
-                    progressDialog = AndroidUtil.showLoadingDialog(activity, "正在处理...");
+                    loadingDialog = AndroidUtil.showLoadingDialog(activity);
+
                     new DefaultDaemonThread(){
                         @Override
                         public void run() {
@@ -247,9 +248,9 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleEvent(final FixedPointInfoEvent event) {
-        if(progressDialog != null){
-            progressDialog.dismiss();
-            progressDialog = null;
+        if(loadingDialog != null){
+            loadingDialog.dismiss();
+            loadingDialog = null;
         }
 
         if (event != null) {
@@ -404,9 +405,9 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
 
         try {
-            if(progressDialog != null){
-                progressDialog.dismiss();
-                progressDialog = null;
+            if(loadingDialog != null){
+                loadingDialog.dismiss();
+                loadingDialog = null;
             }
         }catch (Exception ex){
 

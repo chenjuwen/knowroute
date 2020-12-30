@@ -1,6 +1,6 @@
 package com.heasy.knowroute.action.common;
 
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 @JSActionAnnotation(name = "AndroidBuiltin")
 public class AndroidBuiltinAction implements Action {
-    private ProgressDialog progressDialog;
+    private Dialog loadingDialog;
     private DefaultDaemonThread dismissProgressThread;
 
     @Override
@@ -47,7 +47,7 @@ public class AndroidBuiltinAction implements Action {
             interruptThread();
 
             HeasyApplication heasyApplication = (HeasyApplication)heasyContext.getServiceEngine().getAndroidContext();
-            progressDialog = AndroidUtil.showLoadingDialog(heasyApplication.getMainActivity(), message);
+            loadingDialog = AndroidUtil.showLoadingDialog(heasyApplication.getMainActivity(), message);
 
             dismissProgressThread = new DefaultDaemonThread(){
                 @Override
@@ -77,9 +77,9 @@ public class AndroidBuiltinAction implements Action {
     }
 
     private void dismissProgress(){
-        if(progressDialog != null){
-            progressDialog.dismiss();
-            progressDialog = null;
+        if(loadingDialog != null){
+            loadingDialog.dismiss();
+            loadingDialog = null;
         }
     }
 

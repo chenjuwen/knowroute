@@ -170,11 +170,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleNavigationEvent(final FixedPointNavigationEvent event){
         if(event != null){
-            if(progressDialog != null){
-                progressDialog.dismiss();
-                progressDialog = null;
-            }
-
+            dismissLoadingDialog();
             if(categoryList != null && categoryList.size() > 0) {
                 FixedPointNavigationAdapter adapter = new FixedPointNavigationAdapter(FixedPointNavigationActivity.this, categoryList);
                 list_view.setAdapter(adapter);
@@ -198,7 +194,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                         //refresh map
                         mapMarkerService.getBaiduMap().clear();
 
-                        progressDialog = AndroidUtil.showLoadingDialog(FixedPointNavigationActivity.this, "数据加载中...");
+                        loadingDialog = AndroidUtil.showLoadingDialog(FixedPointNavigationActivity.this);
 
                         new DefaultDaemonThread(){
                             @Override
@@ -232,11 +228,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleCategoryChangeEvent(final FixedPointCategoryChangeEvent event) {
         if (event != null) {
-            if (progressDialog != null) {
-                progressDialog.dismiss();
-                progressDialog = null;
-            }
-
+            dismissLoadingDialog();
             if(StringUtil.isEmpty(event.getMessage())){//success
                 if(pointList != null && pointList.size() > 0){
                     List<LatLng> list = new ArrayList<>();
@@ -265,7 +257,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
             fixedPointAddWindow.showWindow();
         }else if(v.getId() == R.id.btnShowMenu){
             if(categoryList == null || categoryList.size() == 0){
-                progressDialog = AndroidUtil.showLoadingDialog(FixedPointNavigationActivity.this, "数据加载中...");
+                loadingDialog = AndroidUtil.showLoadingDialog(FixedPointNavigationActivity.this);
                 loadData();
             }else{
                 openDrawer();

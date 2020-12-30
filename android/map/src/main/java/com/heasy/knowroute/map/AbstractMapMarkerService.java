@@ -14,7 +14,7 @@ public abstract class AbstractMapMarkerService implements BaiduMap.OnMarkerClick
 
     public void updateMapStatus(LatLng latLng){
         MapStatus.Builder builder = new MapStatus.Builder();
-        builder.target(latLng).zoom(AbstractMapLocationClient.DEFAULT_ZOOM);
+        builder.target(latLng).zoom(baiduMap.getMapStatus().zoom); //zoom不变
         getBaiduMap().animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
     }
 

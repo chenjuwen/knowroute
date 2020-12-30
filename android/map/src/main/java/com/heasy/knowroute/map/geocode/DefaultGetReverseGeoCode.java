@@ -1,17 +1,13 @@
 package com.heasy.knowroute.map.geocode;
 
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.search.core.PoiInfo;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
-import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * 经纬坐标转地址
@@ -45,7 +41,11 @@ public class DefaultGetReverseGeoCode extends AbstractGeoCoder {
             logger.debug(location.longitude + "," + location.latitude);
 
             if(reverseGeoCodeResultCallback != null){
-                reverseGeoCodeResultCallback.execute(address, location);
+                reverseGeoCodeResultCallback.execute(address, location, null);
+            }
+        }else{
+            if(reverseGeoCodeResultCallback != null){
+                reverseGeoCodeResultCallback.execute(null, null, reverseGeoCodeResult.error.name());
             }
         }
     }

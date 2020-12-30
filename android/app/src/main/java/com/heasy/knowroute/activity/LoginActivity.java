@@ -1,5 +1,6 @@
 package com.heasy.knowroute.activity;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,7 +35,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     private TextView tvAgreement;
     private TextView tvPolicy;
 
-    private ProgressDialog progressDialog;
+    private Dialog loadingDialog;
 
     private String mobilephone = "";
     private String loginCaptcha = ""; //登录验证码
@@ -53,7 +54,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                 int type = message.what;
                 String result = (String)message.obj;
 
-                progressDialog.dismiss();
+                loadingDialog.dismiss();
 
                 if(type == 1){ //获取验证码
                     if(StringUtil.isEmpty(result)){
@@ -160,7 +161,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             return;
         }
 
-        progressDialog = AndroidUtil.showLoadingDialog(this, "正在登录中...");
+        loadingDialog = AndroidUtil.showLoadingDialog(this, "登录中...");
 
         //登录处理
         new DefaultDaemonThread(){
@@ -189,7 +190,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             return;
         }
 
-        progressDialog = AndroidUtil.showLoadingDialog(this, "正在获取验证码");
+        loadingDialog = AndroidUtil.showLoadingDialog(this, "获取验证码...");
 
         //获取验证码
         new DefaultDaemonThread() {

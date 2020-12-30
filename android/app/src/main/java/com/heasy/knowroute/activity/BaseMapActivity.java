@@ -1,6 +1,6 @@
 package com.heasy.knowroute.activity;
 
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public abstract class BaseMapActivity extends BaseActivity  implements SensorEventListener {
     private static final Logger logger = LoggerFactory.getLogger(BaseMapActivity.class);
 
-    protected ProgressDialog progressDialog;
+    protected Dialog loadingDialog;
 
     // 传感器相关
     protected SensorManager mSensorManager;
@@ -194,5 +194,12 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
 
     public void setMapLocationClient(AbstractMapLocationClient mapLocationClient) {
         this.mapLocationClient = mapLocationClient;
+    }
+
+    protected void dismissLoadingDialog() {
+        if (loadingDialog != null) {
+            loadingDialog.dismiss();
+            loadingDialog = null;
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.heasy.knowroute.map;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +13,7 @@ import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
+import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.activity.FixedPointNavigationActivity;
 import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
@@ -37,7 +38,7 @@ public class FixedPointAddWindow {
 
     private DefaultGetReverseGeoCode getReverseGeoCode;
     private DefaultGetGeoCode getGeoCode;
-    private ProgressDialog progressDialog;
+    private Dialog loadingDialog;
 
     //add window
     private View view;
@@ -141,23 +142,29 @@ public class FixedPointAddWindow {
 
                         LatLng location = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
 
-                        progressDialog = AndroidUtil.showLoadingDialog(activity, "正在定位...");
+                        loadingDialog = AndroidUtil.showLoadingDialog(activity);
+
                         getReverseGeoCode.getReverseGeoCode(location, new ReverseGeoCodeResultCallback() {
                             @Override
-                            public void execute(String address, LatLng location) {
-                                if(progressDialog != null){
-                                    progressDialog.dismiss();
-                                    progressDialog = null;
+                            public void execute(String address, LatLng location, String error) {
+                                dismissLoadingDialog();
+
+                                if(StringUtil.isEmpty(error)) {
+                                    double longitude = DoubleUtil.decimalNum(location.longitude, 6);
+                                    double latitude = DoubleUtil.decimalNum(location.latitude, 6);
+                                    addMarker(longitude, latitude, address);
+                                }else{
+                                    AndroidUtil.showToast(activity, ResponseCode.FAILURE.message());
                                 }
-
-                                double longitude = DoubleUtil.decimalNum(location.longitude, 6);
-                                double latitude = DoubleUtil.decimalNum(location.latitude, 6);
-
-                                addMarker(longitude, latitude, address);
                             }
                         });
                         break;
                     case 3: //按地址
+                        String address = StringUtil.trimToEmpty(txtAddress.getText().toString());
+                        if(StringUtil.isEmpty(address)){
+                            AndroidUtil.showToast(activity, "请输入地址信息");
+                            return;
+                        }
 
                         break;
                     default:
@@ -174,6 +181,13 @@ public class FixedPointAddWindow {
                 mapMarkerService.getBaiduMap().hideInfoWindow();
             }
         });
+    }
+
+    private void dismissLoadingDialog() {
+        if(loadingDialog != null){
+            loadingDialog.dismiss();
+            loadingDialog = null;
+        }
     }
 
     private void addMarker(double longitude, double latitude, String address) {

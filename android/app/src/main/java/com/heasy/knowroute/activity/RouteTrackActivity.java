@@ -207,7 +207,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
             }
         }
 
-        progressDialog = AndroidUtil.showLoadingDialog(this, "正在加载...");
+        loadingDialog = AndroidUtil.showLoadingDialog(this);
         logger.debug("current zoom: " + mBaiduMap.getMapStatus().zoom);
 
         new DefaultDaemonThread(){
@@ -218,7 +218,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
                 }catch (Exception ex){
                     logger.error("", ex);
                 }
-                progressDialog.dismiss();
+                dismissLoadingDialog();
             }
         }.start();
     }

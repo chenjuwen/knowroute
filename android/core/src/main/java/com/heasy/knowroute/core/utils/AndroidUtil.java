@@ -1,12 +1,20 @@
 package com.heasy.knowroute.core.utils;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Point;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.heasy.knowroute.core.R;
 
 /**
  * Created by Administrator on 2020/10/14.
@@ -22,24 +30,35 @@ public class AndroidUtil {
         toast.show();
     }
 
-    public static ProgressDialog showLoadingDialog(Context context, String message){
-        ProgressDialog progressDialog = new ProgressDialog(context);
+    public static Dialog showLoadingDialog(Context context){
+        return showLoadingDialog(context, "");
+    }
 
-        //progressDialog.getWindow().getAttributes().gravity = Gravity.CENTER; //居中
+    public static Dialog showLoadingDialog(Context context, String message){
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.layout_loading, null);
+        ImageView imageView = (ImageView)view.findViewById(R.id.loadingImageView);
+        TextView textView = (TextView) view.findViewById(R.id.loadingTextView);
 
-        //对话框宽度
-        //WindowManager.LayoutParams params = progressDialog.getWindow().getAttributes();
-        //params.width = 200;
-        //progressDialog.getWindow().setAttributes(params);
+        if(StringUtil.isNotEmpty(message)) {
+            textView.setText(message);
+            textView.setVisibility(View.VISIBLE);
+        }else{
+            textView.setVisibility(View.GONE);
+        }
 
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER); //环形进度条
-        progressDialog.setCancelable(false);
-        progressDialog.setCanceledOnTouchOutside(false); //点击外部返回
-        progressDialog.setIndeterminate(false); //进度条是否明确
-        progressDialog.setTitle("");
-        progressDialog.setMessage(message);
-        progressDialog.show();
-        return progressDialog;
+        //加载图片到ImageView
+        Glide.with(context)
+                .load(R.drawable.loading)
+                .into(imageView);
+
+        Dialog loadingDialog = new Dialog(context);
+        loadingDialog.setCancelable(false);
+        loadingDialog.setCanceledOnTouchOutside(false);
+        loadingDialog.setContentView(view, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
+        loadingDialog.show();
+
+        return loadingDialog;
     }
 
     /**
