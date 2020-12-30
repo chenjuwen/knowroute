@@ -23,6 +23,9 @@ import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.TextOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
+import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
+import com.baidu.mapapi.navi.BaiduMapNavigation;
+import com.baidu.mapapi.navi.NaviParaOption;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.heasy.knowroute.R;
 import com.heasy.knowroute.action.ResponseBean;
@@ -222,12 +225,30 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
             }
         });
 
-        //路径规划
-        Button btnRoute = (Button)view.findViewById(R.id.btnRoute);
-        btnRoute.setOnClickListener(new View.OnClickListener() {
+        //导航
+        Button btnNav = (Button)view.findViewById(R.id.btnNav);
+        btnNav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closeInfoWindow();
+                LocationBean locationBean = HeasyLocationService.getHeasyLocationClient() != null ? HeasyLocationService.getHeasyLocationClient().getLastedLocation() : null;
+                if (locationBean != null && getCurrentMarker() != null) {
+                    NaviParaOption option = new NaviParaOption();
+                    option.startPoint(locationBean.getLatLng());
+                    option.startName("从这里开始");
+                    option.endPoint(getCurrentMarker().getPosition());
+                    option.endName("到这里结束");
+
+                    try {
+                        BaiduMapNavigation.setSupportWebNavi(false);
+                        BaiduMapNavigation.openBaiduMapNavi(option, activity);
+                    }catch (BaiduMapAppNotSupportNaviException ex){
+                        logger.error("", ex);
+                        AndroidUtil.showToast(activity, "请确认是否已安装百度地图APP");
+                    }catch (Exception ex){
+                        logger.error("", ex);
+                        AndroidUtil.showToast(activity, "调起百度地图APP失败");
+                    }
+                }
             }
         });
 
