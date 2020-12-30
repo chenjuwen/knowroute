@@ -23,12 +23,16 @@ import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.map.bean.LocationBean;
 import com.heasy.knowroute.map.geocode.DefaultGetGeoCode;
 import com.heasy.knowroute.map.geocode.DefaultGetReverseGeoCode;
+import com.heasy.knowroute.map.geocode.GeoCodeResultCallback;
 import com.heasy.knowroute.map.geocode.ReverseGeoCodeResultCallback;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FixedPointAddWindow {
     private static final Logger logger = LoggerFactory.getLogger(FixedPointAddWindow.class);
@@ -41,6 +45,7 @@ public class FixedPointAddWindow {
     private Dialog loadingDialog;
 
     //add window
+    InfoWindow infoWindow;
     private View view;
     private RadioGroup radioGroup;
     private EditText txtLongitude;
@@ -166,8 +171,32 @@ public class FixedPointAddWindow {
                             return;
                         }
 
+                        String city = getCity(address);
+                        logger.debug("city=" + city);
+                        if(StringUtil.isEmpty(city)){
+                            AndroidUtil.showToast(activity, "地址没有城市信息");
+                            return;
+                        }
+
+                        loadingDialog = AndroidUtil.showLoadingDialog(activity);
+
+                        getGeoCode.getGeoCode(city, address, new GeoCodeResultCallback() {
+                            @Override
+                            public void execute(LatLng location, String error) {
+                                dismissLoadingDialog();
+
+                                if(StringUtil.isEmpty(error)) {
+                                    double longitude = DoubleUtil.decimalNum(location.longitude, 6);
+                                    double latitude = DoubleUtil.decimalNum(location.latitude, 6);
+                                    addMarker(longitude, latitude, address);
+                                }else{
+                                    AndroidUtil.showToast(activity, ResponseCode.FAILURE.message());
+                                }
+                            }
+                        });
                         break;
                     default:
+                        AndroidUtil.showToast(activity, "请选择一种定位方式");
                         break;
                 }
             }
@@ -178,7 +207,7 @@ public class FixedPointAddWindow {
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mapMarkerService.getBaiduMap().hideInfoWindow();
+                hideWindow();
             }
         });
     }
@@ -188,6 +217,21 @@ public class FixedPointAddWindow {
             loadingDialog.dismiss();
             loadingDialog = null;
         }
+    }
+
+    private String getCity(String address){
+        String city = "";
+
+        String regex = "(?<province>[^省]+自治区|.*?省|.*?行政区|.*?市)?(?<city>[^市]+自治州|.*?地区|.*?行政单位|.+盟|市辖区|.*?市|.*?县)(?<county>[^县]+县|.+区|.+市|.+旗|.+海域|.+岛)?(?<town>[^区]+区|.+镇)?(?<village>.*)";
+        Matcher m = Pattern.compile(regex).matcher(address);
+        if(m.find()){
+            city = m.group(3);
+            if(StringUtil.isEmpty(city)){
+                city = m.group(2);
+            }
+        }
+
+        return city;
     }
 
     private void addMarker(double longitude, double latitude, String address) {
@@ -207,7 +251,7 @@ public class FixedPointAddWindow {
 
         mapMarkerService.updateMapStatus(new LatLng(latitude, longitude));
 
-        mapMarkerService.getBaiduMap().hideInfoWindow();
+        hideWindow();
     }
 
     private void reset(){
@@ -220,8 +264,13 @@ public class FixedPointAddWindow {
 
     public void showWindow(){
         reset();
-        InfoWindow infoWindow = new InfoWindow(view, mapMarkerService.getScreenCenterLocation(activity), 280);
+        infoWindow = new InfoWindow(view, mapMarkerService.getScreenCenterLocation(activity), 280);
         mapMarkerService.getBaiduMap().showInfoWindow(infoWindow);
+    }
+
+    private void hideWindow(){
+        mapMarkerService.getBaiduMap().hideInfoWindow(infoWindow);
+        infoWindow = null;
     }
 
     public void destroy(){

@@ -11,10 +11,11 @@ import com.baidu.mapapi.search.geocode.GeoCodeResult;
 public class DefaultGetGeoCode extends AbstractGeoCoder {
     private GeoCodeResultCallback geoCodeResultCallback;
 
-    public void getGeoCode(String address, GeoCodeResultCallback geoCodeResultCallback){
+    public void getGeoCode(String city, String address, GeoCodeResultCallback geoCodeResultCallback){
         this.geoCodeResultCallback = geoCodeResultCallback;
 
         GeoCodeOption geoCodeOption = new GeoCodeOption();
+        geoCodeOption.city(city);
         geoCodeOption.address(address);
 
         getGeoCoder().geocode(geoCodeOption);

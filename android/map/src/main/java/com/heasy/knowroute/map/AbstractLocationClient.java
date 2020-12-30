@@ -26,6 +26,7 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
 
     private LocationBean currentLocation; //当前已被采纳的位置点
     private LocationBean lastedLocation; //最新的位置点，不一定被采纳
+    private String city;
 
     /**
      * 获取定位信息的间隔时间，单位为毫秒
@@ -125,6 +126,8 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
         float radius = dbLocation.getRadius(); //定位精度
         String time = dbLocation.getTime(); //时间
 
+        city = dbLocation.getCity();
+
         //POI
         //List<Poi> poiList = dbLocation.getPoiList();
 
@@ -172,6 +175,10 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
 
     public void setLastedLocation(LocationBean lastedLocation) {
         this.lastedLocation = lastedLocation;
+    }
+
+    public String getCity() {
+        return city;
     }
 
     public int getScanSpanMillSeconds() {

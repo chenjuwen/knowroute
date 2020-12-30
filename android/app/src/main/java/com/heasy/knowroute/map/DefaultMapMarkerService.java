@@ -242,7 +242,7 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
     }
 
     private void closeInfoWindow(){
-        getBaiduMap().hideInfoWindow();
+        getBaiduMap().hideInfoWindow(infoWindow);
         infoWindow = null;
     }
 
