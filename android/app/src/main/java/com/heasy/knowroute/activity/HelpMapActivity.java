@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
 import com.heasy.knowroute.action.ResponseBean;
@@ -16,6 +17,8 @@ import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.event.ToastEvent;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
+import com.heasy.knowroute.map.AbstractMapLocationClient;
+import com.heasy.knowroute.map.DefaultMapLocationClient;
 import com.heasy.knowroute.service.HttpService;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -38,6 +41,8 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
     private String userId;
     private UserBean userBean;
 
+    private AbstractMapLocationClient mapLocationClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,9 +59,12 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
         initViewComponents();
 
         mMapView = ((MapView) findViewById(R.id.mapView));
-        //initBaiduMap(null);
-        initBaiduMap(BitmapDescriptorFactory.fromResource(R.drawable.icon_location_1), null);
+        initBaiduMap(MyLocationConfiguration.LocationMode.NORMAL, BitmapDescriptorFactory.fromResource(R.drawable.icon_location_1), null);
         initPosition();
+
+        this.mapLocationClient = new DefaultMapLocationClient(mBaiduMap, HelpMapActivity.this);
+        this.mapLocationClient.init();
+        setMapLocationClient(this.mapLocationClient);
     }
 
     private void initViewComponents() {
@@ -87,7 +95,7 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
     private void doLocate() {
         //以指定点坐标为中心显示地图
         LatLng latLng = new LatLng(userBean.getLatitude(), userBean.getLongitude());
-        updateMapStatus(latLng);
+        getMapLocationClient().updateMapStatus(latLng);
 
         //定位数据
         setLocationData(1.0f, 0, userBean.getLongitude(), userBean.getLatitude());
@@ -105,6 +113,11 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        if(mapLocationClient != null){
+            mapLocationClient.destroy();
+        }
+
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
     }
 

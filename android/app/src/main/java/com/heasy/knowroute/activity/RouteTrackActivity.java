@@ -14,6 +14,7 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
@@ -30,6 +31,8 @@ import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.DatetimeUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.ParameterUtil;
+import com.heasy.knowroute.map.AbstractMapLocationClient;
+import com.heasy.knowroute.map.DefaultMapLocationClient;
 import com.heasy.knowroute.service.HttpService;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -78,6 +81,8 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     private String nickName;
     private UserBean userBean;
 
+    private AbstractMapLocationClient mapLocationClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,8 +101,12 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
         initViewComponents();
 
         mMapView = ((MapView) findViewById(R.id.mapView));
-        initBaiduMap(null, null);
+        initBaiduMap(MyLocationConfiguration.LocationMode.NORMAL, null, null);
         initPosition();
+
+        this.mapLocationClient = new DefaultMapLocationClient(mBaiduMap, RouteTrackActivity.this);
+        this.mapLocationClient.init();
+        setMapLocationClient(this.mapLocationClient);
     }
 
     private void initViewComponents() {
@@ -136,10 +145,10 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     private void doLocate() {
         //以指定点坐标为中心显示地图
         LatLng latLng = new LatLng(userBean.getLatitude(), userBean.getLongitude());
-        updateMapStatus(latLng);
+        getMapLocationClient().updateMapStatus(latLng);
 
         //定位数据
-        setLocationData(1.0f, direction, userBean.getLongitude(), userBean.getLatitude());
+        setLocationData(1.0f, 0, userBean.getLongitude(), userBean.getLatitude());
     }
 
     @Override
@@ -255,6 +264,11 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        if(mapLocationClient != null){
+            mapLocationClient.destroy();
+        }
+
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
     }
 

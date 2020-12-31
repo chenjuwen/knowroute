@@ -35,7 +35,6 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
     // 传感器相关
     protected SensorManager mSensorManager;
     protected Double lastX = 0.0;
-    protected int direction = 0;
 
     // Map相关
     protected MapView mMapView;
@@ -47,12 +46,11 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // 获取传感器管理服务
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }
 
-    protected void initBaiduMap(BitmapDescriptor locationIcon, AbstractMapMarkerService markerService) {
+    protected void initBaiduMap(MyLocationConfiguration.LocationMode locationMode, BitmapDescriptor locationIcon, AbstractMapMarkerService markerService) {
         this.markerService = markerService;
 
         //显示缩放按钮
@@ -68,8 +66,7 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
         mBaiduMap.getUiSettings().setCompassEnabled(false);
 
         //定位模式为普通LocationMode.NORMAL、默认图标
-        MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(
-                MyLocationConfiguration.LocationMode.NORMAL, true, locationIcon);
+        MyLocationConfiguration myLocationConfiguration = new MyLocationConfiguration(locationMode, true, locationIcon);
         mBaiduMap.setMyLocationConfiguration(myLocationConfiguration);
 
         if(this.markerService != null) {
@@ -77,29 +74,6 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
             this.markerService.setBaiduMap(mBaiduMap);
             mBaiduMap.setOnMarkerClickListener(this.markerService);
         }
-    }
-
-    /**
-     * 更新地图状态
-     */
-    protected void updateMapStatus(LatLng targetLatLng){
-        MapStatus.Builder builder = new MapStatus.Builder();
-        builder.target(targetLatLng).zoom(AbstractMapLocationClient.DEFAULT_ZOOM); //初始缩放
-        mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build())); //定位到指定位置
-    }
-
-    /**
-     * 获取屏幕中心的坐标点经纬度
-     */
-    protected LatLng getScreenCenterLocation(){
-        Point point = AndroidUtil.getDisplaySize(this);
-
-        Point centerPoint = new Point();
-        centerPoint.x = point.x / 2;
-        centerPoint.y = point.y / 2;
-
-        LatLng centerLatLng = mBaiduMap.getProjection().fromScreenLocation(centerPoint);
-        return centerLatLng;
     }
 
     /**
@@ -126,7 +100,7 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
     public void onSensorChanged(SensorEvent sensorEvent) {
         double x = sensorEvent.values[SensorManager.DATA_X];
         if (Math.abs(x - lastX) > 1.0) {
-            direction = (int) x;
+            int direction = (int) x;
             if(mapLocationClient != null) {
                 mapLocationClient.setDirection(direction);
                 mBaiduMap.setMyLocationData(mapLocationClient.getLocationData());
@@ -142,14 +116,14 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
 
     @Override
     protected void onPause() {
-        super.onPause();
         mMapView.onPause();
+        super.onPause();
     }
 
     @Override
     protected void onResume() {
-        super.onResume();
         mMapView.onResume();
+        super.onResume();
 
         //为系统的方向传感器注册监听器
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
@@ -158,16 +132,14 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
 
     @Override
     protected void onStop() {
-        super.onStop();
-
         //取消注册传感器监听
         mSensorManager.unregisterListener(this);
+
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
         if(mapLocationClient != null){
             mapLocationClient.destroy();
         }
@@ -186,6 +158,8 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
             mMapView.onDestroy();
             mMapView = null;
         }
+
+        super.onDestroy();
     }
 
     public AbstractMapLocationClient getMapLocationClient() {

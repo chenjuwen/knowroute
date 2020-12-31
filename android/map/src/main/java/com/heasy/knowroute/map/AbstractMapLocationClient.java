@@ -60,7 +60,7 @@ public abstract class AbstractMapLocationClient extends AbstractLocationClient{
         }
     }
 
-    private void updateMapStatus(LatLng targetLatLng){
+    public void updateMapStatus(LatLng targetLatLng){
         MapStatus.Builder builder = new MapStatus.Builder();
         builder.target(targetLatLng).zoom(DEFAULT_ZOOM); //初始缩放
         baiduMap.animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build())); //定位到指定位置

@@ -9,8 +9,8 @@ import com.heasy.knowroute.map.bean.LocationBean;
 /**
  * Created by Administrator on 2020/11/6.
  */
-public class DefaultMapLocationService extends AbstractMapLocationClient {
-    public DefaultMapLocationService(BaiduMap baiduMap, Context context){
+public class DefaultMapLocationClient extends AbstractMapLocationClient {
+    public DefaultMapLocationClient(BaiduMap baiduMap, Context context){
         super(baiduMap, context);
     }
 

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
@@ -29,6 +30,8 @@ import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.event.FixedPointCategoryChangeEvent;
 import com.heasy.knowroute.event.FixedPointNavigationEvent;
+import com.heasy.knowroute.map.AbstractMapLocationClient;
+import com.heasy.knowroute.map.DefaultMapLocationClient;
 import com.heasy.knowroute.map.DefaultMapMarkerService;
 import com.heasy.knowroute.map.FixedPointAddWindow;
 import com.heasy.knowroute.service.HttpService;
@@ -60,6 +63,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
 
     private DefaultMapMarkerService mapMarkerService;
     private FixedPointAddWindow fixedPointAddWindow;
+    private AbstractMapLocationClient mapLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +81,12 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
         this.fixedPointAddWindow.init();
 
         initViews();
-        initBaiduMap(null, this.mapMarkerService);
+        initBaiduMap(MyLocationConfiguration.LocationMode.COMPASS, null, this.mapMarkerService); //COMPASS罗盘仪
         initPosition();
+
+        this.mapLocationClient = new DefaultMapLocationClient(mBaiduMap, FixedPointNavigationActivity.this);
+        this.mapLocationClient.init();
+        setMapLocationClient(this.mapLocationClient);
     }
 
     private void initViews(){
@@ -132,12 +140,12 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
 
                     //以指定点坐标为中心显示地图
                     LatLng latLng = new LatLng(userBean.getLatitude(), userBean.getLongitude());
-                    updateMapStatus(latLng);
+                    getMapLocationClient().updateMapStatus(latLng);
 
                     //定位数据，显示默认的定位Marker
                     MyLocationData locationData = new MyLocationData.Builder()
                             .accuracy(1.0f)
-                            .direction(direction)  // 方向信息，顺时针0-360
+                            .direction(getMapLocationClient().getDirection())  // 方向信息，顺时针0-360
                             .longitude(userBean.getLongitude())
                             .latitude(userBean.getLatitude())
                             .build();
@@ -284,6 +292,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
         ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().delete(FIXED_POINT_CATEGORY_ID);
         this.fixedPointAddWindow.destroy();
         this.mapMarkerService.destroy();
+        this.mapLocationClient.destroy();
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
     }
 
