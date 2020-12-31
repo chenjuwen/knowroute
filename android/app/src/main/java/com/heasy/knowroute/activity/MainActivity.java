@@ -46,18 +46,23 @@ public class MainActivity extends BaseActivity{
         if(!serviceRunning()) {
             logger.info("start HeasyLocationService...");
             Intent serviceIntent = new Intent(MainActivity.this, HeasyLocationService.class);
-
-            if(Build.VERSION.SDK_INT >= HeasyApplication.ANDROID8_SDK_INT) {
-                doStartService(serviceIntent);
-            }else{
-                startService(serviceIntent);
-            }
+            doStartService(serviceIntent);
         }
         logger.info("MainActivity Created");
     }
 
+    private void doStartService(Intent serviceIntent){
+        logger.debug("doStartService >> " + Build.VERSION.SDK_INT);
+        if(Build.VERSION.SDK_INT >= 26) {
+            startServiceForSDK26(serviceIntent);
+        }else{
+            startService(serviceIntent);
+        }
+    }
+
     @TargetApi(26)
-    private void doStartService(Intent serviceIntent ){
+    private void startServiceForSDK26(Intent serviceIntent ){
+        logger.debug("startForegroundService...");
         startForegroundService(serviceIntent);
     }
 

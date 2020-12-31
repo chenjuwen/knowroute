@@ -30,12 +30,10 @@ public class HttpService {
     private static OkHttpClientHelper getOkHttpClientHelper(){
         if(okHttpClientHelper == null){
             okHttpClientHelper = new OkHttpClientHelper();
-
             okHttpClientHelper
                     .addNetworkInterceptor(new GenericHeaderInterceptor())
                     .build();
         }
-
         return okHttpClientHelper;
     }
 

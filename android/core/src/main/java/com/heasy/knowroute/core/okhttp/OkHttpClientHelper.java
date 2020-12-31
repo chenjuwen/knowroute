@@ -5,7 +5,10 @@ import com.heasy.knowroute.core.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +30,8 @@ public class OkHttpClientHelper {
 
     private static final int DEFAULT_CONNECT_TIMEOUT_MILLSECONDS = 5000;
     private static final int DEFAULT_READ_TIMEOUT_MILLSECONDS = 5000;
-
+    private static final int DEFAULT_WRITE_TIMEOUT_MILLSECONDS = 5000;
+	
     public static final MediaType MEDIA_TYPE_JSON =  MediaType.parse("application/json; charset=utf-8");
 
     private OkHttpClient.Builder builder;
@@ -39,8 +43,11 @@ public class OkHttpClientHelper {
         DefaultCookieJar cookieJar = new DefaultCookieJar(new MemoryCookieStore());
 
         builder.connectTimeout(DEFAULT_CONNECT_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
+                .callTimeout(DEFAULT_CONNECT_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
         	    .readTimeout(DEFAULT_READ_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
-                .cookieJar(cookieJar);
+        	    .writeTimeout(DEFAULT_WRITE_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
+                .cookieJar(cookieJar)
+                .retryOnConnectionFailure(false);
     }
     
     public OkHttpClientHelper connectTimeout(long timeout, TimeUnit unit){
@@ -80,6 +87,21 @@ public class OkHttpClientHelper {
     
     public void build(){
     	okHttpClient = builder.build();
+    }
+
+    public void destroy(){
+        if(okHttpClient != null){
+            okHttpClient.connectionPool().evictAll();
+            okHttpClient.dispatcher().executorService().shutdown();
+
+            try {
+                okHttpClient.cache().close();
+            } catch (Exception ex) {
+
+            }
+
+            okHttpClient = null;
+        }
     }
 
     /**
@@ -154,18 +176,6 @@ public class OkHttpClientHelper {
         Request request = createGetRequest(url);
         okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
     }
-    
-    /**
-     * 异步post json格式内容
-     * @param url
-     * @param jsonData
-     * @param listener
-     */
-    public void postJSON(String url, String jsonData, HttpClientListener listener){
-    	RequestBody body = FormBody.create(MEDIA_TYPE_JSON, jsonData);
-        Request request = createPostRequest(url, body);
-        okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
-    }
 
     /**
      * post
@@ -215,19 +225,40 @@ public class OkHttpClientHelper {
             }
         }
     }
+
+    /**
+     * 异步post json格式内容
+     * @param url
+     * @param jsonData
+     * @param listener
+     */
+    public void postJSON(String url, String jsonData, HttpClientListener listener){
+        RequestBody body = FormBody.create(MEDIA_TYPE_JSON, jsonData);
+        Request request = createPostRequest(url, body);
+        okHttpClient.newCall(request).enqueue(new DefaultCallback(listener));
+    }
     
     public void download(String url, final String destFilePath){
     	Request request = createGetRequest(url);
     	okHttpClient.newCall(request).enqueue(new DefaultCallback(new HttpClientListener() {
 			@Override
-			public void onReponse(Response response) {
+			public void onResponse(Response response) {
 				if(response.isSuccessful()){
 					InputStream inputStream = response.body().byteStream();
 					FileUtil.writeFile(inputStream, destFilePath);
 		            logger.info("file download to: " + destFilePath);
 				}
 			}
-		}));
+
+            @Override
+            public void onFailure(IOException ex) {
+                if(ex instanceof SocketTimeoutException){
+                    logger.error("网络超时", ex);
+                }else if(ex instanceof ConnectException){
+                    logger.error("连接异常", ex);
+                }
+            }
+        }));
     }
 
     private Request createPostRequest(String url, RequestBody body){

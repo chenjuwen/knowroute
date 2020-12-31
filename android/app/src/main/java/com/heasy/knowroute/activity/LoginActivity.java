@@ -190,7 +190,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             return;
         }
 
-        loadingDialog = AndroidUtil.showLoadingDialog(this, "获取验证码...");
+        loadingDialog = AndroidUtil.showLoadingDialog(this, "获取中...");
 
         //获取验证码
         new DefaultDaemonThread() {

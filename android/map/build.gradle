@@ -34,12 +34,18 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:multidex:1.0.3'
     implementation project(path: ':core')
-    implementation files('../libs/fastjson-1.2.40.jar')
-    implementation files('../libs/slf4j-api-1.7.25.jar')
-    implementation files('../libs/logback-android-1.1.1-6.jar')
-    implementation files('../libs/okhttp-3.9.1.jar')
-    implementation files('../libs/okio-1.13.0.jar')
-    implementation files('../libs/dom4j-1.6.jar')
-    implementation files('../libs/jaxen-1.1.4.jar')
+    implementation 'com.alibaba:fastjson:1.2.40'
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation ('com.github.tony19:logback-android:1.1.1-7') {
+        exclude group: "com.github.tony19"
+        exclude module: "apktool-lib"
+    }
+    implementation 'com.squareup.okhttp3:okhttp:3.14.9'
+    implementation 'com.squareup.okio:okio:1.17.2'
+    implementation ('dom4j:dom4j:1.6') {
+        exclude group: "xml-apis"
+        exclude module: "xml-apis"
+    }
+    implementation 'jaxen:jaxen:1.1.4'
     implementation files('../libs/BaiduLBS_Android.jar')
 }

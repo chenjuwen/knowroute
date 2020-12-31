@@ -24,13 +24,16 @@ public class DefaultCallback implements Callback {
     public void onFailure(Call call, IOException ex) {
         logger.error("callback error", ex);
         call.cancel();
+        if(listener != null){
+            listener.onFailure(ex);
+        }
     }
 
     @Override
     public void onResponse(Call call, Response response) throws IOException {
         if(response.isSuccessful()){
         	if(listener != null){
-        		listener.onReponse(response);
+        		listener.onResponse(response);
         	}
         }
 		response.close();

@@ -20,11 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by Administrator on 2017/9/14.
  */
 public class HeasyApplication extends MultiDexApplication {
-    /**
-     * Android8 SDK_INT is 26
-     */
-    public static final int ANDROID8_SDK_INT = 26;
-
     private static HeasyApplication instance;
     private ConcurrentHashMap<String, Activity> activities = new ConcurrentHashMap<>();
 

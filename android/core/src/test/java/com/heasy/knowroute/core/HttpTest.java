@@ -30,12 +30,17 @@ public class HttpTest {
 
         okHttpClientHelper.asynGet("http://www.knowroute.cn/knowroute/index", new HttpClientListener() {
             @Override
-            public void onReponse(Response response) {
+            public void onResponse(Response response) {
                 try {
                     System.out.println(response.body().string());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+
+            @Override
+            public void onFailure(IOException ex) {
+                ex.printStackTrace();
             }
         });
     }
@@ -49,12 +54,17 @@ public class HttpTest {
 
         okHttpClientHelper.postJSON("http://10.1.43.6:8888/boot/saveUser2", jsonData, new HttpClientListener() {
             @Override
-            public void onReponse(Response response) {
+            public void onResponse(Response response) {
                 try {
                     System.out.println(response.body().string());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+
+            @Override
+            public void onFailure(IOException ex) {
+                ex.printStackTrace();
             }
         });
     }

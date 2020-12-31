@@ -39,10 +39,7 @@ public class StartActivity extends BaseActivity {
         setContentView(R.layout.activity_start);
         hideActionBar();
 
-        TextView textView = (TextView) findViewById(R.id.versionRelease);
-        textView.setText("版本：" + VersionUtil.getVersionName(getApplicationContext()));
-
-        logger.debug(String.valueOf(Build.VERSION.SDK_INT));
+        logger.info("SDK INT is " + Build.VERSION.SDK_INT);
 
         handler = new Handler(){
             @Override
@@ -155,7 +152,7 @@ public class StartActivity extends BaseActivity {
                 initServiceEngine();
                 initActionDispatcher();
 
-                TimeUnit.MILLISECONDS.sleep(2000);
+                TimeUnit.MILLISECONDS.sleep(3000);
 
                 handler.sendEmptyMessage(1);
             } catch (Exception ex) {
