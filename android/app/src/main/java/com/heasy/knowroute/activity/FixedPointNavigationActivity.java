@@ -18,8 +18,6 @@ import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
-import com.heasy.knowroute.action.ResponseBean;
-import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.bean.FixedPointCategoryBean;
 import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.bean.UserBean;
@@ -34,9 +32,10 @@ import com.heasy.knowroute.map.AbstractMapLocationClient;
 import com.heasy.knowroute.map.DefaultMapLocationClient;
 import com.heasy.knowroute.map.DefaultMapMarkerService;
 import com.heasy.knowroute.map.FixedPointAddWindow;
-import com.heasy.knowroute.service.HttpService;
-import com.heasy.knowroute.service.LoginService;
-import com.heasy.knowroute.service.LoginServiceImpl;
+import com.heasy.knowroute.service.backend.BaseAPI;
+import com.heasy.knowroute.service.backend.FixedPointCategoryAPI;
+import com.heasy.knowroute.service.backend.FixedPointInfoAPI;
+import com.heasy.knowroute.service.backend.UserAPI;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -132,12 +131,8 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
         new DefaultDaemonThread(){
             @Override
             public void run() {
-                LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
-                String requestUrl = "user/getById?id=" + loginService.getUserId();
-                ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
-                if(responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                    userBean = FastjsonUtil.string2JavaBean((String) responseBean.getData(), UserBean.class);
-
+                userBean = UserAPI.getById(BaseAPI.getLoginService().getUserId());
+                if(userBean != null){
                     //以指定点坐标为中心显示地图
                     LatLng latLng = new LatLng(userBean.getLatitude(), userBean.getLongitude());
                     getMapLocationClient().updateMapStatus(latLng);
@@ -160,16 +155,14 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
             @Override
             public void run() {
                 try{
-                    LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
-                    String url = "fixedPointCategory/list/" + loginService.getUserId();
-                    ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), url);
-                    if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                        categoryList = FastjsonUtil.arrayString2List((String) responseBean.getData(), FixedPointCategoryBean.class);
-                        ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointNavigationEvent(this, "success"));
-                    }
+                    String result = FixedPointCategoryAPI.list();
+                    categoryList = FastjsonUtil.arrayString2List(result, FixedPointCategoryBean.class);
+                    ServiceEngineFactory.getServiceEngine().getEventService()
+                            .postEvent(new FixedPointNavigationEvent(this, "success"));
                 }catch (Exception ex){
                     logger.error("", ex);
-                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointNavigationEvent(this, "error"));
+                    ServiceEngineFactory.getServiceEngine().getEventService()
+                            .postEvent(new FixedPointNavigationEvent(this, "error"));
                 }
             }
         }.start();
@@ -209,11 +202,8 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                             public void run() {
                                 try{
                                     Integer categoryId = (Integer)ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FIXED_POINT_CATEGORY_ID);
-                                    LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
-                                    String url = "fixedPointInfo/list/" + loginService.getUserId() + "/" + categoryId;
-                                    ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), url);
-                                    if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                                        pointList = FastjsonUtil.arrayString2List((String) responseBean.getData(), FixedPointInfoBean.class);
+                                    pointList = FixedPointInfoAPI.list(categoryId);
+                                    if(pointList != null && pointList.size() > 0){
                                         ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointCategoryChangeEvent(this, ""));
                                     }
                                 }catch (Exception ex){

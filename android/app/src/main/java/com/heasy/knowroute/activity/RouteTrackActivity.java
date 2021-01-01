@@ -20,20 +20,17 @@ import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
 import com.heasy.knowroute.R;
-import com.heasy.knowroute.RouteTrackEvent;
-import com.heasy.knowroute.action.ResponseBean;
-import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.event.ToastEvent;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.DatetimeUtil;
-import com.heasy.knowroute.core.utils.FastjsonUtil;
-import com.heasy.knowroute.core.utils.ParameterUtil;
+import com.heasy.knowroute.event.RouteTrackEvent;
 import com.heasy.knowroute.map.AbstractMapLocationClient;
 import com.heasy.knowroute.map.DefaultMapLocationClient;
-import com.heasy.knowroute.service.HttpService;
+import com.heasy.knowroute.service.backend.PositionAPI;
+import com.heasy.knowroute.service.backend.UserAPI;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -132,10 +129,8 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
         new DefaultDaemonThread(){
             @Override
             public void run() {
-                String requestUrl = "user/getById?id=" + userId;
-                ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
-                if(responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                    userBean = FastjsonUtil.string2JavaBean((String) responseBean.getData(), UserBean.class);
+                userBean = UserAPI.getById(Integer.parseInt(userId));
+                if(userBean != null){
                     doLocate();
                 }
             }
@@ -233,32 +228,23 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     }
 
     private void getPointData(Date startDate, Date endDate) {
-        String requestUrl = "position/getPoints?userId=" + userId
-                + "&startDate=" + ParameterUtil.encodeParamValue(DatetimeUtil.formatDate(startDate, DatetimeUtil.DEFAULT_PATTERN_DT2))
-                + "&endDate=" + ParameterUtil.encodeParamValue(DatetimeUtil.formatDate(endDate, DatetimeUtil.DEFAULT_PATTERN_DT2));
+        JSONArray jsonArray = PositionAPI.getPoints(userId, startDate, endDate);
 
-        ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
-        if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
-            JSONArray jsonArray = FastjsonUtil.string2JSONArray((String)responseBean.getData());
-
-            if(jsonArray == null || jsonArray.size() < 2){
-                ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new ToastEvent(this, "暂无轨迹数据"));
-                return;
-            }
-
-            List<LatLng> points = new ArrayList<LatLng>();
-            for(int i=0; i<jsonArray.size(); i++){
-                JSONObject jsonObject = (JSONObject)jsonArray.get(i);
-                LatLng p = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
-                points.add(p);
-            }
-
-            ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new RouteTrackEvent(this, points));
-
-        }else{
-            logger.error(HttpService.getFailureMessage(responseBean));
-            ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new ToastEvent(this, "操作失败"));
+        if(jsonArray == null || jsonArray.size() < 2){
+            ServiceEngineFactory.getServiceEngine().getEventService()
+                    .postEvent(new ToastEvent(this, "暂无轨迹数据"));
+            return;
         }
+
+        List<LatLng> points = new ArrayList<LatLng>();
+        for(int i=0; i<jsonArray.size(); i++){
+            JSONObject jsonObject = (JSONObject)jsonArray.get(i);
+            LatLng p = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
+            points.add(p);
+        }
+
+        ServiceEngineFactory.getServiceEngine().getEventService()
+                .postEvent(new RouteTrackEvent(this, points));
     }
 
     @Override

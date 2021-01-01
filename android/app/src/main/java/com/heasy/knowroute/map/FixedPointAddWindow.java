@@ -13,7 +13,7 @@ import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
-import com.heasy.knowroute.action.ResponseCode;
+import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.activity.FixedPointNavigationActivity;
 import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;

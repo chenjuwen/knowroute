@@ -1,7 +1,7 @@
-package com.heasy.knowroute.service;
+package com.heasy.knowroute.service.common;
 
-import com.heasy.knowroute.action.ResponseBean;
-import com.heasy.knowroute.action.ResponseCode;
+import com.heasy.knowroute.bean.ResponseBean;
+import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.okhttp.GenericHeaderInterceptor;
 import com.heasy.knowroute.core.okhttp.OkHttpClientHelper;

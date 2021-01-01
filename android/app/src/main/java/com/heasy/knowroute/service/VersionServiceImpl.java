@@ -1,10 +1,10 @@
 package com.heasy.knowroute.service;
 
-import com.heasy.knowroute.action.ResponseBean;
-import com.heasy.knowroute.action.ResponseCode;
-import com.heasy.knowroute.core.HeasyContext;
+import com.heasy.knowroute.bean.ResponseBean;
+import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.service.AbstractService;
 import com.heasy.knowroute.core.utils.VersionUtil;
+import com.heasy.knowroute.service.common.HttpService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

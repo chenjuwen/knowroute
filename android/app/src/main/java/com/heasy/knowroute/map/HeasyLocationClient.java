@@ -3,15 +3,10 @@ package com.heasy.knowroute.map;
 import android.content.Context;
 
 import com.baidu.location.BDLocation;
-import com.heasy.knowroute.action.ResponseBean;
-import com.heasy.knowroute.action.ResponseCode;
-import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.map.bean.LocationBean;
-import com.heasy.knowroute.service.HttpService;
-import com.heasy.knowroute.service.LoginService;
-import com.heasy.knowroute.service.LoginServiceImpl;
+import com.heasy.knowroute.service.backend.PositionAPI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,24 +78,11 @@ public class HeasyLocationClient extends AbstractLocationClient {
             while (true) {
                 try{
                     LocationBean locationBean = queue.take();
-
-                    LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
-
-                    //位置信息实时传输到后台
-                    String requestUrl = "position/insert";
-                    String jsonData = FastjsonUtil.toJSONString(
-                            "id", StringUtil.getUUIDString(),
-                            "userId", String.valueOf(loginService.getUserId()),
-                            "longitude", String.valueOf(locationBean.getLongitude()),
-                            "latitude", String.valueOf(locationBean.getLatitude()),
-                            "address", locationBean.getAddress(),
-                            "times", locationBean.getTime());
-
-                    ResponseBean responseBean = HttpService.postJson(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl, jsonData);
-                    if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
+                    String result = PositionAPI.insert(locationBean);
+                    if(StringUtil.isEmpty(result)){
                         logger.debug("位置信息已上传：" + FastjsonUtil.object2String(locationBean));
                     }else{
-                        logger.error("位置信息无法上传：" + HttpService.getFailureMessage(responseBean));
+                        logger.error("位置信息无法上传：" + result);
                     }
                 }catch (Exception ex){
                     logger.error("", ex);

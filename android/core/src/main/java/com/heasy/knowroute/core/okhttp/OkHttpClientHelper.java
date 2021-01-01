@@ -28,9 +28,9 @@ import okhttp3.Response;
 public class OkHttpClientHelper {
     private static Logger logger = LoggerFactory.getLogger(OkHttpClientHelper.class);
 
-    private static final int DEFAULT_CONNECT_TIMEOUT_MILLSECONDS = 5000;
-    private static final int DEFAULT_READ_TIMEOUT_MILLSECONDS = 5000;
-    private static final int DEFAULT_WRITE_TIMEOUT_MILLSECONDS = 5000;
+    private static final int DEFAULT_CONNECT_TIMEOUT_MILLSECONDS = 8000;
+    private static final int DEFAULT_READ_TIMEOUT_MILLSECONDS = 6000;
+    private static final int DEFAULT_WRITE_TIMEOUT_MILLSECONDS = 6000;
 	
     public static final MediaType MEDIA_TYPE_JSON =  MediaType.parse("application/json; charset=utf-8");
 

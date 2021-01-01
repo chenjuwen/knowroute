@@ -116,37 +116,30 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
-            android:gravity="left"
+            android:gravity="center"
             android:orientation="horizontal">
-
-            <CheckBox
-                android:id="@+id/chkAgreement"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
-
             <TextView
                 android:id="@+id/textView"
-                android:layout_width="70dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="登录即同意" />
 
             <TextView
                 android:id="@+id/tvAgreement"
-                android:layout_width="85dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="《用户协议》"
                 android:textColor="#4682B4" />
 
             <TextView
                 android:id="@+id/textView3"
-                android:layout_width="15dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="和" />
 
             <TextView
                 android:id="@+id/tvPolicy"
-                android:layout_width="85dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="《隐私政策》"
                 android:textColor="#4682B4" />

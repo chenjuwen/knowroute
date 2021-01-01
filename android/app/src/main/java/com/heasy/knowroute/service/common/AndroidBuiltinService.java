@@ -1,4 +1,4 @@
-package com.heasy.knowroute.service;
+package com.heasy.knowroute.service.common;
 
 import android.app.Activity;
 import android.app.PendingIntent;

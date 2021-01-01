@@ -12,7 +12,7 @@ import com.heasy.knowroute.core.annotation.JSActionAnnotation;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.webview.Action;
-import com.heasy.knowroute.service.AndroidBuiltinService;
+import com.heasy.knowroute.service.common.AndroidBuiltinService;
 
 import java.util.concurrent.TimeUnit;
 

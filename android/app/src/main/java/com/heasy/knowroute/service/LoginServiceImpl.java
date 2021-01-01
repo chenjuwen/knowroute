@@ -3,21 +3,17 @@ package com.heasy.knowroute.service;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.alibaba.fastjson.JSONObject;
-import com.heasy.knowroute.action.ResponseBean;
-import com.heasy.knowroute.action.ResponseCode;
+import com.heasy.knowroute.bean.LoginResultBean;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.service.AbstractService;
-import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.FileUtil;
-import com.heasy.knowroute.core.utils.ParameterUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
+import com.heasy.knowroute.service.backend.UserAPI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2020/9/26.
@@ -60,15 +56,7 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     @Override
     public String getCaptche(String phone) {
         try {
-            String requestUrl = "user/getCaptche?phone=" + phone;
-
-            ResponseBean responseBean = HttpService.get(getHeasyContext(), requestUrl);
-            if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                JSONObject obj = FastjsonUtil.string2JSONObject((String)responseBean.getData());
-                return FastjsonUtil.getString(obj, "captche");
-            }else{
-                logger.error(HttpService.getFailureMessage(responseBean));
-            }
+            return UserAPI.getCaptche(phone);
         }catch(Exception ex){
             logger.error("", ex);
         }
@@ -78,14 +66,11 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     @Override
     public String doLogin(String phone, String captche) {
         try {
-            Map<String, String> params = ParameterUtil.toParamMap("phone", phone, "captche", captche);
-            ResponseBean responseBean = HttpService.post(HttpService.getApiRootAddress(getHeasyContext()) + "user/login", params);
-
-            if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
-                String data = (String)responseBean.getData();
-                this.userId = FastjsonUtil.string2JSONObject(data).getIntValue("id");
+            LoginResultBean loginResultBean = UserAPI.login(phone, captche);
+            if(StringUtil.isEmpty(loginResultBean.getErrorMessage())){
+                this.userId = loginResultBean.getUserId();
                 this.userPhone = phone;
-                this.userNickname = FastjsonUtil.string2JSONObject(data).getString("nickname");
+                this.userNickname = loginResultBean.getNickname();
 
                 addAuthorityFile();
 
@@ -94,8 +79,7 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
                 this.userId = 0;
                 this.userPhone = "";
                 this.userNickname = "";
-
-                return HttpService.getFailureMessage(responseBean);
+                return loginResultBean.getErrorMessage();
             }
         }catch(Exception ex){
             logger.error("", ex);

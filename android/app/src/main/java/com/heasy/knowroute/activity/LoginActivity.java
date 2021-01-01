@@ -1,7 +1,6 @@
 package com.heasy.knowroute.activity;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -18,7 +17,7 @@ import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
-import com.heasy.knowroute.service.AndroidBuiltinService;
+import com.heasy.knowroute.service.common.AndroidBuiltinService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
 

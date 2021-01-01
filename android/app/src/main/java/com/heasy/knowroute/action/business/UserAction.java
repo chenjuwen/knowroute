@@ -1,20 +1,17 @@
 package com.heasy.knowroute.action.business;
 
 import com.alibaba.fastjson.JSONObject;
-import com.heasy.knowroute.action.ResponseBean;
-import com.heasy.knowroute.action.ResponseCode;
+import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.annotation.JSActionAnnotation;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.webview.Action;
-import com.heasy.knowroute.service.HttpService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
-import com.heasy.knowroute.service.UserService;
-import com.heasy.knowroute.service.UserServiceImpl;
 import com.heasy.knowroute.service.VersionService;
 import com.heasy.knowroute.service.VersionServiceImpl;
+import com.heasy.knowroute.service.backend.UserAPI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,15 +27,12 @@ public class UserAction implements Action {
 
         if ("cancelAccount".equalsIgnoreCase(extend)){
             try {
-                String url = "user/cancel?id=" + loginService.getUserId();
-                ResponseBean responseBean = HttpService.get(heasyContext, url);
-                if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                    return Constants.SUCCESS;
-                }
+                return UserAPI.cancel();
             }catch (Exception ex){
                 logger.error("", ex);
+                return "销户失败";
             }
-            return "销户失败";
+
         }else if("my-info".equalsIgnoreCase(extend)){
             try {
                 VersionService versionService = heasyContext.getServiceEngine().getService(VersionServiceImpl.class);
@@ -55,12 +49,11 @@ public class UserAction implements Action {
                 logger.error("", ex);
             }
             return "{}";
+
         }else if("updateNickname".equalsIgnoreCase(extend)){
             try {
                 String newNickname = FastjsonUtil.getString(jsonObject, "new_nickname");
-                UserService userService = heasyContext.getServiceEngine().getService(UserServiceImpl.class);
-                String result = userService.updateNickname(loginService.getUserId(), newNickname);
-                return result;
+                return UserAPI.updateNickname(newNickname);
             }catch (Exception ex){
                 logger.error("", ex);
                 return ResponseCode.FAILURE.message();
@@ -69,4 +62,5 @@ public class UserAction implements Action {
 
         return Constants.SUCCESS;
     }
+
 }

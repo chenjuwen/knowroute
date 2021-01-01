@@ -10,16 +10,13 @@ import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
-import com.heasy.knowroute.action.ResponseBean;
-import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.event.ToastEvent;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
-import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.map.AbstractMapLocationClient;
 import com.heasy.knowroute.map.DefaultMapLocationClient;
-import com.heasy.knowroute.service.HttpService;
+import com.heasy.knowroute.service.backend.UserAPI;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -81,12 +78,11 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
         new DefaultDaemonThread(){
             @Override
             public void run() {
-                String requestUrl = "user/getById?id=" + userId;
-                ResponseBean responseBean = HttpService.get(ServiceEngineFactory.getServiceEngine().getHeasyContext(), requestUrl);
-                if(responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                    userBean = FastjsonUtil.string2JavaBean((String) responseBean.getData(), UserBean.class);
+                userBean = UserAPI.getById(Integer.parseInt(userId));
+                if(userBean != null){
                     doLocate();
-                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new ToastEvent(this, "显示位置信息"));
+                    ServiceEngineFactory.getServiceEngine().getEventService()
+                            .postEvent(new ToastEvent(this, "显示位置信息"));
                 }
             }
         }.start();

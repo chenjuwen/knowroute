@@ -28,8 +28,6 @@ import com.baidu.mapapi.navi.BaiduMapNavigation;
 import com.baidu.mapapi.navi.NaviParaOption;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.heasy.knowroute.R;
-import com.heasy.knowroute.action.ResponseBean;
-import com.heasy.knowroute.action.ResponseCode;
 import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
@@ -39,7 +37,7 @@ import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.event.FixedPointInfoEvent;
 import com.heasy.knowroute.map.bean.LocationBean;
-import com.heasy.knowroute.service.HttpService;
+import com.heasy.knowroute.service.backend.FixedPointInfoAPI;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -160,12 +158,9 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
                         @Override
                         public void run() {
                             try {
-                                String url = "fixedPointInfo/saveOrUpdate";
                                 String data = FastjsonUtil.object2String(bean);
-                                ResponseBean responseBean = HttpService.postJson(ServiceEngineFactory.getServiceEngine().getHeasyContext(), url, data);
-                                if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                                    String result = (String) responseBean.getData();
-                                    int id = FastjsonUtil.string2JSONObject(result).getIntValue("id");
+                                Integer id = FixedPointInfoAPI.saveOrUpdate(data);
+                                if(id != null){
                                     bean.setId(id);
 
                                     Bundle bundle = new Bundle();
@@ -174,8 +169,8 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
 
                                     FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.SAVE.name(), "");
                                     ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
-                                } else {
-                                    FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.SAVE.name(), HttpService.getFailureMessage(responseBean));
+                                }else{
+                                    FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.SAVE.name(), "保存失败");
                                     ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
                                 }
                             }catch (Exception ex){
@@ -201,15 +196,9 @@ public class DefaultMapMarkerService extends AbstractMapMarkerService {
                         @Override
                         public void run() {
                             try {
-                                String url = "fixedPointInfo/deleteById/" + bean.getUserId() + "/" + bean.getId();
-                                ResponseBean responseBean = HttpService.postJson(ServiceEngineFactory.getServiceEngine().getHeasyContext(), url, "");
-                                if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                                    FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.DELETE.name(), "");
-                                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
-                                } else {
-                                    FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.DELETE.name(), HttpService.getFailureMessage(responseBean));
-                                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
-                                }
+                                String result = FixedPointInfoAPI.deleteById(bean.getUserId(), bean.getId());
+                                FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.DELETE.name(), result);
+                                ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
                             }catch (Exception ex){
                                 logger.error("", ex);
                                 FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.DELETE.name(), "删除失败");

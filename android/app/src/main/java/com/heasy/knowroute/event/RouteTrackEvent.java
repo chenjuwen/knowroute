@@ -1,4 +1,4 @@
-package com.heasy.knowroute;
+package com.heasy.knowroute.event;
 
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.core.event.AbstractEvent;

@@ -1,4 +1,4 @@
-package com.heasy.knowroute.action;
+package com.heasy.knowroute.bean;
 
 public enum ResponseCode {
 	SUCCESS(1, "成功"),
