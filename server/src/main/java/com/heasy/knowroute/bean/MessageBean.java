@@ -2,24 +2,45 @@ package com.heasy.knowroute.bean;
 
 import java.util.Date;
 
-/**
- * 消息
- */
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description="系统消息JavaBean类")
 public class MessageBean {
+	@ApiModelProperty(value="id")
 	private int id;
+
+	@ApiModelProperty(value="标题")
 	private String title;
+
+	@ApiModelProperty(value="内容")
 	private String content;
+
+	@ApiModelProperty(value="消息类别")
 	private String category;
+
+	@ApiModelProperty(value="消息处理结果")
 	private String result;
+
+	@ApiModelProperty(value="消息发送者")
 	private String sender;
+
+	@ApiModelProperty(value="发送者昵称")
 	private String senderNickname;
+
+	@ApiModelProperty(value="发送者手机号")
 	private String senderPhone;
+
+	@ApiModelProperty(value="消息接收者")
 	private String receiver;
+
+	@ApiModelProperty(value="消息归属")
 	private Integer owner;
+
+	@ApiModelProperty(value="创建时间")
 	private Date createDate;
-	/**
-	 * 状态：0待处理，1已处理
-	 */
+	
+	@ApiModelProperty(value="消息状态，0待处理，1已处理")
 	private int status;
 	
 	public int getId() {

@@ -2,11 +2,20 @@ package com.heasy.knowroute.api;
 
 import java.io.Serializable;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description="接口返回结果JavaBean类")
 public class WebResponse implements Serializable{
 	private static final long serialVersionUID = 8075402133320819186L;
-	
+
+	@ApiModelProperty(value="结果状态码")
 	private Integer code;
+	
+	@ApiModelProperty(value="结果消息")
 	private String message;
+	
+	@ApiModelProperty(value="结果数据")
 	private Object data;
 	
 	public WebResponse() {

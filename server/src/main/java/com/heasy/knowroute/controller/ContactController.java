@@ -22,8 +22,13 @@ import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.DatetimeUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONArray;
 
+@Api(tags="紧急联系人管理")
 @RestController
 @RequestMapping("/contact")
 public class ContactController extends BaseController{
@@ -36,6 +41,10 @@ public class ContactController extends BaseController{
 	@Autowired
 	private UserService userService;
 	
+	@ApiOperation(value="save", notes="保存联系人信息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="contactBean", paramType="body", required=true, dataType="ContactBean")
+	})
 	@RequestMapping(value="/save", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse save(@RequestBody ContactBean contactBean){
 		List<ContactBean> contactList = contactService.getAll(contactBean.getUserId());
@@ -55,7 +64,11 @@ public class ContactController extends BaseController{
 			return WebResponse.failure(ResponseCode.FAILURE);
 		}
 	}
-	
+
+	@ApiOperation(value="update", notes="更新联系人信息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="contactBean", paramType="body", required=true, dataType="ContactBean")
+	})
 	@RequestMapping(value="/update", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse update(@RequestBody ContactBean contactBean){
 		boolean result = contactService.existsContact(contactBean);
@@ -71,6 +84,10 @@ public class ContactController extends BaseController{
 		}
 	}
 
+	@ApiOperation(value="delete", notes="删除联系人信息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="id", paramType="query", required=true, dataType="Integer")
+	})
 	@RequestMapping(value="/delete", method=RequestMethod.GET)
     public WebResponse delete(@RequestParam(value="id") Integer id) {
 		boolean b = contactService.delete(id);
@@ -81,6 +98,10 @@ public class ContactController extends BaseController{
 		}
     }
 
+	@ApiOperation(value="getAll", notes="获取所有联系人信息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="query", required=true, dataType="Integer")
+	})
 	@RequestMapping(value="/getAll", method=RequestMethod.GET)
     public WebResponse getAll(@RequestParam(value="userId") Integer userId) {
 		List<ContactBean> contactList = contactService.getAll(userId);
@@ -91,10 +112,10 @@ public class ContactController extends BaseController{
 		}
     }
 	
-
-	/**
-	 * 紧急求助的站内消息
-	 */
+	@ApiOperation(value="notify", notes="发送紧急求助站内消息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+	})
 	@RequestMapping(value="/notify", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse notify(@RequestBody Map<String,String> map) {
 		String userId = map.get("userId");

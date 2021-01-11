@@ -1,13 +1,20 @@
 package com.heasy.knowroute.bean;
 
-/**
- * 用户紧急联系人
- * @author Administrator
- */
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description="紧急联系人JavaBean类")
 public class ContactBean {
+	@ApiModelProperty(value="id")
 	private int id;
+	
+	@ApiModelProperty(value="用户ID")
 	private int userId;
+	
+	@ApiModelProperty(value="联系人姓名")
 	private String contactName;
+	
+	@ApiModelProperty(value="联系人手机号")
 	private String contactPhone;
 	
 	public int getId() {

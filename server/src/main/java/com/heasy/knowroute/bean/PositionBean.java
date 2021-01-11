@@ -6,18 +6,29 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-/**
- * 用户位置点信息
- */
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description="用户轨迹点JavaBean类")
 public class PositionBean {
+	@ApiModelProperty(value="id")
 	private String id;
+	
+	@ApiModelProperty(value="用户ID")
 	private int userId;
+	
+	@ApiModelProperty(value="经度")
 	private double longitude;
+	
+	@ApiModelProperty(value="纬度")
 	private double latitude;
+	
+	@ApiModelProperty(value="地址")
 	private String address;
 	
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", locale="zh", timezone="GMT+8")
+	@ApiModelProperty(value="时间")
 	private Date times;
 	
 	public String getId() {

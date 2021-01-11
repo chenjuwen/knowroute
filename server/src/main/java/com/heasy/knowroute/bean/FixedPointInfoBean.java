@@ -2,16 +2,36 @@ package com.heasy.knowroute.bean;
 
 import java.io.Serializable;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description="定点属性JavaBean类")
 public class FixedPointInfoBean implements Serializable {
 	private static final long serialVersionUID = 5825597504308144333L;
+
+	@ApiModelProperty(value="id")
 	private int id;
+	
+	@ApiModelProperty(value="用户ID")
 	private int userId;
+	
+	@ApiModelProperty(value="类别ID")
     private int categoryId;
+	
+	@ApiModelProperty(value="经度")
     private double longitude;
+	
+	@ApiModelProperty(value="纬度")
     private double latitude;
+	
+	@ApiModelProperty(value="地址")
     private String address;
-    private String comments; //备注
-    private String label; //标签
+	
+	@ApiModelProperty(value="备注")
+    private String comments;
+	
+	@ApiModelProperty(value="标签")
+    private String label;
 
     public int getId() {
         return id;
