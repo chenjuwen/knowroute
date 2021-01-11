@@ -21,6 +21,7 @@ import com.heasy.knowroute.bean.PositionBean;
 import com.heasy.knowroute.service.PositionService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.DatetimeUtil;
+import com.heasy.knowroute.utils.JsonUtil;
 
 import net.sf.json.JSONArray;
 
@@ -69,7 +70,7 @@ public class PositionController extends BaseController{
             
 			List<PointBean> list = positionService.getPoints(userId, startDate, endDate);
 			if(!CollectionUtils.isEmpty(list)) {
-				return WebResponse.success(JSONArray.fromObject(list).toString(2));
+				return WebResponse.success(JsonUtil.object2ArrayString(list));
 			}else {
 				return WebResponse.success("[]");
 			}

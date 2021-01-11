@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/tv_name"
+        android:id="@+id/mapPointIconLabel"
         android:layout_width="wrap_content"
         android:minWidth="40dp"
         android:layout_height="wrap_content"

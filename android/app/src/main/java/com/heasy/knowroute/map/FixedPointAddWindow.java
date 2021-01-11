@@ -13,9 +13,9 @@ import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.model.LatLng;
 import com.heasy.knowroute.R;
-import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.activity.FixedPointNavigationActivity;
 import com.heasy.knowroute.bean.FixedPointInfoBean;
+import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.DoubleUtil;
@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 public class FixedPointAddWindow {
     private static final Logger logger = LoggerFactory.getLogger(FixedPointAddWindow.class);
     private Activity activity;
-    private DefaultMapMarkerService mapMarkerService;
+    private FixedPointMapMarkerService mapMarkerService;
     private int findType; //1按当前位置，2按经纬度，3按地址
 
     private DefaultGetReverseGeoCode getReverseGeoCode;
@@ -54,7 +54,7 @@ public class FixedPointAddWindow {
     private Button btnFind;
     private Button btnClose;
 
-    public FixedPointAddWindow(Activity activity, DefaultMapMarkerService mapMarkerService){
+    public FixedPointAddWindow(Activity activity, FixedPointMapMarkerService mapMarkerService){
         this.activity = activity;
         this.mapMarkerService = mapMarkerService;
     }
@@ -246,7 +246,7 @@ public class FixedPointAddWindow {
         bean.setLabel("新增");
 
         //add marker
-        Bitmap bitmap = mapMarkerService.getViewBitmap(mapMarkerService.getMapPointView(bean.getLabel()));
+        Bitmap bitmap = mapMarkerService.createViewBitmap(mapMarkerService.getCustomMapPointView(bean.getLabel(), activity));
         mapMarkerService.addMarkerOverlay(bean, BitmapDescriptorFactory.fromBitmap(bitmap));
 
         mapMarkerService.updateMapStatus(new LatLng(latitude, longitude));

@@ -40,15 +40,16 @@ public class PositionServiceImpl extends BaseService implements PositionService 
 			String startDateStr = DatetimeUtil.formatDate(startDate);
 			String endDateStr = DatetimeUtil.formatDate(DatetimeUtil.add(endDate, Calendar.MINUTE, 1));
 			
-        	String sql = "select * from positions where user_id=? and times>=? and times<? order by times asc";
+        	String sql = "select * from positions where user_id=? and times>=? and times<=? order by times asc";
         	
         	List<PointBean> list = jdbcTemplate.query(sql, new RowMapper<PointBean>() {
         		@Override
         		public PointBean mapRow(ResultSet rs, int rowNum) throws SQLException {
         			double longitude = rs.getDouble("longitude");
         			double latitude = rs.getDouble("latitude");
+        			String times = rs.getString("times");
         			
-        			PointBean bean = new PointBean(longitude, latitude);
+        			PointBean bean = new PointBean(longitude, latitude, times);
         			return bean;
         		}
         	}, userId, startDateStr, endDateStr);

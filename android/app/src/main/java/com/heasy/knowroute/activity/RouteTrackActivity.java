@@ -5,12 +5,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
-import com.baidu.mapapi.map.MapStatusUpdate;
-import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
@@ -18,8 +14,8 @@ import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.PolylineOptions;
 import com.baidu.mapapi.model.LatLng;
-import com.baidu.mapapi.model.LatLngBounds;
 import com.heasy.knowroute.R;
+import com.heasy.knowroute.bean.PointBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.event.ToastEvent;
@@ -29,6 +25,7 @@ import com.heasy.knowroute.core.utils.DatetimeUtil;
 import com.heasy.knowroute.event.RouteTrackEvent;
 import com.heasy.knowroute.map.AbstractMapLocationClient;
 import com.heasy.knowroute.map.DefaultMapLocationClient;
+import com.heasy.knowroute.map.RouteTrackMapMarkerService;
 import com.heasy.knowroute.service.backend.PositionAPI;
 import com.heasy.knowroute.service.backend.UserAPI;
 
@@ -69,6 +66,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     private TextView txtStartDate;
     private TextView txtEndDate;
     private Button btnViewTrack;
+    private TextView statInfo;
 
     private Date minDate = DatetimeUtil.addDate(Calendar.MONTH, -12);
     private Date maxDate = DatetimeUtil.addDate(Calendar.MONTH, 12);
@@ -79,6 +77,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     private UserBean userBean;
 
     private AbstractMapLocationClient mapLocationClient;
+    private RouteTrackMapMarkerService mapMarkerService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +94,12 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
 
         ServiceEngineFactory.getServiceEngine().getEventService().register(this);
 
+        this.mapMarkerService = new RouteTrackMapMarkerService();
+
         initViewComponents();
 
         mMapView = ((MapView) findViewById(R.id.mapView));
-        initBaiduMap(MyLocationConfiguration.LocationMode.NORMAL, null, null);
+        initBaiduMap(MyLocationConfiguration.LocationMode.NORMAL, null, this.mapMarkerService);
         initPosition();
 
         this.mapLocationClient = new DefaultMapLocationClient(mBaiduMap, RouteTrackActivity.this);
@@ -123,6 +124,8 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
 
         btnViewTrack = (Button)findViewById(R.id.btnViewTrack);
         btnViewTrack.setOnClickListener(this);
+
+        statInfo = (TextView)findViewById(R.id.statInfo);
     }
 
     private void initPosition() {
@@ -131,19 +134,15 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
             public void run() {
                 userBean = UserAPI.getById(Integer.parseInt(userId));
                 if(userBean != null){
-                    doLocate();
+                    //以指定点坐标为中心显示地图
+                    LatLng latLng = new LatLng(userBean.getLatitude(), userBean.getLongitude());
+                    getMapLocationClient().updateMapStatus(latLng);
+
+                    //定位数据
+                    setLocationData(1.0f, 0, userBean.getLongitude(), userBean.getLatitude());
                 }
             }
         }.start();
-    }
-
-    private void doLocate() {
-        //以指定点坐标为中心显示地图
-        LatLng latLng = new LatLng(userBean.getLatitude(), userBean.getLongitude());
-        getMapLocationClient().updateMapStatus(latLng);
-
-        //定位数据
-        setLocationData(1.0f, 0, userBean.getLongitude(), userBean.getLatitude());
     }
 
     @Override
@@ -200,6 +199,9 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
             return;
         }
 
+        statInfo.setText("");
+        statInfo.setVisibility(View.GONE);
+
         mBaiduMap.clear();
 
         if(trackRunThread != null){
@@ -218,33 +220,22 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
             @Override
             public void run() {
                 try {
-                    getPointData(startDate, endDate);
+                    List<PointBean> list = PositionAPI.getPoints(userId, startDate, endDate);
+                    if(list == null || list.size() < 2){
+                        ServiceEngineFactory.getServiceEngine().getEventService()
+                                .postEvent(new ToastEvent(this, "暂无轨迹数据"));
+                        return;
+                    }
+
+                    ServiceEngineFactory.getServiceEngine().getEventService()
+                            .postEvent(new RouteTrackEvent(this, list));
                 }catch (Exception ex){
                     logger.error("", ex);
+                }finally {
+                    dismissLoadingDialog();
                 }
-                dismissLoadingDialog();
             }
         }.start();
-    }
-
-    private void getPointData(Date startDate, Date endDate) {
-        JSONArray jsonArray = PositionAPI.getPoints(userId, startDate, endDate);
-
-        if(jsonArray == null || jsonArray.size() < 2){
-            ServiceEngineFactory.getServiceEngine().getEventService()
-                    .postEvent(new ToastEvent(this, "暂无轨迹数据"));
-            return;
-        }
-
-        List<LatLng> points = new ArrayList<LatLng>();
-        for(int i=0; i<jsonArray.size(); i++){
-            JSONObject jsonObject = (JSONObject)jsonArray.get(i);
-            LatLng p = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
-            points.add(p);
-        }
-
-        ServiceEngineFactory.getServiceEngine().getEventService()
-                .postEvent(new RouteTrackEvent(this, points));
     }
 
     @Override
@@ -254,6 +245,8 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
         if(mapLocationClient != null){
             mapLocationClient.destroy();
         }
+
+        this.mapMarkerService.destroy();
 
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
     }
@@ -275,38 +268,61 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleRouteTrack(final RouteTrackEvent event){
         if(event != null){
+            Date startTime = null;
+            Date endTime = null;
+
+            long totalDistance = 0; //总路程
+            LatLng provPoint = null;
+            List<LatLng> points = new ArrayList<LatLng>();
+            for(int i=0; i<event.getList().size(); i++){
+                PointBean pointBean = event.getList().get(i);
+                LatLng point = new LatLng(pointBean.getLatitude(), pointBean.getLongitude());
+
+                if(provPoint == null){
+                    provPoint = point;
+                }else{
+                    totalDistance += mapMarkerService.calculateDistance(provPoint, point);
+                    provPoint = point;
+                }
+
+                points.add(point);
+
+                if(i == 0){
+                    startTime = DatetimeUtil.toDate(pointBean.getTimes());
+                }
+
+                if(i == event.getList().size() - 1){
+                    endTime = DatetimeUtil.toDate(pointBean.getTimes());
+                }
+            }
+
+            //总耗时
+            logger.debug(DatetimeUtil.formatDate(startTime) + " - " + DatetimeUtil.formatDate(endTime));
+            String statInfoStr = "行程 " + totalDistance + " 米, 耗时 " + DatetimeUtil.differMinutes(startTime, endTime) + " 分钟";
+            logger.debug(statInfoStr);
+            statInfo.setText(statInfoStr);
+            statInfo.setVisibility(View.VISIBLE);
+
             //折线
             OverlayOptions polylineOptions = new PolylineOptions()
                     .width(LINE_WIDTH)
                     .color(LINE_COLOR)
-                    .points(event.getPoints());
+                    .points(points);
 
             mBaiduMap.addOverlay(polylineOptions);
 
             /*
             //开始点
-            BitmapDescriptor startBitmap = BitmapDescriptorFactory.fromResource(R.drawable.start);
-            OverlayOptions startMarkerOptions = new MarkerOptions()
-                    .position(event.getPoints().get(0))
-                    .icon(startBitmap);
-            mBaiduMap.addOverlay(startMarkerOptions);
+            Bitmap startBitmap = mapMarkerService.createViewBitmap(mapMarkerService.getCustomMapPointView(startTime, RouteTrackActivity.this));
+            mapMarkerService.addMarkerOverlay(startPoint, BitmapDescriptorFactory.fromBitmap(startBitmap));
 
             //结束点
-            BitmapDescriptor endBitmap = BitmapDescriptorFactory.fromResource(R.drawable.end);
-            OverlayOptions endMarkerOptions = new MarkerOptions()
-                    .position(event.getPoints().get(event.getPoints().size()-1))
-                    .icon(endBitmap);
-            mBaiduMap.addOverlay(endMarkerOptions);
+            Bitmap endBitmap = mapMarkerService.createViewBitmap(mapMarkerService.getCustomMapPointView(endTime, RouteTrackActivity.this));
+            mapMarkerService.addMarkerOverlay(endPoint, BitmapDescriptorFactory.fromBitmap(endBitmap));
             */
 
-            //屏幕内显示所有marker
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            for (LatLng latLng : event.getPoints()) {
-                builder = builder.include(latLng);
-            }
-            LatLngBounds latlngBounds = builder.build();
-            MapStatusUpdate mapStatusUpdate = MapStatusUpdateFactory.newLatLngBounds(latlngBounds, mMapView.getWidth()-50, mMapView.getHeight()-50);
-            mBaiduMap.animateMapStatus(mapStatusUpdate);
+            //在屏幕显示所有点
+            mapMarkerService.showAllMarkersInScreen(points);
 
             //轨迹回放
             trackRunThread = new DefaultDaemonThread(){
@@ -316,12 +332,12 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
                         //运动小人
                         BitmapDescriptor personBitmap = BitmapDescriptorFactory.fromResource(R.drawable.person);
                         OverlayOptions personMarkerOptions = new MarkerOptions()
-                                .position(event.getPoints().get(0))
+                                .position(points.get(0))
                                 .icon(personBitmap);
                         Marker marker = (Marker)mBaiduMap.addOverlay(personMarkerOptions);
 
-                        for(int i=0; i<event.getPoints().size(); i++){
-                            marker.setPosition(event.getPoints().get(i));
+                        for(int i=0; i<points.size(); i++){
+                            marker.setPosition(points.get(i));
                             TimeUnit.MILLISECONDS.sleep(PLAYBACK_INTERVAL_MILLISECONDS);
                         }
                     }catch (Exception ex){

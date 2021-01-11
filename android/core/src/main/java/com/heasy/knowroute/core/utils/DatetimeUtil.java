@@ -223,10 +223,9 @@ public class DatetimeUtil {
     }
 
     /**
-     * 两个日期相差几个小时
+     * 两个日期相差的小时数
      * @param startDate 开始日期
      * @param endDate 结束日期
-     * @return
      */
     public static long differHours(Date startDate, Date endDate) {
         if(startDate == null || endDate == null) {
@@ -235,6 +234,20 @@ public class DatetimeUtil {
 
         long milliseconds = endDate.getTime() - startDate.getTime();
         return milliseconds / (60*60*1000);
+    }
+
+    /**
+     * 两个日期相差的分钟数
+     * @param startDate
+     * @param endDate
+     */
+    public static long differMinutes(Date startDate, Date endDate) {
+        if(startDate == null || endDate == null) {
+            return 0;
+        }
+
+        long milliseconds = endDate.getTime() - startDate.getTime();
+        return milliseconds / (60*1000);
     }
 
 }

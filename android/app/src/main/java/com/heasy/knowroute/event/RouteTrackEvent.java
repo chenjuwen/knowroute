@@ -1,6 +1,6 @@
 package com.heasy.knowroute.event;
 
-import com.baidu.mapapi.model.LatLng;
+import com.heasy.knowroute.bean.PointBean;
 import com.heasy.knowroute.core.event.AbstractEvent;
 
 import java.util.List;
@@ -9,14 +9,14 @@ import java.util.List;
  * Created by Administrator on 2020/11/7.
  */
 public class RouteTrackEvent extends AbstractEvent {
-    private List<LatLng> points;
+    private List<PointBean> dataList;
 
-    public RouteTrackEvent(Object source, List<LatLng> points){
+    public RouteTrackEvent(Object source, List<PointBean> dataList){
         super(source);
-        this.points = points;
+        this.dataList = dataList;
     }
 
-    public List<LatLng> getPoints() {
-        return points;
+    public List<PointBean> getList() {
+        return dataList;
     }
 }

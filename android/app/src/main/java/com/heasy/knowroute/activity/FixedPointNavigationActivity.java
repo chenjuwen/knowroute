@@ -30,8 +30,8 @@ import com.heasy.knowroute.event.FixedPointCategoryChangeEvent;
 import com.heasy.knowroute.event.FixedPointNavigationEvent;
 import com.heasy.knowroute.map.AbstractMapLocationClient;
 import com.heasy.knowroute.map.DefaultMapLocationClient;
-import com.heasy.knowroute.map.DefaultMapMarkerService;
 import com.heasy.knowroute.map.FixedPointAddWindow;
+import com.heasy.knowroute.map.FixedPointMapMarkerService;
 import com.heasy.knowroute.service.backend.BaseAPI;
 import com.heasy.knowroute.service.backend.FixedPointCategoryAPI;
 import com.heasy.knowroute.service.backend.FixedPointInfoAPI;
@@ -60,7 +60,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     private List<FixedPointCategoryBean> categoryList = new ArrayList<>();
     private List<FixedPointInfoBean> pointList;
 
-    private DefaultMapMarkerService mapMarkerService;
+    private FixedPointMapMarkerService mapMarkerService;
     private FixedPointAddWindow fixedPointAddWindow;
     private AbstractMapLocationClient mapLocationClient;
 
@@ -73,13 +73,15 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
 
         ServiceEngineFactory.getServiceEngine().getEventService().register(this);
 
-        this.mapMarkerService = new DefaultMapMarkerService(FixedPointNavigationActivity.this);
+        this.mapMarkerService = new FixedPointMapMarkerService(FixedPointNavigationActivity.this);
         this.mapMarkerService.init();
 
         this.fixedPointAddWindow = new FixedPointAddWindow(FixedPointNavigationActivity.this, this.mapMarkerService);
         this.fixedPointAddWindow.init();
 
         initViews();
+
+        mMapView = ((MapView) findViewById(R.id.mapView));
         initBaiduMap(MyLocationConfiguration.LocationMode.COMPASS, null, this.mapMarkerService); //COMPASS罗盘仪
         initPosition();
 
@@ -90,7 +92,6 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
 
     private void initViews(){
         drawer_layout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mMapView = ((MapView) findViewById(R.id.mapView));
         selectedCategory = (TextView)findViewById(R.id.selectedCategory);
         list_view = (ListView) findViewById(R.id.list_view);
 
@@ -203,9 +204,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                                 try{
                                     Integer categoryId = (Integer)ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FIXED_POINT_CATEGORY_ID);
                                     pointList = FixedPointInfoAPI.list(categoryId);
-                                    if(pointList != null && pointList.size() > 0){
-                                        ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointCategoryChangeEvent(this, ""));
-                                    }
+                                    ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointCategoryChangeEvent(this, ""));
                                 }catch (Exception ex){
                                     logger.error("", ex);
                                     ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointCategoryChangeEvent(this, "数据加载失败"));
@@ -227,13 +226,14 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     public void handleCategoryChangeEvent(final FixedPointCategoryChangeEvent event) {
         if (event != null) {
             dismissLoadingDialog();
+
             if(StringUtil.isEmpty(event.getMessage())){//success
                 if(pointList != null && pointList.size() > 0){
                     List<LatLng> list = new ArrayList<>();
 
                     for(int i=0; i<pointList.size(); i++){
                         FixedPointInfoBean bean = pointList.get(i);
-                        Bitmap bitmap = mapMarkerService.getViewBitmap(mapMarkerService.getMapPointView(bean.getLabel()));
+                        Bitmap bitmap = mapMarkerService.createViewBitmap(mapMarkerService.getCustomMapPointView(bean.getLabel(), FixedPointNavigationActivity.this));
                         mapMarkerService.addMarkerOverlay(bean, BitmapDescriptorFactory.fromBitmap(bitmap));
                         list.add(new LatLng(bean.getLatitude(), bean.getLongitude()));
                     }

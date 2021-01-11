@@ -1,6 +1,6 @@
 package com.heasy.knowroute.service.backend;
 
-import com.alibaba.fastjson.JSONArray;
+import com.heasy.knowroute.bean.PointBean;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.utils.DatetimeUtil;
@@ -10,18 +10,26 @@ import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.map.bean.LocationBean;
 import com.heasy.knowroute.service.common.HttpService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Date;
+import java.util.List;
 
 public class PositionAPI extends BaseAPI {
-    public static JSONArray getPoints(String userId, Date startDate, Date endDate){
+    private static final Logger logger = LoggerFactory.getLogger(PositionAPI.class);
+
+    public static List<PointBean> getPoints(String userId, Date startDate, Date endDate){
         String requestUrl = "position/getPoints?userId=" + userId
                 + "&startDate=" + ParameterUtil.encodeParamValue(DatetimeUtil.formatDate(startDate, DatetimeUtil.DEFAULT_PATTERN_DT2))
                 + "&endDate=" + ParameterUtil.encodeParamValue(DatetimeUtil.formatDate(endDate, DatetimeUtil.DEFAULT_PATTERN_DT2));
 
         ResponseBean responseBean = HttpService.get(getHeasyContext(), requestUrl);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-            JSONArray jsonArray = FastjsonUtil.string2JSONArray((String) responseBean.getData());
-            return jsonArray;
+            String data = (String) responseBean.getData();
+            //logger.debug(data);
+            List<PointBean> dataList = FastjsonUtil.arrayString2List(data, PointBean.class);
+            return dataList;
         }else{
             return null;
         }
