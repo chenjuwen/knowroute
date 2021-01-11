@@ -55,6 +55,13 @@ public class WebResponse implements Serializable{
 		result.setData(data);
 		return result;
 	}
+	
+	public static WebResponse failure(Integer code, String message) {
+		WebResponse result = new WebResponse();
+		result.setCode(code);
+		result.setMessage(message);
+		return result;
+	}
 
 	public Integer getCode() {
 		return code;

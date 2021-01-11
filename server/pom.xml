@@ -119,6 +119,7 @@
 	</dependency>
 	<dependency>
 	    <groupId>org.springframework.boot</groupId>
+	    <!-- 框架默认注入 DataSourceTransactionManager 实例 -->
 	    <artifactId>spring-boot-starter-jdbc</artifactId>
 	</dependency>
 	

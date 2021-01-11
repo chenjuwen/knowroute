@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.heasy.knowroute.bean.ContactBean;
 
@@ -17,50 +19,36 @@ import com.heasy.knowroute.bean.ContactBean;
 public class ContactServiceImpl extends BaseService implements ContactService {
     private static final Logger logger = LoggerFactory.getLogger(ContactServiceImpl.class);
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
 	public boolean save(ContactBean bean) {
-		try{
-			if(existsContact(bean)) {
-				return false;
-			}
-			
-        	String sql = "insert into contacts(user_id,contact_name,contact_phone) values (?,?,?)";
-        	jdbcTemplate.update(sql, bean.getUserId(), bean.getContactName(), bean.getContactPhone());
-            return true;
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
+		if(existsContact(bean)) {
+			return false;
+		}
+		
+    	String sql = "insert into contacts(user_id,contact_name,contact_phone) values (?,?,?)";
+    	jdbcTemplate.update(sql, bean.getUserId(), bean.getContactName(), bean.getContactPhone());
+    	
+        return true;
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
 	public boolean update(ContactBean bean) {
-		try{
-			if(existsContact(bean)) {
-				return false;
-			}
-			
-        	String sql = "update contacts set contact_name=?,contact_phone=? where id=?";
-        	jdbcTemplate.update(sql, bean.getContactName(), bean.getContactPhone(), bean.getId());
-            return true;
-
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
+		if(existsContact(bean)) {
+			return false;
+		}
+		
+    	String sql = "update contacts set contact_name=?,contact_phone=? where id=?";
+    	jdbcTemplate.update(sql, bean.getContactName(), bean.getContactPhone(), bean.getId());
+        return true;
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public boolean delete(int id) {
-		try{
-        	String sql = "delete from contacts where id=?";
-        	jdbcTemplate.update(sql, id);
-            return true;
-
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
+	public void delete(int id) {
+    	String sql = "delete from contacts where id=?";
+    	jdbcTemplate.update(sql, id);
 	}
 
 	@Override

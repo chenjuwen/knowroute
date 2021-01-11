@@ -47,8 +47,7 @@ public class ContactServiceTest {
 	
 	@Test
 	public void delete() {
-		boolean b = contactService.delete(1);
-		System.out.println(b);
+		contactService.delete(1);
 	}
 	
 	@Test

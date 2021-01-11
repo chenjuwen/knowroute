@@ -30,9 +30,9 @@ public class AccessControlInterceptor extends HandlerInterceptorAdapter{
 		
 		System.out.println("user-agent=" + request.getHeader("user-agent"));
 		
-		System.out.println("Method: " + request.getMethod());
-		System.out.println("QueryString: " + request.getQueryString());
-		System.out.println("RequestURI: " + request.getRequestURI());
+//		System.out.println("Method: " + request.getMethod());
+//		System.out.println("QueryString: " + request.getQueryString());
+//		System.out.println("RequestURI: " + request.getRequestURI());
 		
 		if(handler instanceof HandlerMethod){
 			HandlerMethod handlerMethod = (HandlerMethod) handler;

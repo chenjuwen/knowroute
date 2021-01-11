@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +34,8 @@ import net.sf.json.JSONArray;
 @RestController
 @RequestMapping("/contact")
 public class ContactController extends BaseController{
+    private static final Logger logger = LoggerFactory.getLogger(ContactController.class);
+    
 	@Autowired
 	private ContactService contactService;
 	
@@ -90,12 +94,8 @@ public class ContactController extends BaseController{
 	})
 	@RequestMapping(value="/delete", method=RequestMethod.GET)
     public WebResponse delete(@RequestParam(value="id") Integer id) {
-		boolean b = contactService.delete(id);
-		if(b) {
-			return WebResponse.success();
-		}else {
-			return WebResponse.failure(ResponseCode.FAILURE);
-		}
+		contactService.delete(id);
+		return WebResponse.success();
     }
 
 	@ApiOperation(value="getAll", notes="获取所有联系人信息")
