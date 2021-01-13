@@ -17,6 +17,12 @@ import com.heasy.knowroute.bean.MessageBean;
 import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.utils.JsonUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+
+@Api(tags="消息管理")
 @RestController
 @RequestMapping("/message")
 public class MessageController extends BaseController{
@@ -24,35 +30,35 @@ public class MessageController extends BaseController{
     
 	@Autowired
 	private MessageService messageService;
-    
+
+	@ApiOperation(value="insert", notes="添加消息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="messageBean", paramType="body", required=true, dataType="MessageBean")
+	})
 	@RequestMapping(value="/insert", method=RequestMethod.POST)
 	public WebResponse insert(@RequestBody MessageBean messageBean){
-		try {
-			int id = messageService.insert(messageBean);
-			if(id > 0) {
-				return WebResponse.success(JsonUtil.toJSONString("id", String.valueOf(id)));
-			}
-		}catch(Exception ex) {
-			logger.error("", ex);
+		int id = messageService.insert(messageBean);
+		if(id > 0) {
+			return WebResponse.success(JsonUtil.toJSONString("id", String.valueOf(id)));
+		}else {
+			return WebResponse.failure();
 		}
-		return WebResponse.failure();
 	}
     
-	/**
-	 * 完成消息的处理
-	 */
+	@ApiOperation(value="confirm", notes="确认消息处理情况")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="messageBean", paramType="body", required=true, dataType="MessageBean")
+	})
 	@RequestMapping(value="/confirm", method=RequestMethod.POST)
 	public WebResponse confirm(@RequestBody MessageBean messageBean){
-		try {
-			logger.debug(JsonUtil.object2String(messageBean));
-			messageService.confirmMessage(messageBean.getId(), messageBean.getResult());
-			return WebResponse.success();
-		}catch(Exception ex) {
-			logger.error("", ex);
-		}
-		return WebResponse.failure();
+		messageService.confirmMessage(messageBean.getId(), messageBean.getResult());
+		return WebResponse.success();
 	}
 
+	@ApiOperation(value="list", notes="获取某个用户的所有消息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer")
+	})
 	@RequestMapping(value="/list/{userId}", method=RequestMethod.GET)
 	public WebResponse list(@PathVariable Integer userId){
 		try {

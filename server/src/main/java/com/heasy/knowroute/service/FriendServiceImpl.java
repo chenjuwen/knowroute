@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.heasy.knowroute.bean.FriendBean;
 import com.heasy.knowroute.bean.MessageBean;
@@ -149,66 +151,104 @@ public class FriendServiceImpl extends BaseService implements FriendService {
         return null;
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
+	@Override
+	public boolean confirmAdd(int messageId, String pass) {
+		MessageBean messageBean = messageService.getMessage(messageId);
+		if(messageBean != null) {
+			if(pass.equalsIgnoreCase("yes")) {
+				messageService.confirmMessage(messageId, "已同意");
+				
+				//添加好友关系
+				UserBean receiverUser = userService.getUserByPhone(messageBean.getReceiver());
+				addFriendRelationship(Integer.parseInt(messageBean.getSender()), messageBean.getReceiver(), 
+						receiverUser.getId(), messageBean.getSenderPhone());
+				
+				//添加站内消息
+				MessageBean bean = new MessageBean();
+				bean.setTitle("好友提醒");
+				bean.setContent(messageBean.getReceiver() + "同意了您的好友邀请");
+				bean.setCategory(EnumConstants.MessageCategory.GENERAL.name());
+				bean.setCreateDate(DatetimeUtil.nowDate());
+				bean.setOwner(new Integer(messageBean.getSender()));
+				bean.setStatus(1);
+				messageService.insert(bean);
+				
+			} else {
+				messageService.confirmMessage(messageId, "已忽略");
+				
+				//添加站内消息
+				MessageBean bean = new MessageBean();
+				bean.setTitle("好友提醒");
+				bean.setContent(messageBean.getReceiver() + "拒绝了您的好友邀请");
+				bean.setCategory(EnumConstants.MessageCategory.GENERAL.name());
+				bean.setCreateDate(DatetimeUtil.nowDate());
+				bean.setOwner(new Integer(messageBean.getSender()));
+				bean.setStatus(1);
+				messageService.insert(bean);
+			}
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
+	@Override
+	public void addFriendRelationship(int aUserId, String bPhone, int bUserId, String aPhone) {
+		insert(aUserId, bPhone);
+		insert(bUserId, aPhone);
+	}
+
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	/**
 	 * 添加好友
 	 * @param userId 用户id
 	 * @param phone 好友的手机号
 	 */
 	@Override
-	public boolean insert(int userId, String phone) {
-		try{
-			FriendBean friendBean = getFriend(userId, phone);
-			if(friendBean == null) {
-				UserBean userBean = userService.getUserByPhone(phone); //好友
-				if(userBean != null) {
-					String sql = "insert into friends(user_id,related_user_id,nickname) values (?,?,?)";
-		        	jdbcTemplate.update(sql, userId, userBean.getId(), userBean.getNickname());
-		        	logger.info("添加好友关系： " + userId + " >> " + phone);
-		            return true;
-				}else {
-					logger.warn("好友 " + phone + " 不在系统中");
-				}
+	public void insert(int userId, String phone) {
+		FriendBean friendBean = getFriend(userId, phone);
+		if(friendBean == null) {
+			UserBean friendUserBean = userService.getUserByPhone(phone); //好友
+			if(friendUserBean != null) {
+				String sql = "insert into friends(user_id,related_user_id,nickname) values (?,?,?)";
+	        	jdbcTemplate.update(sql, userId, friendUserBean.getId(), friendUserBean.getNickname());
+	        	logger.info("添加好友关系： " + userId + " >> " + phone);
+			}else {
+				logger.warn("好友 " + phone + " 不在系统中");
 			}
-        }catch (Exception ex){
-            logger.error("", ex);
-        }
-        return false;
+		}
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public boolean updateNickname(int id, String newNickname) {
-		try{
-        	String sql = "update friends set nickname=? where id=?";
-        	int i = jdbcTemplate.update(sql, newNickname, id);
-            return (i>0);
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
+	public void updateNickname(int id, String newNickname) {
+    	String sql = "update friends set nickname=? where id=?";
+    	jdbcTemplate.update(sql, newNickname, id);
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	/**
 	 * 删除好友关系
 	 */
 	@Override
 	public boolean delete(int id) {
-		try{
-			FriendBean bean = getFriend(id);
-			if(bean != null) {
-				int userId = bean.getUserId();
-				int relatedUserId = bean.getRelatedUserId();
-				
-	        	String sql = "delete from friends where user_id=? and related_user_id=?";
-	        	jdbcTemplate.update(sql, userId, relatedUserId);
-	        	
-	        	sql = "delete from friends where user_id=? and related_user_id=?";
-	        	jdbcTemplate.update(sql, relatedUserId, userId);
-			}
-            return true;
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
+		FriendBean bean = getFriend(id);
+		if(bean == null) {
+			return false;
+		}
+		
+		int userId = bean.getUserId();
+		int relatedUserId = bean.getRelatedUserId();
+		
+    	String sql = "delete from friends where user_id=? and related_user_id=?";
+    	jdbcTemplate.update(sql, userId, relatedUserId);
+    	
+    	sql = "delete from friends where user_id=? and related_user_id=?";
+    	jdbcTemplate.update(sql, relatedUserId, userId);
+    	
+        return true;
 	}
 
 	class FriendRowMapper implements RowMapper<FriendBean>{

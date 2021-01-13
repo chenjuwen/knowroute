@@ -16,6 +16,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.heasy.knowroute.bean.MessageBean;
 import com.heasy.knowroute.utils.DatetimeUtil;
@@ -80,57 +82,46 @@ public class MessageServiceImpl extends BaseService implements MessageService {
         return null;
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	/**
 	 * @return 记录的id值，0表示错误，大于0表示真实的id值
 	 */
 	@Override
 	public int insert(MessageBean bean) {
-		try {
-    		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-    		final String sql = "insert into messages(title,content,category,result,sender,sender_nickname,sender_phone,receiver,create_date,status,owner) values(?,?,?,?,?,?,?,?,?,?,?)";
-    		
-    		KeyHolder keyHolder = new GeneratedKeyHolder(); 
-    		
-    		jdbcTemplate.update(new PreparedStatementCreator(){
-    			@Override
-    			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
-    				PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-    				ps.setString(1, bean.getTitle());
-					ps.setString(2, bean.getContent());
-					ps.setString(3, bean.getCategory());
-					ps.setString(4, StringUtil.trimToEmpty(bean.getResult()));
-					ps.setString(5, bean.getSender());
-					ps.setString(6, bean.getSenderNickname());
-					ps.setString(7, bean.getSenderPhone());
-					ps.setString(8, bean.getReceiver());
-					ps.setString(9, date);
-					ps.setInt(10, bean.getStatus());
-					ps.setInt(11, bean.getOwner()==null ? 0 : bean.getOwner());
-					return ps;
-    			}
-    		}, keyHolder);
-    		
-    		int id = keyHolder.getKey().intValue();
-    		logger.info("id=" + id);
-        	return id;
-    		
-    	}catch(Exception ex) {
-    		logger.error("", ex);
-    		return 0;
-    	}
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+		final String sql = "insert into messages(title,content,category,result,sender,sender_nickname,sender_phone,receiver,create_date,status,owner) values(?,?,?,?,?,?,?,?,?,?,?)";
+		
+		KeyHolder keyHolder = new GeneratedKeyHolder(); 
+		
+		jdbcTemplate.update(new PreparedStatementCreator(){
+			@Override
+			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+				PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, bean.getTitle());
+				ps.setString(2, bean.getContent());
+				ps.setString(3, bean.getCategory());
+				ps.setString(4, StringUtil.trimToEmpty(bean.getResult()));
+				ps.setString(5, bean.getSender());
+				ps.setString(6, bean.getSenderNickname());
+				ps.setString(7, bean.getSenderPhone());
+				ps.setString(8, bean.getReceiver());
+				ps.setString(9, date);
+				ps.setInt(10, bean.getStatus());
+				ps.setInt(11, bean.getOwner()==null ? 0 : bean.getOwner());
+				return ps;
+			}
+		}, keyHolder);
+		
+		int id = keyHolder.getKey().intValue();
+		logger.info("id=" + id);
+    	return id;
 	}
-	
+
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public boolean confirmMessage(int id, String result) {
-		try{
-        	String sql = "update messages set status=1,result=? where id=?";
-        	int i = jdbcTemplate.update(sql, result, id);
-        	System.out.println("confirmMessage >> i=" + i);
-            return i>0;
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
+	public void confirmMessage(int id, String result) {
+    	String sql = "update messages set status=1,result=? where id=?";
+    	jdbcTemplate.update(sql, result, id);
 	}
 	
 	class MessageRowMapper implements RowMapper<MessageBean>{

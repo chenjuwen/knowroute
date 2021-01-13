@@ -23,12 +23,16 @@ import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.service.FriendService;
 import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.service.UserService;
-import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import net.sf.json.JSONArray;
 
+@Api(tags="好友管理")
 @RestController
 @RequestMapping("/friend")
 public class FriendController extends BaseController{
@@ -42,12 +46,12 @@ public class FriendController extends BaseController{
 	
 	@Autowired
 	private UserService userService;
-    
-	/**
-	 *  好友状态检查
-	 * @param userId
-	 * @param phone 好友的手机号
-	 */
+
+	@ApiOperation(value="check", notes="检查好友状态")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="query", required=true, dataType="Integer"),
+		@ApiImplicitParam(name="phone", paramType="query", required=true, dataType="String")
+	})
 	@RequestMapping(value="/check", method=RequestMethod.GET)
 	public WebResponse check(@RequestParam(value="userId") Integer userId,
 			@RequestParam(value="phone") String phone){
@@ -60,9 +64,10 @@ public class FriendController extends BaseController{
 		return WebResponse.failure();
 	}
 	
-	/**
-	 * 好友列表数据
-	 */
+	@ApiOperation(value="list", notes="获取好友列表")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="query", required=true, dataType="Integer")
+	})
 	@RequestMapping(value="/list", method=RequestMethod.GET)
 	public WebResponse list(@RequestParam(value="userId") Integer userId){
 		try {
@@ -76,9 +81,10 @@ public class FriendController extends BaseController{
 		return WebResponse.success("[]");
 	}
 
-	/**
-	 * 邀请好友的站内消息
-	 */
+	@ApiOperation(value="invite", notes="添加邀请好友的站内信")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+	})
 	@RequestMapping(value="/invite", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse invite(@RequestBody Map<String,String> map) {
 		String userId = map.get("userId");
@@ -110,9 +116,10 @@ public class FriendController extends BaseController{
 		return WebResponse.failure();
 	}
 	
-	/**
-	 * 添加好友的站内消息
-	 */
+	@ApiOperation(value="add", notes="添加好友的站内信")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+	})
 	@RequestMapping(value="/add", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse add(@RequestBody Map<String,String> map) {
 		String userId = map.get("userId");
@@ -147,9 +154,10 @@ public class FriendController extends BaseController{
 		return WebResponse.failure();
 	}
 	
-	/**
-	 * 确认是否加为好友
-	 */
+	@ApiOperation(value="confirmAdd", notes="确认是否加为好友")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+	})
 	@RequestMapping(value="/confirmAdd", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse confirmAdd(@RequestBody Map<String,String> map) {
 		String id = map.get("id");
@@ -159,75 +167,39 @@ public class FriendController extends BaseController{
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);
 		}
 
-		MessageBean messageBean = messageService.getMessage(Integer.parseInt(id));
-		if(messageBean != null) {
-			if(pass.equalsIgnoreCase("yes")) {
-				messageService.confirmMessage(Integer.parseInt(id), "已同意");
-				
-				//添加好友关系
-				UserBean receiverUser = userService.getUserByPhone(messageBean.getReceiver());
-				friendService.insert(Integer.parseInt(messageBean.getSender()), messageBean.getReceiver());
-				friendService.insert(receiverUser.getId(), messageBean.getSenderPhone());
-				
-				//添加站内消息
-				MessageBean bean = new MessageBean();
-				bean.setTitle("好友提醒");
-				bean.setContent(messageBean.getReceiver() + "同意了您的好友邀请");
-				bean.setCategory(EnumConstants.MessageCategory.GENERAL.name());
-				bean.setCreateDate(DatetimeUtil.nowDate());
-				bean.setOwner(new Integer(messageBean.getSender()));
-				bean.setStatus(1);
-				messageService.insert(bean);
-				
-				return WebResponse.success();
-			}else {
-				messageService.confirmMessage(Integer.parseInt(id), "已忽略");
-				
-				//添加站内消息
-				MessageBean bean = new MessageBean();
-				bean.setTitle("好友提醒");
-				bean.setContent(messageBean.getReceiver() + "拒绝了您的好友邀请");
-				bean.setCategory(EnumConstants.MessageCategory.GENERAL.name());
-				bean.setCreateDate(DatetimeUtil.nowDate());
-				bean.setOwner(new Integer(messageBean.getSender()));
-				bean.setStatus(1);
-				messageService.insert(bean);
-				
-				return WebResponse.success();
-			}
+		boolean b = friendService.confirmAdd(Integer.parseInt(id), pass);
+		if(b) {
+			return WebResponse.success();
+		}else {
+			return WebResponse.failure();
 		}
-		
-		return WebResponse.failure();
 	}
-	
+
+	@ApiOperation(value="updateNickname", notes="更新好友昵称")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+	})
 	@RequestMapping(value="/updateNickname", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse updateNickname(@RequestBody Map<String,String> map) {
-		try {
-			String id = map.get("id");
-			String newNickname = map.get("newNickname");
-			
-			boolean b = friendService.updateNickname(Integer.parseInt(id), newNickname);
-			if(b) {
-				return WebResponse.success();
-			}
-		}catch(Exception ex) {
-			logger.error("", ex);
-		}
-		return WebResponse.failure();
+		String id = map.get("id");
+		String newNickname = map.get("newNickname");
+		
+		friendService.updateNickname(Integer.parseInt(id), newNickname);
+		return WebResponse.success();
 	}
-	
+
+	@ApiOperation(value="delete", notes="删除好友")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="id", paramType="path", required=true, dataType="Integer")
+	})
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse delete(@PathVariable Integer id) {
-		try {
-			boolean b = friendService.delete(id);
-			if(b) {
-				return WebResponse.success();
-			}
-		}catch(Exception ex) {
-			logger.error("", ex);
+		boolean b = friendService.delete(id);
+		if(b) {
+			return WebResponse.success();
+		}else {
+			return WebResponse.failure();
 		}
-		return WebResponse.failure();
 	}
-	
 	
 }

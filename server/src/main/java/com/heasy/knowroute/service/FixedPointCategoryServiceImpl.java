@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.heasy.knowroute.bean.FixedPointCategoryBean;
 import com.heasy.knowroute.utils.DatetimeUtil;
@@ -29,66 +31,39 @@ public class FixedPointCategoryServiceImpl extends BaseService implements FixedP
         return null;
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public boolean insert(int userId, String name) {
-		try{
-    		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-        	String sql = "insert into fixed_point_categorys(user_id,name,create_date) values (?,?,?)";
-        	jdbcTemplate.update(sql, userId, name, date);
-            return true;
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
+	public void insert(int userId, String name) {
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    	String sql = "insert into fixed_point_categorys(user_id,name,create_date) values (?,?,?)";
+    	jdbcTemplate.update(sql, userId, name, date);
+	}
+
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
+	@Override
+	public void update(int id, String name) {
+    	String sql = "update fixed_point_categorys set name=? where id=?";
+    	jdbcTemplate.update(sql, name, id);
+	}
+
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
+	@Override
+	public void delete(int id) {
+    	String sql = "delete from fixed_point_categorys where id=?";
+    	jdbcTemplate.update(sql, id);
 	}
 
 	@Override
-	public boolean update(int id, String name) {
-		try{
-        	String sql = "update fixed_point_categorys set name=? where id=?";
-        	jdbcTemplate.update(sql, name, id);
-            return true;
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
+	public void topping(int id) {
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    	String sql = "update fixed_point_categorys set topping=1,create_date=? where id=?";
+    	jdbcTemplate.update(sql, date, id);
 	}
 
 	@Override
-	public boolean delete(int id) {
-		try{
-        	String sql = "delete from fixed_point_categorys where id=?";
-        	jdbcTemplate.update(sql, id);
-            return true;
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
-	}
-
-	@Override
-	public boolean topping(int id) {
-		try{
-    		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-        	String sql = "update fixed_point_categorys set topping=1,create_date=? where id=?";
-        	jdbcTemplate.update(sql, date, id);
-            return true;
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
-	}
-
-	@Override
-	public boolean cancelTopping(int id) {
-		try{
-        	String sql = "update fixed_point_categorys set topping=0 where id=?";
-        	jdbcTemplate.update(sql, id);
-            return true;
-        }catch (Exception ex){
-            logger.error("", ex);
-            return false;
-        }
+	public void cancelTopping(int id) {
+    	String sql = "update fixed_point_categorys set topping=0 where id=?";
+    	jdbcTemplate.update(sql, id);
 	}
 
 	class RowMapperImpl implements RowMapper<FixedPointCategoryBean>{

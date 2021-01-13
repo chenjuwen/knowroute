@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.heasy.knowroute.bean.PointBean;
 import com.heasy.knowroute.bean.PositionBean;
@@ -18,20 +20,13 @@ import com.heasy.knowroute.utils.DatetimeUtil;
 @Service
 public class PositionServiceImpl extends BaseService implements PositionService {
     private static final Logger logger = LoggerFactory.getLogger(PositionServiceImpl.class);
-    
+
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public boolean insert(PositionBean bean) {
-		try {
-    		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-    		
-    		final String sql = "insert into positions(id,user_id,longitude,latitude,times) values(?,?,?,?,?)";
-    		jdbcTemplate.update(sql, bean.getId(), bean.getUserId(), bean.getLongitude(), bean.getLatitude(), date);
-    		
-        	return true;
-    	}catch(Exception ex) {
-    		logger.error("", ex);
-    		return false;
-    	}
+	public void insert(PositionBean bean) {
+    	String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    	final String sql = "insert into positions(id,user_id,longitude,latitude,times) values(?,?,?,?,?)";
+    	jdbcTemplate.update(sql, bean.getId(), bean.getUserId(), bean.getLongitude(), bean.getLatitude(), date);
 	}
 
 	@Override

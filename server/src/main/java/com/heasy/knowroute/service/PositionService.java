@@ -7,6 +7,6 @@ import com.heasy.knowroute.bean.PointBean;
 import com.heasy.knowroute.bean.PositionBean;
 
 public interface PositionService {
-	public boolean insert(PositionBean bean);
+	public void insert(PositionBean bean);
 	public List<PointBean> getPoints(int userId, Date startDate, Date endDate);
 }

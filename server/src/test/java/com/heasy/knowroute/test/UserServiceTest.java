@@ -62,7 +62,6 @@ public class UserServiceTest {
 	
 	@Test
 	public void cancelAccount() {
-		boolean b = userService.cancelAccount(1, "13798188343");
-		System.out.println(b);
+		userService.cancelAccount(1, "13798188343");
 	}
 }

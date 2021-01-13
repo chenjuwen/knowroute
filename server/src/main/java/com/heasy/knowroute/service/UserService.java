@@ -12,8 +12,8 @@ public interface UserService{
     UserBean getUserById(int id);
     UserBean getUserByPhone(String phone);
     int insert(String phone, String invite_code);
-    boolean updateNickname(int id, String newNickname);
+    void updateNickname(int id, String newNickname);
     boolean updateLastLoginDate(int id);
     boolean updatePositionInfo(int id, double longitude, double latitude, String address, Date positionTimes);
-    boolean cancelAccount(int id, String phone);
+    void cancelAccount(int id, String phone);
 }

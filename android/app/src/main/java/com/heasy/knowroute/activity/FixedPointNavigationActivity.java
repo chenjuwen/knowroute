@@ -83,6 +83,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
 
         mMapView = ((MapView) findViewById(R.id.mapView));
         initBaiduMap(MyLocationConfiguration.LocationMode.COMPASS, null, this.mapMarkerService); //COMPASS罗盘仪
+
         initPosition();
 
         this.mapLocationClient = new DefaultMapLocationClient(mBaiduMap, FixedPointNavigationActivity.this);

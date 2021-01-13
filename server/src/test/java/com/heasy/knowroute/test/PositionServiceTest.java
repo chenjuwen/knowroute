@@ -35,8 +35,7 @@ public class PositionServiceTest {
 		bean.setLatitude(22.617776);
 		bean.setTimes(DatetimeUtil.nowDate());
 		
-		boolean b = positionService.insert(bean);
-		System.out.println(b);
+		positionService.insert(bean);
 	}
 	
 	@Test

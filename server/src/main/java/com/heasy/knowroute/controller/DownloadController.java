@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.heasy.knowroute.utils.StringUtil;
 
-/**
- * 文件下载
- */
+import springfox.documentation.annotations.ApiIgnore;
+
+@ApiIgnore
 @Controller
 public class DownloadController {
 	private static Logger logger = LoggerFactory.getLogger(DownloadController.class);

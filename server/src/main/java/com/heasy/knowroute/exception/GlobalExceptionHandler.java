@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.heasy.knowroute.api.ResponseCode;
 import com.heasy.knowroute.api.WebResponse;
 
 /**
@@ -36,7 +35,7 @@ public class GlobalExceptionHandler {
     	logger.error("throwableErrorHandler...");
     	logger.error("", ex);
     	
-    	WebResponse webResponse = WebResponse.failure(ResponseCode.FAILURE, ex.toString());
+    	WebResponse webResponse = WebResponse.failure();
         return webResponse;
     }
     

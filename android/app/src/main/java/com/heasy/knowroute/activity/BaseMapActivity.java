@@ -1,7 +1,6 @@
 package com.heasy.knowroute.activity;
 
 import android.app.Dialog;
-import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,13 +10,9 @@ import android.support.annotation.Nullable;
 
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
-import com.baidu.mapapi.map.MapStatus;
-import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
-import com.baidu.mapapi.model.LatLng;
-import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.map.AbstractMapLocationClient;
 import com.heasy.knowroute.map.AbstractMapMarkerService;
 
@@ -73,6 +68,7 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
             this.markerService.setMapView(mMapView);
             this.markerService.setBaiduMap(mBaiduMap);
             mBaiduMap.setOnMarkerClickListener(this.markerService);
+            mBaiduMap.setOnMapLongClickListener(this.markerService);
         }
     }
 
@@ -147,6 +143,7 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
         if(mBaiduMap != null) {
             if(this.markerService != null) {
                 mBaiduMap.removeMarkerClickListener(this.markerService);
+                mBaiduMap.setOnMapLongClickListener(null);
             }
 
             // 关闭定位图层

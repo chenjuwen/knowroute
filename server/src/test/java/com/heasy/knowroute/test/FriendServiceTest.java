@@ -57,14 +57,12 @@ public class FriendServiceTest {
 
 	@Test
 	public void insertFriend() {
-		boolean b = friendService.insert(5, "13798189356");
-		System.out.println(b);
+		friendService.insert(5, "13798189356");
 	}
 
 	@Test
 	public void update() {
-		boolean b = friendService.updateNickname(3, "张三2");
-		System.out.println(b);
+		friendService.updateNickname(3, "张三2");
 	}
 
 	@Test

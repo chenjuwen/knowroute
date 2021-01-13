@@ -21,6 +21,12 @@ import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+
+@Api(tags="用户管理")
 @RestController
 @RequestMapping("/user")
 public class UserController extends BaseController{
@@ -32,6 +38,10 @@ public class UserController extends BaseController{
 	@Autowired
 	private CaptcheService captcheService;
 
+	@ApiOperation(value="getCaptche", notes="获取登陆验证码")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="phone", paramType="query", required=true, dataType="String")
+	})
 	@RequestMapping(value="/getCaptche", method=RequestMethod.GET)
 	public WebResponse getCaptche(@RequestParam(value="phone") String phone) {
 		if(!StringUtil.isMobile(phone)) {
@@ -44,7 +54,12 @@ public class UserController extends BaseController{
 		
 		return WebResponse.success(JsonUtil.toJSONString("captche", captche));
 	}
-	
+
+	@ApiOperation(value="login", notes="系统登陆")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="phone", paramType="query", required=true, dataType="String"),
+		@ApiImplicitParam(name="phone", paramType="query", required=true, dataType="String")
+	})
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public WebResponse login(HttpServletRequest request){
 		String phone = StringUtil.trimToEmpty(request.getParameter("phone"));
@@ -66,17 +81,24 @@ public class UserController extends BaseController{
 			return WebResponse.failure(ResponseCode.CAPTCHE_INVALID);
 		}
 		
-		int id = userService.login(phone);
-		if(id > 0) {
-			captcheService.delete(phone);
-			UserBean newUser = userService.getUserById(id);
-			String data = JsonUtil.toJSONString("id", String.valueOf(id), "nickname", newUser.getNickname());
-			return WebResponse.success(data);
-		}else {
-			return WebResponse.failure(ResponseCode.LOGIN_ERROR);
+		try {
+			int id = userService.login(phone);
+			if(id > 0) {
+				captcheService.delete(phone);
+				UserBean newUser = userService.getUserById(id);
+				String data = JsonUtil.toJSONString("id", String.valueOf(id), "nickname", newUser.getNickname());
+				return WebResponse.success(data);
+			}
+		}catch(Exception ex) {
+			logger.error("", ex);
 		}
+		return WebResponse.failure(ResponseCode.LOGIN_ERROR);
 	}
-	
+
+	@ApiOperation(value="getById", notes="根据id获取用户信息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="id", paramType="query", required=true, dataType="Integer")
+	})
 	@RequestMapping(value="/getById", method=RequestMethod.GET)
 	public WebResponse getById(@RequestParam(value="id") Integer id){
 		UserBean bean = userService.getUserById(id);
@@ -87,7 +109,11 @@ public class UserController extends BaseController{
 			return WebResponse.failure(ResponseCode.NO_DATA);
 		}
 	}
-	
+
+	@ApiOperation(value="getByPhone", notes="根据手机号获取用户信息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="phone", paramType="query", required=true, dataType="String")
+	})
 	@RequestMapping(value="/getByPhone", method=RequestMethod.GET)
 	public WebResponse getByPhone(@RequestParam(value="phone") String phone){
 		UserBean bean = userService.getUserByPhone(phone);
@@ -98,34 +124,33 @@ public class UserController extends BaseController{
 			return WebResponse.failure(ResponseCode.NO_DATA);
 		}
 	}
-	
+
+	@ApiOperation(value="updateNickname", notes="更新用户昵称")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+	})
 	@RequestMapping(value="/updateNickname", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse updateNickname(@RequestBody Map<String,String> map){
 		String userId = map.get("userId");
 		String newNickname = map.get("newNickname");
 		
-		boolean b = userService.updateNickname(Integer.parseInt(userId), newNickname);
-		if(b) {
-			return WebResponse.success();
-		}else {
-			return WebResponse.failure();
-		}
+		userService.updateNickname(Integer.parseInt(userId), newNickname);
+		return WebResponse.success();
 	}
-	
-	/**
-	 * 注销账户
-	 * @param id 用户ID
-	 */
+
+	@ApiOperation(value="cancel", notes="注销账户")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="id", paramType="query", required=true, dataType="Integer")
+	})
 	@RequestMapping(value="/cancel", method=RequestMethod.GET)
 	public WebResponse cancel(@RequestParam(value="id") Integer id){
 		UserBean bean = userService.getUserById(id);
 		if(bean != null) {
-			boolean b = userService.cancelAccount(id, bean.getPhone());
-			if(b) {
-				return WebResponse.success();
-			}
+			userService.cancelAccount(id, bean.getPhone());
+			return WebResponse.success();
+		}else {
+			return WebResponse.failure();
 		}
-		return WebResponse.failure();
 	}
 	
 }

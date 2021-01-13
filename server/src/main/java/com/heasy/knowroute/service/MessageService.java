@@ -10,5 +10,5 @@ public interface MessageService {
 	public MessageBean getMessage(String sender, String receiver, String category);
 	public List<MessageBean> getInviteAgreeMessage(String phone);
 	public int insert(MessageBean messageBean);
-	public boolean confirmMessage(int id, String result);
+	public void confirmMessage(int id, String result);
 }

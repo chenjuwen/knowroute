@@ -14,6 +14,9 @@ import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.service.VersionService;
 
+import springfox.documentation.annotations.ApiIgnore;
+
+@ApiIgnore
 @Controller
 public class MapController extends BaseController{
 	@Autowired

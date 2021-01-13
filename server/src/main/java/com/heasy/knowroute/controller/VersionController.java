@@ -11,6 +11,10 @@ import com.heasy.knowroute.api.WebResponse;
 import com.heasy.knowroute.bean.VersionBean;
 import com.heasy.knowroute.service.VersionService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+@Api(tags="版本管理")
 @RestController
 @RequestMapping("/version")
 public class VersionController extends BaseController{
@@ -19,6 +23,7 @@ public class VersionController extends BaseController{
 	@Autowired
 	private VersionService versionService;
 
+	@ApiOperation(value="lasted", notes="获取最新的版本号")
 	@RequestMapping(value="/lasted", method=RequestMethod.GET)
 	public WebResponse lasted() {
 		VersionBean bean = versionService.getLatestVersion();

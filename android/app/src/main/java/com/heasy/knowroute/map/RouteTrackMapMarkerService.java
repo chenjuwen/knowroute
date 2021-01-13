@@ -1,7 +1,5 @@
 package com.heasy.knowroute.map;
 
-import android.app.Dialog;
-
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
@@ -12,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 public class RouteTrackMapMarkerService extends AbstractMapMarkerService {
     private static final Logger logger = LoggerFactory.getLogger(RouteTrackMapMarkerService.class);
-    private Dialog loadingDialog;
 
     @Override
     public boolean onMarkerClick(final Marker marker) {

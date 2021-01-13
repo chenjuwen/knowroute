@@ -1,7 +1,6 @@
 package com.heasy.knowroute.map;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
@@ -20,14 +20,20 @@ import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
 import com.baidu.mapapi.navi.BaiduMapNavigation;
 import com.baidu.mapapi.navi.NaviParaOption;
 import com.heasy.knowroute.R;
+import com.heasy.knowroute.activity.FixedPointNavigationActivity;
 import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
+import com.heasy.knowroute.core.utils.DoubleUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.event.FixedPointInfoEvent;
 import com.heasy.knowroute.map.bean.LocationBean;
+import com.heasy.knowroute.map.geocode.DefaultGetReverseGeoCode;
+import com.heasy.knowroute.map.geocode.ReverseGeoCodeResultCallback;
+import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.LoginServiceImpl;
 import com.heasy.knowroute.service.backend.FixedPointInfoAPI;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -37,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
-public class FixedPointMapMarkerService extends AbstractMapMarkerService {
+public class FixedPointMapMarkerService extends AbstractMapMarkerService implements BaiduMap.OnMapLongClickListener {
     private static final Logger logger = LoggerFactory.getLogger(FixedPointMapMarkerService.class);
     public static final int DISTANCE_UPDATE_INTERVAL_SECONDS = 5;
 
@@ -50,8 +56,8 @@ public class FixedPointMapMarkerService extends AbstractMapMarkerService {
 
     private Activity activity;
     private FixedPointInfoBean bean;
-    private Dialog loadingDialog;
     private DistanceUpdater distanceUpdater;
+    private DefaultGetReverseGeoCode getReverseGeoCode;
 
     public FixedPointMapMarkerService(Activity activity){
         this.activity = activity;
@@ -59,6 +65,9 @@ public class FixedPointMapMarkerService extends AbstractMapMarkerService {
 
     public void init(){
         ServiceEngineFactory.getServiceEngine().getEventService().register(this);
+
+        getReverseGeoCode = new DefaultGetReverseGeoCode();
+        getReverseGeoCode.init();
 
         distanceUpdater = new DistanceUpdater();
         distanceUpdater.start();
@@ -77,6 +86,42 @@ public class FixedPointMapMarkerService extends AbstractMapMarkerService {
         getBaiduMap().showInfoWindow(infoWindow);
 
         return true;
+    }
+
+    @Override
+    public void onMapLongClick(LatLng location) {
+        loadingDialog = AndroidUtil.showLoadingDialog(activity);
+
+        getReverseGeoCode.getReverseGeoCode(location, new ReverseGeoCodeResultCallback() {
+            @Override
+            public void execute(String address, LatLng location, String error) {
+                logger.debug("error: " + error);
+                dismissLoadingDialog();
+                if(StringUtil.isEmpty(error)) {
+                    double longitude = DoubleUtil.decimalNum(location.longitude, 6);
+                    double latitude = DoubleUtil.decimalNum(location.latitude, 6);
+                    addMarker(longitude, latitude, address);
+                }
+            }
+        });
+    }
+
+    private void addMarker(double longitude, double latitude, String address) {
+        LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+
+        FixedPointInfoBean bean = new FixedPointInfoBean();
+        bean.setUserId(loginService.getUserId());
+        bean.setCategoryId((Integer) ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FixedPointNavigationActivity.FIXED_POINT_CATEGORY_ID));
+        bean.setLongitude(longitude);
+        bean.setLatitude(latitude);
+        bean.setAddress(address);
+        bean.setLabel("新增");
+
+        //add marker
+        Bitmap bitmap = createViewBitmap(getCustomMapPointView(bean.getLabel(), activity));
+        addMarkerOverlay(bean, BitmapDescriptorFactory.fromBitmap(bitmap));
+
+        updateMapStatus(new LatLng(latitude, longitude));
     }
 
     /**
@@ -303,8 +348,15 @@ public class FixedPointMapMarkerService extends AbstractMapMarkerService {
 
     public void destroy(){
         this.activity = null;
+
+        if(getReverseGeoCode != null){
+            getReverseGeoCode.destroy();
+            getReverseGeoCode = null;
+        }
+
         setBaiduMap(null);
         setMapView(null);
+
         setCurrentMarker(null);
         ServiceEngineFactory.getServiceEngine().getEventService().unregister(this);
 

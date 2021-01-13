@@ -1,6 +1,7 @@
 package com.heasy.knowroute.map;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -31,11 +32,12 @@ import java.util.List;
 /**
  * 百度地图覆盖物服务
  */
-public abstract class AbstractMapMarkerService implements BaiduMap.OnMarkerClickListener {
+public abstract class AbstractMapMarkerService implements BaiduMap.OnMarkerClickListener, BaiduMap.OnMapLongClickListener {
     private static final Logger logger = LoggerFactory.getLogger(AbstractMapMarkerService.class);
     private MapView mapView;
     private BaiduMap baiduMap;
     private Marker currentMarker;
+    protected Dialog loadingDialog;
 
     public MapView getMapView() {
         return mapView;
@@ -172,4 +174,15 @@ public abstract class AbstractMapMarkerService implements BaiduMap.OnMarkerClick
         return pointView;
     }
 
+    public void dismissLoadingDialog() {
+        if(loadingDialog != null){
+            loadingDialog.dismiss();
+            loadingDialog = null;
+        }
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+
+    }
 }
