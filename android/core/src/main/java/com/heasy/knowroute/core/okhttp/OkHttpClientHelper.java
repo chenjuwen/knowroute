@@ -13,6 +13,7 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.ConnectionPool;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;
 import okhttp3.Interceptor;
@@ -28,7 +29,7 @@ import okhttp3.Response;
 public class OkHttpClientHelper {
     private static Logger logger = LoggerFactory.getLogger(OkHttpClientHelper.class);
 
-    private static final int DEFAULT_CONNECT_TIMEOUT_MILLSECONDS = 8000;
+    private static final int DEFAULT_CONNECT_TIMEOUT_MILLSECONDS = 15 * 000;
     private static final int DEFAULT_READ_TIMEOUT_MILLSECONDS = 6000;
     private static final int DEFAULT_WRITE_TIMEOUT_MILLSECONDS = 6000;
 	
@@ -36,8 +37,10 @@ public class OkHttpClientHelper {
 
     private OkHttpClient.Builder builder;
     private OkHttpClient okHttpClient;
+    private ConnectionPool connectionPool;
 
     public OkHttpClientHelper(){
+        connectionPool = new ConnectionPool(5, 10, TimeUnit.MINUTES);
         builder = new OkHttpClient.Builder();
 
         DefaultCookieJar cookieJar = new DefaultCookieJar(new MemoryCookieStore());
@@ -46,8 +49,9 @@ public class OkHttpClientHelper {
                 .callTimeout(DEFAULT_CONNECT_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
         	    .readTimeout(DEFAULT_READ_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
         	    .writeTimeout(DEFAULT_WRITE_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
+                .connectionPool(connectionPool)
                 .cookieJar(cookieJar)
-                .retryOnConnectionFailure(false);
+                .retryOnConnectionFailure(true);
     }
     
     public OkHttpClientHelper connectTimeout(long timeout, TimeUnit unit){

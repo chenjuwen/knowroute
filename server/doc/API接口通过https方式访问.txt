@@ -1,0 +1,10 @@
+1、springboot启用https
+	在application.properties配置文件中添加如下配置信息
+		server.ssl.protocol=TLS
+		server.ssl.key-store=classpath:knowroute.cn.p12
+		server.ssl.key-store-password=1z086kdx4lw387
+		server.ssl.key-store-type=PKCS12
+2、配置nginx
+	见nginx.conf文件
+3、在Windows部署API接口时，通过域名访问API接口需要关闭防火墙
+	

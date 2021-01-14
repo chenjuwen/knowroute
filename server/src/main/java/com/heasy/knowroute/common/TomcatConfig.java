@@ -40,8 +40,13 @@ public class TomcatConfig {
         Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
         connector.setScheme("http");
         connector.setPort(8080);
+        
+        //true： http使用http, https使用https
+        //false： http重定向到https
         connector.setSecure(false);
+        
         connector.setRedirectPort(serverPort);
         return connector;
     }
+	
 }

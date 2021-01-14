@@ -45,8 +45,8 @@ public class HttpService {
     public static String getApiRootAddress(HeasyContext heasyContext) {
         if(StringUtil.isEmpty(apiRootAddress)){
             apiRootAddress = heasyContext.getServiceEngine().getConfigurationService().getConfigBean().getApiAddress();
-            logger.debug("apiRootAddress=" + apiRootAddress);
         }
+        logger.debug("apiRootAddress=" + apiRootAddress);
         return apiRootAddress;
     }
 

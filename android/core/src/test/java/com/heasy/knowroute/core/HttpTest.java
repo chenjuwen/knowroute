@@ -19,7 +19,7 @@ public class HttpTest {
         OkHttpClientHelper okHttpClientHelper = new OkHttpClientHelper();
         okHttpClientHelper.build();
 
-        String content = okHttpClientHelper.synGet("http://180.215.209.100/knowroute/index");
+        String content = okHttpClientHelper.synGet("https://www.knowroute.cn/knowroute/index");
         System.out.println(content);
     }
 
