@@ -54,7 +54,7 @@ public class ContactServiceTest {
 	public void get() {
 		ContactBean bean = contactService.get(1);
 		if(bean != null) {
-			System.out.println(JSONObject.fromObject(bean).toString(2));
+			System.out.println(JSONObject.fromObject(bean).toString());
 		}
 	}
 	
@@ -62,7 +62,7 @@ public class ContactServiceTest {
 	public void getAll(){
 		List<ContactBean> list = contactService.getAll(5);
 		if(!CollectionUtils.isEmpty(list)) {
-			System.out.println(JSONArray.fromObject(list).toString(2));
+			System.out.println(JSONArray.fromObject(list).toString());
 		}
 	}
 }

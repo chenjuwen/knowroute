@@ -3,6 +3,7 @@ package com.heasy.knowroute.core;
 import com.heasy.knowroute.core.okhttp.HttpClientListener;
 import com.heasy.knowroute.core.okhttp.OkHttpClientHelper;
 import com.heasy.knowroute.core.okhttp.RequestBuilder;
+import com.heasy.knowroute.core.okhttp.interceptor.LogInterceptor;
 
 import org.junit.Test;
 
@@ -17,10 +18,13 @@ public class HttpTest {
     @Test
     public void synGet() throws Exception {
         OkHttpClientHelper okHttpClientHelper = new OkHttpClientHelper();
-        okHttpClientHelper.build();
+        okHttpClientHelper
+                .addNetworkInterceptor(new LogInterceptor())
+                .build();
 
         String content = okHttpClientHelper.synGet("https://www.knowroute.cn/knowroute/index");
         System.out.println(content);
+        okHttpClientHelper.destroy();
     }
 
     @Test

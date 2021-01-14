@@ -23,12 +23,12 @@ import com.heasy.knowroute.service.ContactService;
 import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.DatetimeUtil;
+import com.heasy.knowroute.utils.JsonUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import net.sf.json.JSONArray;
 
 @Api(tags="紧急联系人管理")
 @RestController
@@ -106,7 +106,7 @@ public class ContactController extends BaseController{
     public WebResponse getAll(@RequestParam(value="userId") Integer userId) {
 		List<ContactBean> contactList = contactService.getAll(userId);
 		if(!CollectionUtils.isEmpty(contactList)) {
-			return WebResponse.success(JSONArray.fromObject(contactList).toString(2));
+			return WebResponse.success(JsonUtil.object2ArrayString(contactList));
 		}else {
 			return WebResponse.success("[]");
 		}

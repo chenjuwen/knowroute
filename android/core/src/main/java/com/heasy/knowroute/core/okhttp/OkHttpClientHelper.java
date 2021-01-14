@@ -29,7 +29,7 @@ import okhttp3.Response;
 public class OkHttpClientHelper {
     private static Logger logger = LoggerFactory.getLogger(OkHttpClientHelper.class);
 
-    private static final int DEFAULT_CONNECT_TIMEOUT_MILLSECONDS = 15 * 000;
+    private static final int DEFAULT_CONNECT_TIMEOUT_MILLSECONDS = 15 * 1000;
     private static final int DEFAULT_READ_TIMEOUT_MILLSECONDS = 6000;
     private static final int DEFAULT_WRITE_TIMEOUT_MILLSECONDS = 6000;
 	
@@ -51,7 +51,7 @@ public class OkHttpClientHelper {
         	    .writeTimeout(DEFAULT_WRITE_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
                 .connectionPool(connectionPool)
                 .cookieJar(cookieJar)
-                .retryOnConnectionFailure(true);
+                .retryOnConnectionFailure(false);
     }
     
     public OkHttpClientHelper connectTimeout(long timeout, TimeUnit unit){

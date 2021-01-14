@@ -30,7 +30,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import net.sf.json.JSONArray;
 
 @Api(tags="好友管理")
 @RestController
@@ -73,7 +72,7 @@ public class FriendController extends BaseController{
 		try {
 			List<FriendBean> list = friendService.getFriendList(userId);
 			if(CollectionUtils.isNotEmpty(list)) {
-				return WebResponse.success(JSONArray.fromObject(list).toString());
+				return WebResponse.success(JsonUtil.object2ArrayString(list));
 			}
 		}catch(Exception ex) {
 			logger.error("", ex);

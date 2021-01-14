@@ -3,9 +3,11 @@ package com.heasy.knowroute.service.common;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.HeasyContext;
-import com.heasy.knowroute.core.okhttp.GenericHeaderInterceptor;
+import com.heasy.knowroute.core.okhttp.interceptor.GenericHeaderInterceptor;
 import com.heasy.knowroute.core.okhttp.OkHttpClientHelper;
 import com.heasy.knowroute.core.okhttp.RequestBuilder;
+import com.heasy.knowroute.core.okhttp.interceptor.LogInterceptor;
+import com.heasy.knowroute.core.okhttp.interceptor.RetryInterceptor;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 
@@ -31,6 +33,8 @@ public class HttpService {
         if(okHttpClientHelper == null){
             okHttpClientHelper = new OkHttpClientHelper();
             okHttpClientHelper
+                    .addInterceptor(new RetryInterceptor())
+                    .addNetworkInterceptor(new LogInterceptor())
                     .addNetworkInterceptor(new GenericHeaderInterceptor())
                     .build();
         }
@@ -45,8 +49,8 @@ public class HttpService {
     public static String getApiRootAddress(HeasyContext heasyContext) {
         if(StringUtil.isEmpty(apiRootAddress)){
             apiRootAddress = heasyContext.getServiceEngine().getConfigurationService().getConfigBean().getApiAddress();
+            logger.debug("apiRootAddress=" + apiRootAddress);
         }
-        logger.debug("apiRootAddress=" + apiRootAddress);
         return apiRootAddress;
     }
 
@@ -56,7 +60,7 @@ public class HttpService {
 
             if (StringUtil.isNotEmpty(result)) {
                 ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
-                logger.debug("httpGet response:" + FastjsonUtil.object2String(responseBean));
+                //logger.debug("httpGet response:" + FastjsonUtil.object2String(responseBean));
                 return responseBean;
             }
 
@@ -76,7 +80,7 @@ public class HttpService {
                     .build();
 
             String result = getOkHttpClientHelper().post(request);
-            logger.debug("httpPost response:" + result);
+            //logger.debug("httpPost response:" + result);
 
             if(StringUtil.isNotEmpty(result)){
                 ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
@@ -94,7 +98,7 @@ public class HttpService {
     public static ResponseBean postJson(HeasyContext heasyContext, String requestUrl, String jsonData){
         try {
             String result = getOkHttpClientHelper().postJSON(getApiRootAddress(heasyContext) + requestUrl, jsonData);
-            logger.debug("httpPost response:" + result);
+            //logger.debug("httpPost response:" + result);
 
             if(StringUtil.isNotEmpty(result)){
                 ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
