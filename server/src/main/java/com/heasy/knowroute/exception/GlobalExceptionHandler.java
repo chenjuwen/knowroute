@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.heasy.knowroute.api.WebResponse;
+import com.heasy.knowroute.bean.WebResponse;
 
 /**
  * Controller层的全局捕获异常类

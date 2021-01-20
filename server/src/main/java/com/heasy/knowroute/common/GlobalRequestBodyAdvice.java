@@ -13,6 +13,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
 import com.heasy.knowroute.utils.JsonUtil;
 
+/**
+ * 输出使用@RequestBody注解类标注的请求体信息
+ */
 @ControllerAdvice
 public class GlobalRequestBodyAdvice implements RequestBodyAdvice{
     private static final Logger logger = LoggerFactory.getLogger(GlobalRequestBodyAdvice.class);
@@ -32,13 +35,10 @@ public class GlobalRequestBodyAdvice implements RequestBodyAdvice{
 	@Override
 	public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
 			Class<? extends HttpMessageConverter<?>> converterType) {
-		logger.info("-----afterBodyRead-----");
-		logger.info(parameter.getDeclaringClass().getName() + "::" + parameter.getMethod().getName());
-		
 		if(body instanceof String) {
 			logger.info(body.toString());
 		}else {
-			logger.info("\nRequestBody:\n"+JsonUtil.object2String(body));
+			logger.info("RequestBody: "+JsonUtil.object2String(body));
 		}
 		
 		return body;

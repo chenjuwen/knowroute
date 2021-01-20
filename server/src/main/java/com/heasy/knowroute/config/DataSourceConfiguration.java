@@ -1,4 +1,4 @@
-package com.heasy.knowroute.common;
+package com.heasy.knowroute.config;
 
 import javax.sql.DataSource;
 

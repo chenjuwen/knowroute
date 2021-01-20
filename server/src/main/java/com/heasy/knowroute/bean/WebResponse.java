@@ -1,4 +1,4 @@
-package com.heasy.knowroute.api;
+package com.heasy.knowroute.bean;
 
 import java.io.Serializable;
 

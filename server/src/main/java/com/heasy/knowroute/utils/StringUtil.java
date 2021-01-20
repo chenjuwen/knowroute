@@ -38,10 +38,10 @@ public class StringUtil {
 	}
 	
 	/**
-	 * 获取四位随机数
+	 * 获取随机数
 	 */
-	public static String getFourDigitRandomNumber(){
-		return RandomStringUtils.randomNumeric(4);
+	public static String getRandomNumber(int count){
+		return RandomStringUtils.randomNumeric(count);
 	}
 	
 //	public static void main(String[] args) {

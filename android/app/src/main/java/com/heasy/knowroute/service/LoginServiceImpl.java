@@ -54,19 +54,19 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     }
 
     @Override
-    public String getCaptche(String phone) {
+    public boolean getCaptcha(String phone) {
         try {
-            return UserAPI.getCaptche(phone);
+            return UserAPI.getCaptcha(phone);
         }catch(Exception ex){
             logger.error("", ex);
+            return false;
         }
-        return "";
     }
 
     @Override
-    public String doLogin(String phone, String captche) {
+    public String doLogin(String phone, String captcha) {
         try {
-            LoginResultBean loginResultBean = UserAPI.login(phone, captche);
+            LoginResultBean loginResultBean = UserAPI.login(phone, captcha);
             if(StringUtil.isEmpty(loginResultBean.getErrorMessage())){
                 this.userId = loginResultBean.getUserId();
                 this.userPhone = phone;

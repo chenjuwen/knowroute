@@ -5,7 +5,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.heasy.knowroute.api.WebResponse;
+import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.utils.DatetimeUtil;
 
 import springfox.documentation.annotations.ApiIgnore;

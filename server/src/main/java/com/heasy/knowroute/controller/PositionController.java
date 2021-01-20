@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.heasy.knowroute.api.ResponseCode;
-import com.heasy.knowroute.api.WebResponse;
 import com.heasy.knowroute.bean.PointBean;
 import com.heasy.knowroute.bean.PositionBean;
+import com.heasy.knowroute.bean.ResponseCode;
+import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.service.PositionService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.DatetimeUtil;

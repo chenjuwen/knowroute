@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.heasy.knowroute.api.ResponseCode;
-import com.heasy.knowroute.api.WebResponse;
 import com.heasy.knowroute.bean.FixedPointCategoryBean;
+import com.heasy.knowroute.bean.ResponseCode;
+import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.service.FixedPointCategoryService;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;

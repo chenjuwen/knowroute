@@ -1,4 +1,4 @@
-package com.heasy.knowroute.api;
+package com.heasy.knowroute.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,14 +10,16 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.utils.JsonUtil;
 
 /**
- * 使用@ControllerAdvice和ResponseBodyAdvice接口拦截Controller方法默认返回参数，统一处理返回值/响应体
+ * 响应统一处理：
+ * 		使用@ControllerAdvice和ResponseBodyAd	vice接口拦截Controller方法默认返回参数，统一处理返回值/响应体
  */
 @RestControllerAdvice
-public class MyResponseBodyAdvice implements ResponseBodyAdvice<Object>{
-	private static Logger logger = LoggerFactory.getLogger(MyResponseBodyAdvice.class);
+public class GlobalResponseBodyAdvice implements ResponseBodyAdvice<Object>{
+	private static Logger logger = LoggerFactory.getLogger(GlobalResponseBodyAdvice.class);
 	
 	@Override
 	public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -30,10 +32,9 @@ public class MyResponseBodyAdvice implements ResponseBodyAdvice<Object>{
 			ServerHttpResponse response) {
 		if(body instanceof WebResponse) {
 			logger.debug(JsonUtil.object2String(body));
-			return (WebResponse)body;
 		}else {
 			logger.debug(body.toString());
-			return body;
 		}
+		return body;
 	}
 }

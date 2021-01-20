@@ -1,9 +1,8 @@
 package com.heasy.knowroute.service.backend;
 
-import com.alibaba.fastjson.JSONObject;
+import com.heasy.knowroute.bean.LoginResultBean;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
-import com.heasy.knowroute.bean.LoginResultBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
@@ -63,22 +62,19 @@ public class UserAPI extends BaseAPI {
         }
     }
 
-    public static String getCaptche(String phone){
+    public static boolean getCaptcha(String phone){
         String requestUrl = "user/getCaptche?phone=" + phone;
         ResponseBean responseBean = HttpService.get(getHeasyContext(), requestUrl);
         if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-            JSONObject obj = FastjsonUtil.string2JSONObject((String) responseBean.getData());
-            String captche = FastjsonUtil.getString(obj, "captche");
-            logger.debug("captche=" + captche);
-            return captche;
+            return true;
         }else{
             logger.error(HttpService.getFailureMessage(responseBean));
-            return "";
+            return false;
         }
     }
 
-    public static LoginResultBean login(String phone, String captche) {
-        Map<String, String> params = ParameterUtil.toParamMap("phone", phone, "captche", captche);
+    public static LoginResultBean login(String phone, String captcha) {
+        Map<String, String> params = ParameterUtil.toParamMap("phone", phone, "captcha", captcha);
         ResponseBean responseBean = HttpService.post(HttpService.getApiRootAddress(getHeasyContext()) + "user/login", params);
         if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
             String data = (String) responseBean.getData();

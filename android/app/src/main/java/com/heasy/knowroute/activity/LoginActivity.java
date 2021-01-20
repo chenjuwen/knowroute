@@ -17,7 +17,6 @@ import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
-import com.heasy.knowroute.service.common.AndroidBuiltinService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
 
@@ -36,8 +35,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
     private Dialog loadingDialog;
 
+    private boolean captchaObtained = false;
     private String mobilephone = "";
-    private String loginCaptcha = ""; //登录验证码
     private Handler handler = null;
 
     @Override
@@ -52,26 +51,17 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             public void handleMessage(Message message) {
                 int type = message.what;
                 String result = (String)message.obj;
+                logger.debug("result=" + result);
 
                 loadingDialog.dismiss();
 
                 if(type == 1){ //获取验证码
-                    if(StringUtil.isEmpty(result)){
+                    if(!"true".equalsIgnoreCase(result)){
                         AndroidUtil.showToast(getApplicationContext(), "获取验证码失败");
                         return;
                     }
 
-                    loginCaptcha = result;
-
-                    //发送短信
-                    String smsMessage = "【知途】验证码" + loginCaptcha + "，您正在登录，若非本人操作，请勿泄露。";
-                    boolean b = AndroidBuiltinService.sendSMS(mobilephone, smsMessage);
-
-                    if(!b){
-                        AndroidUtil.showToast(getApplicationContext(), "获取验证码失败");
-                        return;
-                    }
-
+                    captchaObtained = true;
                     AndroidUtil.showToast(getApplicationContext(), "获取验证码成功");
 
                     final String oldText = btnGetCaptcha.getText().toString();
@@ -89,12 +79,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                         public void onFinish() {
                             btnGetCaptcha.setEnabled(true);
                             btnGetCaptcha.setText(oldText);
-
                         }
                     }.start();
 
                 }else if(type == 2){ //登录
                     if(Constants.SUCCESS.equalsIgnoreCase(result)){
+                        captchaObtained = false;
                         logger.debug("start MainActivity...");
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         startActivity(intent);
@@ -130,7 +120,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btnGetCaptcha:
-                getCaptche();
+                getCaptcha();
                 break;
             case R.id.btnLogin:
                 doLogin();
@@ -149,8 +139,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             return;
         }
 
-        if(StringUtil.isEmpty(loginCaptcha)){
-            AndroidUtil.showToast(getApplicationContext(), "请先获取验证码");
+        if(!captchaObtained){
+            AndroidUtil.showToast(getApplicationContext(), "请获取验证码");
             return;
         }
 
@@ -182,7 +172,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     /**
      * 获取验证码
      */
-    private void getCaptche(){
+    private void getCaptcha(){
         mobilephone = StringUtil.trimToEmpty(phone.getText().toString());
         if(mobilephone.length() != 11){
             AndroidUtil.showToast(getApplicationContext(), "请输入11位手机号码");
@@ -196,11 +186,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             @Override
             public void run() {
                 LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
-                String captcha = loginService.getCaptche(mobilephone);
+                boolean b = loginService.getCaptcha(mobilephone);
 
                 Message message = new Message();
                 message.what = 1;
-                message.obj = captcha;
+                message.obj = String.valueOf(b);
                 handler.sendMessage(message);
             }
         }.start();

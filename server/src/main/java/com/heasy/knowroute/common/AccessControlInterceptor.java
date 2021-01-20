@@ -6,12 +6,14 @@ import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.heasy.knowroute.api.ResponseCode;
-import com.heasy.knowroute.api.WebResponse;
+import com.heasy.knowroute.bean.ResponseCode;
+import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.utils.JsonUtil;
 
 /**
@@ -19,25 +21,26 @@ import com.heasy.knowroute.utils.JsonUtil;
  */
 @Component
 public class AccessControlInterceptor extends HandlerInterceptorAdapter{
+	private static Logger logger = LoggerFactory.getLogger(AccessControlInterceptor.class);
+	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
 			Object handler) throws Exception {
 //		Enumeration<String> e = request.getHeaderNames();
 //		while(e.hasMoreElements()) {
 //			String name = e.nextElement();
-//			System.out.println(name + "=" + request.getHeader(name));
+//			logger.debug(name + "=" + request.getHeader(name));
 //		}
 		
-		System.out.println("user-agent=" + request.getHeader("user-agent"));
+		logger.debug("user-agent=" + request.getHeader("user-agent"));
 		
-//		System.out.println("Method: " + request.getMethod());
-//		System.out.println("QueryString: " + request.getQueryString());
-//		System.out.println("RequestURI: " + request.getRequestURI());
+		logger.debug("Method: " + request.getMethod());
+		logger.debug("QueryString: " + request.getQueryString());
+		logger.debug("RequestURI: " + request.getRequestURI());
 		
 		if(handler instanceof HandlerMethod){
 			HandlerMethod handlerMethod = (HandlerMethod) handler;
-			System.out.println(handlerMethod.getBeanType().getName());
-			System.out.println(handlerMethod.getMethod().getName());
+			logger.debug(handlerMethod.getBeanType().getName() + "::" + handlerMethod.getMethod().getName());
 			
 			//获取方法注解
 			OnlyAdminAnnotation onlyAdminAnnotation = handlerMethod.getMethodAnnotation(OnlyAdminAnnotation.class);

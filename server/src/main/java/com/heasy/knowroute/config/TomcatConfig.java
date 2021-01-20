@@ -1,4 +1,4 @@
-package com.heasy.knowroute.common;
+package com.heasy.knowroute.config;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;

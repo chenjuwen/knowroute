@@ -8,6 +8,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.heasy.Main;
 import com.heasy.knowroute.bean.UserBean;
+import com.heasy.knowroute.service.SMSService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.StringUtil;
@@ -19,6 +20,16 @@ import net.sf.json.JSONObject;
 public class UserServiceTest {	
 	@Autowired
     private UserService userService;
+	@Autowired
+	private SMSService smsService;
+	
+	@Test
+	public void sendSMS() {
+		String captche = StringUtil.getRandomNumber(6);
+		boolean b = smsService.sendVerificationCode("13798189352", captche);
+		System.out.println(captche);
+		System.out.println(b);
+	}
 
 	@Test
 	public void login(){

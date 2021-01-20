@@ -1,10 +1,12 @@
-package com.heasy.knowroute.common;
+package com.heasy.knowroute.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.heasy.knowroute.common.AccessControlInterceptor;
 
 /**
  * WebMVC配置类

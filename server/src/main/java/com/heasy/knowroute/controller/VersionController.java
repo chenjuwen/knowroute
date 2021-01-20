@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.heasy.knowroute.api.WebResponse;
 import com.heasy.knowroute.bean.VersionBean;
+import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.service.VersionService;
 
 import io.swagger.annotations.Api;

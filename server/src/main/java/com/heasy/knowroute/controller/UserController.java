@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.heasy.knowroute.api.ResponseCode;
-import com.heasy.knowroute.api.WebResponse;
+import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
+import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.service.CaptcheService;
+import com.heasy.knowroute.service.SMSService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
@@ -36,6 +37,9 @@ public class UserController extends BaseController{
 	private UserService userService;
 	
 	@Autowired
+	private SMSService smsService;
+	
+	@Autowired
 	private CaptcheService captcheService;
 
 	@ApiOperation(value="getCaptche", notes="获取登陆验证码")
@@ -48,37 +52,44 @@ public class UserController extends BaseController{
 			return WebResponse.failure(ResponseCode.PHONE_INVALID);
 		}
 
-		String captche = StringUtil.getFourDigitRandomNumber();
-		captcheService.set(phone, captche);
-		logger.info("captche=" + captche);
+		//获取6位长度的验证码
+		String captcha = StringUtil.getRandomNumber(6);
+		logger.debug("captcha=" + captcha);
 		
-		return WebResponse.success(JsonUtil.toJSONString("captche", captche));
+		//发送短信
+		boolean b = smsService.sendVerificationCode(phone, captcha);
+		if(b) {
+			captcheService.set(phone, captcha);
+			return WebResponse.success();
+		}else {
+			return WebResponse.failure(ResponseCode.GET_CAPTCHA_ERROR);
+		}
 	}
 
 	@ApiOperation(value="login", notes="系统登陆")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="phone", paramType="query", required=true, dataType="String"),
-		@ApiImplicitParam(name="phone", paramType="query", required=true, dataType="String")
+		@ApiImplicitParam(name="captcha", paramType="query", required=true, dataType="String")
 	})
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public WebResponse login(HttpServletRequest request){
 		String phone = StringUtil.trimToEmpty(request.getParameter("phone"));
-		String captche = StringUtil.trimToEmpty(request.getParameter("captche"));
-		logger.debug("start login: phone=" + phone + ", captche=" + captche);
-
-		String validCaptche = captcheService.get(phone);
-		logger.debug("validCaptche=" + validCaptche);
+		String captcha = StringUtil.trimToEmpty(request.getParameter("captcha"));
+		logger.debug("start login: phone=" + phone + ", captcha=" + captcha);
 		
 		if(!StringUtil.isMobile(phone)) {
 			return WebResponse.failure(ResponseCode.PHONE_INVALID);
 		}
+
+		String validCaptcha = captcheService.get(phone);
+		logger.debug("validCaptcha=" + validCaptcha);
 		
-		if(StringUtil.isEmpty(captche) || StringUtil.isEmpty(validCaptche)) {
-			return WebResponse.failure(ResponseCode.CAPTCHE_INVALID);
+		if(StringUtil.isEmpty(captcha) || StringUtil.isEmpty(validCaptcha)) {
+			return WebResponse.failure(ResponseCode.CAPTCHA_INVALID);
 		}
 		
-		if(!captche.equalsIgnoreCase(validCaptche)) {
-			return WebResponse.failure(ResponseCode.CAPTCHE_INVALID);
+		if(!captcha.equalsIgnoreCase(validCaptcha)) {
+			return WebResponse.failure(ResponseCode.CAPTCHA_INVALID);
 		}
 		
 		try {
