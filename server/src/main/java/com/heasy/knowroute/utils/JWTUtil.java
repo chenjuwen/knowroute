@@ -1,6 +1,6 @@
 package com.heasy.knowroute.utils;
 
-import java.util.Date;
+import java.util.Calendar;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -9,11 +9,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.JWTVerifier;
 
 public class JWTUtil {
-	public static final String SECRET_KEY = "knowroute@admin"; //秘钥
-	public static final long TOKEN_EXPIRE_TIME = 5 * 60 * 1000; //token过期时间
-	public static final long REFRESH_TOKEN_EXPIRE_TIME = 10 * 60 * 1000; //refreshToken过期时间
+	private static final String SECRET_KEY = "knowroute@admin"; //秘钥
+	private static final int TOKEN_EXPIRE_TIME = 24 * 60 * 60 * 1000; //token过期时间，24小时
 	private static final String ISSUER = "knowroute"; //签发人
 
+	public static final String CLAIM_USERID = "userid";
+	public static final String CLAIM_PHONE = "phone";
+	
 	private static Algorithm getAlgorithm() {
 		return Algorithm.HMAC256(SECRET_KEY); //算法
 	}
@@ -21,14 +23,13 @@ public class JWTUtil {
     /**
      * 生成签名
      */
-	public static String generateToken(String username){
-        Date now = new Date();
-        
+	public static String generateToken(String userid, String phone){
 		String token = JWT.create()
 			.withIssuer(ISSUER) //签发人
-			.withIssuedAt(now) //签发时间
-			.withExpiresAt(new Date(now.getTime() + TOKEN_EXPIRE_TIME)) //过期时间
-			.withClaim("username", username) //保存身份标识
+			.withIssuedAt(DatetimeUtil.nowDate()) //签发时间
+			.withExpiresAt(DatetimeUtil.add(DatetimeUtil.nowDate(), Calendar.MILLISECOND, TOKEN_EXPIRE_TIME)) //过期时间
+			.withClaim(CLAIM_USERID, userid)
+			.withClaim(CLAIM_PHONE, phone)
 			.sign(getAlgorithm());
 		return token;
 	}
@@ -36,11 +37,15 @@ public class JWTUtil {
 	/**
 	 * 验证token是否正确
 	 */
-	public static boolean verify(String token, String username){
+	public static boolean verify(String token, String claimName, String claimValue){
 	    try {
+	    	if(StringUtil.isEmpty(token)) {
+	    		return false;
+	    	}
+	    	
 			JWTVerifier verifier = JWT.require(getAlgorithm())
 					.withIssuer(ISSUER)
-					.withClaim("username", username)
+					.withClaim(claimName, claimValue)
 					.build();
 			verifier.verify(token);
 			return true;
@@ -52,6 +57,10 @@ public class JWTUtil {
 	
 	public static boolean verify(String token){
 	    try {
+	    	if(StringUtil.isEmpty(token)) {
+	    		return false;
+	    	}
+	    	
 			JWTVerifier verifier = JWT.require(getAlgorithm())
 					.withIssuer(ISSUER)
 					.build();
@@ -68,19 +77,11 @@ public class JWTUtil {
 	 */
 	public static String getClaimFromToken(String token, String claimName){
 		try{
+	    	if(StringUtil.isEmpty(token)) {
+	    		return "";
+	    	}
+	    	
 			return JWT.decode(token).getClaim(claimName).asString();
-		}catch(Exception ex){
-			ex.printStackTrace();
-		}
-		return "";
-	}
-	
-	/**
-	 * 从token获取username
-	 */
-	public static String getUsername(String token){
-		try{
-			return JWT.decode(token).getClaim("username").asString();
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
@@ -128,11 +129,8 @@ public class JWTUtil {
 //		String username = JWTUtil.getClaimFromToken(token, "username");
 //		System.out.println(username);
 //		
-//		username = JWTUtil.getUsername(token);
-//		System.out.println(username);
-//		
 //		System.out.println(JWTUtil.verify(token, username));
-//		System.out.println(JWTUtil.verify(token));
+//		System.out.println(JWTUtil.verify(null));
 //	}
 
 }

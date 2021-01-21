@@ -6,14 +6,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.heasy.knowroute.HeasyApplication;
 import com.heasy.knowroute.WebViewWrapperFactory;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.event.ExitAppEvent;
+import com.heasy.knowroute.core.event.ToastEvent;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
+import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.webview.WebViewWrapper;
+import com.heasy.knowroute.event.TokenEvent;
 import com.heasy.knowroute.map.HeasyLocationService;
+import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.LoginServiceImpl;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -48,6 +54,7 @@ public class MainActivity extends BaseActivity{
             Intent serviceIntent = new Intent(MainActivity.this, HeasyLocationService.class);
             doStartService(serviceIntent);
         }
+
         logger.info("MainActivity Created");
     }
 
@@ -106,6 +113,7 @@ public class MainActivity extends BaseActivity{
     @Override
     protected void onRestart() {
         super.onRestart();
+
         if(HeasyLocationService.getHeasyLocationClient() != null){
             HeasyLocationService.getHeasyLocationClient().restart();
         }
@@ -138,4 +146,19 @@ public class MainActivity extends BaseActivity{
         heasyApplication.exit();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleTokenEvent(TokenEvent tokenEvent){
+        if(tokenEvent != null){
+            AndroidUtil.showToast(MainActivity.this, "Token有误，请重新登录！", Toast.LENGTH_LONG);
+
+            //清除登录信息
+            LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+            if(loginService != null){
+                loginService.cleanCache();
+            }
+
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+        }
+    }
 }

@@ -52,7 +52,7 @@
 			}
 		</style>
 		
-		<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=dznCIamw2fFeqGOxQGHKYAxACOYw143G"></script>
+		<script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=dznCIamw2fFeqGOxQGHKYAxACOYw143G"></script>
 		<script type="text/javascript" src="js/map.js"></script>
     </head>
     <body>    	

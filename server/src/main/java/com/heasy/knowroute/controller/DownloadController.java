@@ -34,18 +34,17 @@ public class DownloadController {
 		if(StringUtil.isNotEmpty(filename)){
 			response.setHeader("content-type", "application/octet-stream");
 			response.setContentType("application/octet-stream");
-			//response.setContentType("application/force-download");
 			response.setHeader("Content-Disposition", "attachment;filename=" + filename);
 			
 			byte[] buff = new byte[4096];
 		    BufferedInputStream inStream = null;
-		    OutputStream os = null;
+		    OutputStream outStream = null;
 		    try {
-		    	os = response.getOutputStream();
+		    	outStream = response.getOutputStream();
 		    	inStream = new BufferedInputStream(new FileInputStream(new File(basePath + File.separator + filename)));
 		    	int i = inStream.read(buff);
 		    	while (i != -1) {
-		    		os.write(buff, 0, i);
+		    		outStream.write(buff, 0, i);
 		    		i = inStream.read(buff);
 		    	}
 		    	
@@ -55,6 +54,30 @@ public class DownloadController {
 		    	if (inStream != null) {
 		    		try {
 		    			inStream.close();
+		    		} catch (IOException ex) {
+		    			ex.printStackTrace();
+		    		}
+		    	}
+		    	
+		    	if (outStream != null) {
+		    		try {
+		    			outStream.close();
+		    		} catch (IOException ex) {
+		    			ex.printStackTrace();
+		    		}
+		    	}
+		    }
+		}else {
+			OutputStream outStream = null;
+		    try {
+		    	outStream = response.getOutputStream();
+		    	outStream.write("param filename is empty".getBytes());
+		    } catch (IOException ex) {
+				logger.error("response error", ex);
+		    } finally {
+		    	if (outStream != null) {
+		    		try {
+		    			outStream.close();
 		    		} catch (IOException ex) {
 		    			ex.printStackTrace();
 		    		}

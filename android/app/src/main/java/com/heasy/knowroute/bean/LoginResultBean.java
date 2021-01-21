@@ -3,6 +3,7 @@ package com.heasy.knowroute.bean;
 public class LoginResultBean {
     private int userId;
     private String nickname;
+    private String token;
     private String errorMessage;
 
     public int getUserId() {
@@ -19,6 +20,14 @@ public class LoginResultBean {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getErrorMessage() {

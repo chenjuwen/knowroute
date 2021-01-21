@@ -16,8 +16,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * 访问地址：
- *     http://localhost:8080/knowroute/doc.html
- *     http://localhost:8080/knowroute/swagger-ui.html
+ *     https://localhost:8080/knowroute/doc.html
+ *     https://localhost:8080/knowroute/swagger-ui.html
  */
 @Configuration
 @EnableSwagger2

@@ -1,7 +1,6 @@
 package com.heasy.knowroute.common;
 
 import java.io.OutputStream;
-import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,18 +25,6 @@ public class AccessControlInterceptor extends HandlerInterceptorAdapter{
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
 			Object handler) throws Exception {
-//		Enumeration<String> e = request.getHeaderNames();
-//		while(e.hasMoreElements()) {
-//			String name = e.nextElement();
-//			logger.debug(name + "=" + request.getHeader(name));
-//		}
-		
-		logger.debug("user-agent=" + request.getHeader("user-agent"));
-		
-		logger.debug("Method: " + request.getMethod());
-		logger.debug("QueryString: " + request.getQueryString());
-		logger.debug("RequestURI: " + request.getRequestURI());
-		
 		if(handler instanceof HandlerMethod){
 			HandlerMethod handlerMethod = (HandlerMethod) handler;
 			logger.debug(handlerMethod.getBeanType().getName() + "::" + handlerMethod.getMethod().getName());

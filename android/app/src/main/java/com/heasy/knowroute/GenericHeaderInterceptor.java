@@ -1,4 +1,8 @@
-package com.heasy.knowroute.core.okhttp.interceptor;
+package com.heasy.knowroute;
+
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
+import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.LoginServiceImpl;
 
 import java.io.IOException;
 
@@ -12,11 +16,14 @@ import okhttp3.Response;
 public class GenericHeaderInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
+        LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+
         Request originalRequest = chain.request();
         Request newRequest = originalRequest.newBuilder()
-                .header("token", "knowroute_token_value")
-                .header("front", "knowroute_app")
+                .header("token", loginService.getToken())
+                .header("front", "KR_APP")
                 .build();
         return chain.proceed(newRequest);
     }
+
 }

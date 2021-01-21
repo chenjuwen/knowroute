@@ -1,15 +1,18 @@
 package com.heasy.knowroute.service.common;
 
+import com.heasy.knowroute.GenericHeaderInterceptor;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.HeasyContext;
-import com.heasy.knowroute.core.okhttp.interceptor.GenericHeaderInterceptor;
 import com.heasy.knowroute.core.okhttp.OkHttpClientHelper;
 import com.heasy.knowroute.core.okhttp.RequestBuilder;
 import com.heasy.knowroute.core.okhttp.interceptor.LogInterceptor;
 import com.heasy.knowroute.core.okhttp.interceptor.RetryInterceptor;
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
+import com.heasy.knowroute.event.FixedPointNavigationEvent;
+import com.heasy.knowroute.event.TokenEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +36,6 @@ public class HttpService {
         if(okHttpClientHelper == null){
             okHttpClientHelper = new OkHttpClientHelper();
             okHttpClientHelper
-                    .addInterceptor(new RetryInterceptor())
                     .addNetworkInterceptor(new LogInterceptor())
                     .addNetworkInterceptor(new GenericHeaderInterceptor())
                     .build();
@@ -60,10 +62,9 @@ public class HttpService {
 
             if (StringUtil.isNotEmpty(result)) {
                 ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
-                //logger.debug("httpGet response:" + FastjsonUtil.object2String(responseBean));
+                verifyToken(responseBean);
                 return responseBean;
             }
-
         }catch (SocketTimeoutException | SocketException | UnknownHostException ex){
             return ResponseBean.failure(ResponseCode.NETWORK_ERROR);
         }catch (Exception ex){
@@ -84,6 +85,7 @@ public class HttpService {
 
             if(StringUtil.isNotEmpty(result)){
                 ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
+                verifyToken(responseBean);
                 return responseBean;
             }
 
@@ -98,10 +100,9 @@ public class HttpService {
     public static ResponseBean postJson(HeasyContext heasyContext, String requestUrl, String jsonData){
         try {
             String result = getOkHttpClientHelper().postJSON(getApiRootAddress(heasyContext) + requestUrl, jsonData);
-            //logger.debug("httpPost response:" + result);
-
             if(StringUtil.isNotEmpty(result)){
                 ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
+                verifyToken(responseBean);
                 return responseBean;
             }
 
@@ -116,6 +117,17 @@ public class HttpService {
     public static String getFailureMessage(ResponseBean responseBean){
         String result = responseBean.getData() != null ? (String)responseBean.getData() : responseBean.getMessage();
         return result;
+    }
+
+    /**
+     * token有误时，需要重新登录
+     */
+    private static void verifyToken(ResponseBean responseBean){
+        if(responseBean != null && responseBean.getCode() == 2003){
+            logger.debug("token有误时，需要重新登录");
+            ServiceEngineFactory.getServiceEngine().getEventService()
+                    .postEvent(new TokenEvent(okHttpClientHelper, "token error"));
+        }
     }
 
 }

@@ -15,7 +15,7 @@
 		<script type="text/javascript" src="js/muse-ui.js"></script>
 		<script type="text/javascript" src="js/muse-ui-message.js"></script>
 		<script type="text/javascript" src="js/jquery.min-1.11.3.js"></script>
-		<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=dznCIamw2fFeqGOxQGHKYAxACOYw143G"></script>
+		<script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=dznCIamw2fFeqGOxQGHKYAxACOYw143G"></script>
 		<script type="text/javascript" src="js/map.js"></script>
 	
 		<style type="text/css" >

@@ -12,6 +12,7 @@ public interface LoginService extends Service{
     String getPhone();
     String getNickname();
     void setNickname(String nickname);
+    String getToken();
     boolean isLogin();
     boolean cleanCache();
 }

@@ -11,7 +11,8 @@ public enum ResponseCode {
 	GET_CAPTCHA_ERROR(1005, "获取验证码失败"),
 	
 	NO_ACCESS(2001, "无权访问"),
-	LOGIN_ERROR(2002, "登录失败");
+	LOGIN_ERROR(2002, "登录失败"),
+	TOKEN_ERROR(2003, "token有误");
 	
 	private Integer code;
 	private String message;

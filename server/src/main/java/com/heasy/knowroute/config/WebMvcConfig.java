@@ -6,7 +6,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.heasy.knowroute.common.AccessControlInterceptor;
+import com.heasy.knowroute.common.JWTInterceptor;
+import com.heasy.knowroute.common.LogInterceptor;
 
 /**
  * WebMVC配置类
@@ -14,8 +15,10 @@ import com.heasy.knowroute.common.AccessControlInterceptor;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired
-    private AccessControlInterceptor accessControlInterceptor;
-
+    private LogInterceptor logInterceptor;
+	@Autowired
+    private JWTInterceptor jwtInterceptor;
+	
 	/**
 	 * 设置默认的访问页面
 	 */
@@ -26,7 +29,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(accessControlInterceptor);
+		//注册拦截器
+		registry.addInterceptor(logInterceptor).addPathPatterns("/**");
+		
+		registry.addInterceptor(jwtInterceptor).addPathPatterns("/**")
+			.excludePathPatterns("/", "/index", "/download", "/helpme", "/invite", "/user/getCaptcha", "/user/login", "/doc.html", "/js/**", "/css/**", "/images/**", "/**/*.js", "/**/*.css");
 	}
 	
 }

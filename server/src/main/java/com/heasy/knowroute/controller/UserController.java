@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,9 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.bean.WebResponse;
-import com.heasy.knowroute.service.CaptcheService;
+import com.heasy.knowroute.service.CacheService;
 import com.heasy.knowroute.service.SMSService;
 import com.heasy.knowroute.service.UserService;
+import com.heasy.knowroute.utils.JWTUtil;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
 
@@ -40,14 +42,14 @@ public class UserController extends BaseController{
 	private SMSService smsService;
 	
 	@Autowired
-	private CaptcheService captcheService;
+	private CacheService cacheService;
 
-	@ApiOperation(value="getCaptche", notes="获取登陆验证码")
+	@ApiOperation(value="getCaptcha", notes="获取登陆验证码")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="phone", paramType="query", required=true, dataType="String")
 	})
-	@RequestMapping(value="/getCaptche", method=RequestMethod.GET)
-	public WebResponse getCaptche(@RequestParam(value="phone") String phone) {
+	@RequestMapping(value="/getCaptcha", method=RequestMethod.GET)
+	public WebResponse getCaptcha(@RequestParam(value="phone") String phone) {
 		if(!StringUtil.isMobile(phone)) {
 			return WebResponse.failure(ResponseCode.PHONE_INVALID);
 		}
@@ -59,11 +61,27 @@ public class UserController extends BaseController{
 		//发送短信
 		boolean b = smsService.sendVerificationCode(phone, captcha);
 		if(b) {
-			captcheService.set(phone, captcha);
+			cacheService.put(getCaptchaCache(), phone, captcha);
 			return WebResponse.success();
 		}else {
 			return WebResponse.failure(ResponseCode.GET_CAPTCHA_ERROR);
 		}
+	}
+
+	/**
+	 * 获取验证码对应的Cache
+	 */
+	private Cache getCaptchaCache() {
+		Cache cache = cacheService.getCache(CacheService.CACHE_NAME_CAPTCHA);
+		return cache;
+	}
+
+	/**
+	 * 获取Token对应的Cache
+	 */
+	private Cache getTokenCache() {
+		Cache cache = cacheService.getCache(CacheService.CACHE_NAME_TOKEN);
+		return cache;
 	}
 
 	@ApiOperation(value="login", notes="系统登陆")
@@ -81,7 +99,7 @@ public class UserController extends BaseController{
 			return WebResponse.failure(ResponseCode.PHONE_INVALID);
 		}
 
-		String validCaptcha = captcheService.get(phone);
+		String validCaptcha = cacheService.get(getCaptchaCache(), phone);
 		logger.debug("validCaptcha=" + validCaptcha);
 		
 		if(StringUtil.isEmpty(captcha) || StringUtil.isEmpty(validCaptcha)) {
@@ -95,9 +113,14 @@ public class UserController extends BaseController{
 		try {
 			int id = userService.login(phone);
 			if(id > 0) {
-				captcheService.delete(phone);
-				UserBean newUser = userService.getUserById(id);
-				String data = JsonUtil.toJSONString("id", String.valueOf(id), "nickname", newUser.getNickname());
+				cacheService.evict(getCaptchaCache(), phone);
+				
+				//生成token
+				UserBean user = userService.getUserById(id);
+				String token = JWTUtil.generateToken(String.valueOf(user.getId()), phone);
+				cacheService.put(getTokenCache(), token, phone);
+				
+				String data = JsonUtil.toJSONString("id", String.valueOf(id), "nickname", user.getNickname(), "token", token);
 				return WebResponse.success(data);
 			}
 		}catch(Exception ex) {

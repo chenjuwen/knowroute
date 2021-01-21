@@ -6,7 +6,8 @@ package com.heasy.knowroute.core;
 public class Constants {
     //login auth
     public static final String AUTH_DIR = "heasy";
-    public static final String AUTH_DATA_FILE_NAME = "authority.txt";
+    public static final String AUTHORITY_FILE_NAME = "authority.txt";
+    public static final String TOKEN_FILE_NAME = "token.txt";
 
     public static final String SUCCESS = "success";
 }
