@@ -1,16 +1,24 @@
 package com.heasy.knowroute.utils;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.InvalidClaimException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.JWTVerifier;
 
 public class JWTUtil {
+	private static Logger logger = LoggerFactory.getLogger(JWTUtil.class);
+	
 	private static final String SECRET_KEY = "knowroute@admin"; //秘钥
-	private static final int TOKEN_EXPIRE_TIME = 24 * 60 * 60 * 1000; //token过期时间，24小时
+	private static final int TOKEN_EXPIRE_TIME = 3 * 24 * 60 * 60 * 1000; //token过期时间
 	private static final String ISSUER = "knowroute"; //签发人
 
 	public static final String CLAIM_USERID = "userid";
@@ -49,8 +57,15 @@ public class JWTUtil {
 					.build();
 			verifier.verify(token);
 			return true;
+			
+	    } catch (SignatureVerificationException ex) {
+	    	logger.error(ex.toString());
+	    } catch (TokenExpiredException ex) {
+	    	logger.error(ex.toString());
+	    } catch (InvalidClaimException ex) {
+	    	logger.error(ex.toString());
 	    } catch (Exception ex){
-	    	ex.printStackTrace();
+	    	logger.error("", ex);
 	    }
 	    return false;
 	}
@@ -61,13 +76,18 @@ public class JWTUtil {
 	    		return false;
 	    	}
 	    	
-			JWTVerifier verifier = JWT.require(getAlgorithm())
-					.withIssuer(ISSUER)
-					.build();
-			verifier.verify(token);
+			JWTVerifier verifier = JWT.require(getAlgorithm()).withIssuer(ISSUER).build();
+			verifier.verify(token); //验证不通过时会抛出各种异常
 			return true;
+			
+	    } catch (SignatureVerificationException ex) {
+	    	logger.error(ex.toString());
+	    } catch (TokenExpiredException ex) {
+	    	logger.error(ex.toString());
+	    } catch (InvalidClaimException ex) {
+	    	logger.error(ex.toString());
 	    } catch (Exception ex){
-	    	ex.printStackTrace();
+	    	logger.error("", ex);
 	    }
 	    return false;
 	}
@@ -83,7 +103,7 @@ public class JWTUtil {
 	    	
 			return JWT.decode(token).getClaim(claimName).asString();
 		}catch(Exception ex){
-			ex.printStackTrace();
+	    	logger.error("", ex);
 		}
 		return "";
 	}
@@ -107,6 +127,14 @@ public class JWTUtil {
 	}
 	
 	/**
+	 * 获取过期时间
+	 */
+	public static Date getExpiresDate(String token) {
+		Date date = JWT.decode(token).getClaims().get("exp").asDate();
+		return date;
+	}
+	
+	/**
 	 * 验证token是否有效：没有被篡改等
 	 */
 	public static boolean checkToken(String token){
@@ -119,18 +147,16 @@ public class JWTUtil {
 		return newSignature.endsWith(signature);
 	}
     
-//	public static void main(String[] args) {
-//		String token = JWTUtil.generateToken("admin");
+//	public static void main(String[] args) throws Exception {
+//		String token = JWTUtil.generateToken("5", "13798189352");
 //		System.out.println(token);
-//		System.out.println(getOriginalHeader(token));
-//		System.out.println(getOriginalPayload(token));
-//		System.out.println(checkToken(token));
-//		
-//		String username = JWTUtil.getClaimFromToken(token, "username");
-//		System.out.println(username);
-//		
-//		System.out.println(JWTUtil.verify(token, username));
-//		System.out.println(JWTUtil.verify(null));
+//		System.out.println(JWTUtil.verify(token));
+//		TimeUnit.SECONDS.sleep(3);
+//		System.out.println(JWTUtil.verify(token));
+//		Date date = JWTUtil.getExpiresDate(token);
+//		System.out.println(DatetimeUtil.formatDate(DatetimeUtil.nowDate()));
+//		System.out.println(DatetimeUtil.formatDate(date));
+//		System.out.println(DatetimeUtil.nowDate().after(date));
 //	}
 
 }

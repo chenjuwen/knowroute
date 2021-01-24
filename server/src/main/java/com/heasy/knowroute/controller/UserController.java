@@ -76,14 +76,6 @@ public class UserController extends BaseController{
 		return cache;
 	}
 
-	/**
-	 * 获取Token对应的Cache
-	 */
-	private Cache getTokenCache() {
-		Cache cache = cacheService.getCache(CacheService.CACHE_NAME_TOKEN);
-		return cache;
-	}
-
 	@ApiOperation(value="login", notes="系统登陆")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="phone", paramType="query", required=true, dataType="String"),
@@ -118,7 +110,6 @@ public class UserController extends BaseController{
 				//生成token
 				UserBean user = userService.getUserById(id);
 				String token = JWTUtil.generateToken(String.valueOf(user.getId()), phone);
-				cacheService.put(getTokenCache(), token, phone);
 				
 				String data = JsonUtil.toJSONString("id", String.valueOf(id), "nickname", user.getNickname(), "token", token);
 				return WebResponse.success(data);

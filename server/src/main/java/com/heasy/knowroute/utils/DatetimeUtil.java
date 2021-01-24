@@ -189,6 +189,12 @@ public class DatetimeUtil {
     	return cal.getTime();
     }
     
+    public static Date add(int milliSeconds) {
+    	Calendar cal = getCalendar();
+    	cal.add(Calendar.MILLISECOND, milliSeconds);
+    	return cal.getTime();
+    }
+    
     /**
      * 当前日期增加若干日期数，可正可负
      * 

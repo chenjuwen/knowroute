@@ -29,9 +29,9 @@ import okhttp3.Response;
 public class OkHttpClientHelper {
     private static Logger logger = LoggerFactory.getLogger(OkHttpClientHelper.class);
 
-    private static final int DEFAULT_CONNECT_TIMEOUT_MILLSECONDS = 15 * 1000;
-    private static final int DEFAULT_READ_TIMEOUT_MILLSECONDS = 6000;
-    private static final int DEFAULT_WRITE_TIMEOUT_MILLSECONDS = 6000;
+    private static final int DEFAULT_CONNECT_TIMEOUT_MILLISECONDS = 15 * 1000;
+    private static final int DEFAULT_READ_TIMEOUT_MILLISECONDS = 10 * 1000;
+    private static final int DEFAULT_WRITE_TIMEOUT_MILLISECONDS = 10 * 1000;
 	
     public static final MediaType MEDIA_TYPE_JSON =  MediaType.parse("application/json; charset=utf-8");
 
@@ -45,10 +45,10 @@ public class OkHttpClientHelper {
 
         DefaultCookieJar cookieJar = new DefaultCookieJar(new MemoryCookieStore());
 
-        builder.connectTimeout(DEFAULT_CONNECT_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
-                .callTimeout(DEFAULT_CONNECT_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
-        	    .readTimeout(DEFAULT_READ_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
-        	    .writeTimeout(DEFAULT_WRITE_TIMEOUT_MILLSECONDS, TimeUnit.MILLISECONDS)
+        builder.connectTimeout(DEFAULT_CONNECT_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
+                .callTimeout(DEFAULT_CONNECT_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
+        	    .readTimeout(DEFAULT_READ_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
+        	    .writeTimeout(DEFAULT_WRITE_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
                 .connectionPool(connectionPool)
                 .cookieJar(cookieJar)
                 .retryOnConnectionFailure(false);

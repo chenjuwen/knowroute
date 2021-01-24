@@ -33,7 +33,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(logInterceptor).addPathPatterns("/**");
 		
 		registry.addInterceptor(jwtInterceptor).addPathPatterns("/**")
-			.excludePathPatterns("/", "/index", "/download", "/helpme", "/invite", "/user/getCaptcha", "/user/login", "/doc.html", "/js/**", "/css/**", "/images/**", "/**/*.js", "/**/*.css");
+			.excludePathPatterns("/", "/index", "/download", "/helpme", "/aboutme", "/invite", "/user/getCaptcha", "/user/login", "/doc.html", "/js/**", "/css/**", "/images/**", "/**/*.js", "/**/*.css");
 	}
 	
 }

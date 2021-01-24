@@ -7,17 +7,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.WebResponse;
-import com.heasy.knowroute.service.CacheService;
 import com.heasy.knowroute.utils.JWTUtil;
 import com.heasy.knowroute.utils.JsonUtil;
-import com.heasy.knowroute.utils.StringUtil;
 
 /**
  * JWT拦截器
@@ -25,9 +21,6 @@ import com.heasy.knowroute.utils.StringUtil;
 @Component
 public class JWTInterceptor extends HandlerInterceptorAdapter{
 	private static Logger logger = LoggerFactory.getLogger(JWTInterceptor.class);
-
-	@Autowired
-	private CacheService cacheService;
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
@@ -48,24 +41,7 @@ public class JWTInterceptor extends HandlerInterceptorAdapter{
 			return false;
 		}
 		
-		//判断是否在服务端缓存中
-		String phone = cacheService.get(getTokenCache(), token);
-		logger.debug("phone=" + phone);
-		if(StringUtil.isEmpty(phone)) {
-			logger.debug("token不存在于服务端");
-			responseError(response, ResponseCode.TOKEN_ERROR);
-			return false;
-		}
-		
 		return true;
-	}
-
-	/**
-	 * 获取Token对应的Cache
-	 */
-	private Cache getTokenCache() {
-		Cache cache = cacheService.getCache(CacheService.CACHE_NAME_TOKEN);
-		return cache;
 	}
 	
 	private void responseError(HttpServletResponse response, ResponseCode responseCode)throws Exception{
