@@ -20,6 +20,7 @@ import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.service.CacheService;
 import com.heasy.knowroute.service.SMSService;
 import com.heasy.knowroute.service.UserService;
+import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.JWTUtil;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
@@ -110,8 +111,11 @@ public class UserController extends BaseController{
 				//生成token
 				UserBean user = userService.getUserById(id);
 				String token = JWTUtil.generateToken(String.valueOf(user.getId()), phone);
+				String expiresDate = DatetimeUtil.formatDate(JWTUtil.getExpiresDate(token));
 				
-				String data = JsonUtil.toJSONString("id", String.valueOf(id), "nickname", user.getNickname(), "token", token);
+				String data = JsonUtil.toJSONString("userId", String.valueOf(id), "nickname", 
+						user.getNickname(), "token", token, "expiresDate", expiresDate);
+				
 				return WebResponse.success(data);
 			}
 		}catch(Exception ex) {

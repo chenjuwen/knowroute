@@ -46,7 +46,7 @@ public class LogInterceptor implements Interceptor {
 
         } catch (Exception ex) {
             errorMessage = ex.toString();
-           logger.error(ex.toString());
+           logger.error("", ex);
         } finally {
             long end = System.currentTimeMillis();
             String duration = String.valueOf(end - start);

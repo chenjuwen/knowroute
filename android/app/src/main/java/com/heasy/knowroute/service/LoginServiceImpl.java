@@ -5,6 +5,7 @@ import android.content.Context;
 import com.heasy.knowroute.bean.LoginResultBean;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.service.AbstractService;
+import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.FileUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.service.backend.UserAPI;
@@ -20,10 +21,7 @@ import java.io.File;
 public class LoginServiceImpl extends AbstractService implements LoginService {
     private static final Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
 
-    private int userId = 0;
-    private String userPhone = "";
-    private String userNickname = "";
-    private String token = "";
+    private LoginResultBean loginResult;
 
     @Override
     public void init() {
@@ -31,20 +29,11 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
             //read authority file
             String authorityContent = FileUtil.readTextFile(getAuthorityFilePath());
             if(StringUtil.isNotEmpty(authorityContent)) {
-                String[] arr = authorityContent.split(",");
-                this.userId = Integer.parseInt(arr[0]);
-                this.userPhone = arr[1];
-                this.userNickname = arr[2];
-                logger.debug("userId=" + this.userId + ", userPhone=" + this.userPhone + ", userNickname=" + userNickname);
+                logger.debug(authorityContent);
+                this.loginResult = FastjsonUtil.string2JavaBean(authorityContent, LoginResultBean.class);
+            }else{
+                this.loginResult = new LoginResultBean();
             }
-
-            //read token file
-            String tokenContent = FileUtil.readTextFile(getTokenFilePath());
-            if(StringUtil.isNotEmpty(tokenContent)) {
-                this.token = tokenContent;
-                logger.debug("token=" + this.token);
-            }
-
             successInit = true;
         }catch(Exception ex){
             logger.error("", ex);
@@ -54,14 +43,7 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     @Override
     public void unInit() {
         super.unInit();
-        reset();
-    }
-
-    private void reset() {
-        userId = 0;
-        userPhone = "";
-        userNickname = "";
-        token = "";
+        this.loginResult = null;
     }
 
     @Override
@@ -79,17 +61,11 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
         try {
             LoginResultBean loginResultBean = UserAPI.login(phone, captcha);
             if(StringUtil.isEmpty(loginResultBean.getErrorMessage())){
-                this.userId = loginResultBean.getUserId();
-                this.userPhone = phone;
-                this.userNickname = loginResultBean.getNickname();
-                this.token = loginResultBean.getToken();
-
+                loginResult = loginResultBean;
                 addAuthorityFile();
-                addTokenFile();
-
                 return Constants.SUCCESS;
             }else{
-                reset();
+                loginResult = loginResultBean;
                 return loginResultBean.getErrorMessage();
             }
         }catch(Exception ex){
@@ -100,46 +76,42 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
 
     @Override
     public int getUserId() {
-        return this.userId;
+        return this.loginResult.getUserId();
     }
 
     @Override
     public String getPhone() {
-        return this.userPhone;
+        return StringUtil.trimToEmpty(this.loginResult.getPhone());
     }
 
     @Override
     public String getNickname() {
-        return this.userNickname;
+        return StringUtil.trimToEmpty(this.loginResult.getNickname());
     }
 
     @Override
     public void setNickname(String nickname) {
-        this.userNickname = nickname;
+        this.loginResult.setNickname(nickname);
         addAuthorityFile();
     }
 
     @Override
     public String getToken() {
-        return this.token;
+        return StringUtil.trimToEmpty(this.loginResult.getToken());
     }
 
     @Override
     public boolean isLogin() {
-        return this.userId > 0;
+        return this.loginResult.getUserId() > 0;
     }
 
     @Override
     public boolean cleanCache() {
         try {
-            reset();
+            this.loginResult = new LoginResultBean();
 
             //delete authority file
             FileUtil.deleteFile(getAuthorityFilePath());
-
-            //delete token file
-            FileUtil.deleteFile(getTokenFilePath());
-
         }catch(Exception ex){
             logger.error("", ex);
         }
@@ -158,22 +130,8 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
 
     private void addAuthorityFile() {
         String filePath = getAuthorityFilePath();
-        FileUtil.writeFile(this.userId + "," + this.userPhone + "," + this.userNickname, filePath);
-    }
-
-    /**
-     * 获取token信息
-     */
-    private String getTokenFilePath(){
-        String filePath = getHeasyContext().getServiceEngine().getAndroidContext()
-                .getDir(Constants.AUTH_DIR, Context.MODE_PRIVATE).getPath();
-        filePath += File.separator + Constants.TOKEN_FILE_NAME;
-        return filePath;
-    }
-
-    private void addTokenFile(){
-        String filePath = getTokenFilePath();
-        FileUtil.writeFile(this.token, filePath);
+        String data = FastjsonUtil.object2String(this.loginResult);
+        FileUtil.writeFile(data, filePath);
     }
 
 }

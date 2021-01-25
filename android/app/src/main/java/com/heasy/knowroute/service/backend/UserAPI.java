@@ -1,6 +1,5 @@
 package com.heasy.knowroute.service.backend;
 
-import com.alibaba.fastjson.JSONObject;
 import com.heasy.knowroute.bean.LoginResultBean;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
@@ -79,16 +78,13 @@ public class UserAPI extends BaseAPI {
         ResponseBean responseBean = HttpService.post(HttpService.getApiRootAddress(getHeasyContext()) + "user/login", params);
         if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
             String data = (String) responseBean.getData();
-            JSONObject jsonObject = FastjsonUtil.string2JSONObject(data);
-
-            LoginResultBean bean = new LoginResultBean();
-            bean.setUserId(Integer.parseInt(FastjsonUtil.getString(jsonObject, "id", "0")));
-            bean.setNickname(FastjsonUtil.getString(jsonObject, "nickname"));
-            bean.setToken(FastjsonUtil.getString(jsonObject, "token"));
+            LoginResultBean bean = FastjsonUtil.string2JavaBean(data, LoginResultBean.class);
+            bean.setPhone(phone);
             bean.setErrorMessage("");
             return bean;
         } else {
             LoginResultBean bean = new LoginResultBean();
+            bean.setPhone(phone);
             bean.setErrorMessage(HttpService.getFailureMessage(responseBean));
             return bean;
         }

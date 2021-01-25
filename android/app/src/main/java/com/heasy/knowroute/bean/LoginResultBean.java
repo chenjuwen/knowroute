@@ -2,8 +2,10 @@ package com.heasy.knowroute.bean;
 
 public class LoginResultBean {
     private int userId;
+    private String phone;
     private String nickname;
     private String token;
+    private String expiresDate;
     private String errorMessage;
 
     public int getUserId() {
@@ -12,6 +14,14 @@ public class LoginResultBean {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getNickname() {
@@ -28,6 +38,14 @@ public class LoginResultBean {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getExpiresDate() {
+        return expiresDate;
+    }
+
+    public void setExpiresDate(String expiresDate) {
+        this.expiresDate = expiresDate;
     }
 
     public String getErrorMessage() {
