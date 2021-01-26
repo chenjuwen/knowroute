@@ -101,6 +101,18 @@ public class LoginServiceImpl extends AbstractService implements LoginService {
     }
 
     @Override
+    public String getTokenExpiresDate() {
+        return this.loginResult.getExpiresDate();
+    }
+
+    @Override
+    public void refreshToken(LoginResultBean loginResultBean) {
+        logger.info("刷新token：" + FastjsonUtil.object2String(loginResultBean));
+        this.loginResult = loginResultBean;
+        addAuthorityFile();
+    }
+
+    @Override
     public boolean isLogin() {
         return this.loginResult.getUserId() > 0;
     }

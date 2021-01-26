@@ -16,9 +16,11 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 
 public class JWTUtil {
 	private static Logger logger = LoggerFactory.getLogger(JWTUtil.class);
+
+	public static final int TOKEN_EXPIRE_TIME = 3 * 24 * 60 * 60 * 1000; //token过期时间
+	public static final int REFRESH_TOKEN_REMAINING_MINUTES = 4 * 60; //刷新token的最大剩余分钟数
 	
 	private static final String SECRET_KEY = "knowroute@admin"; //秘钥
-	private static final int TOKEN_EXPIRE_TIME = 3 * 24 * 60 * 60 * 1000; //token过期时间
 	private static final String ISSUER = "knowroute"; //签发人
 
 	public static final String CLAIM_USERID = "userid";

@@ -12,7 +12,8 @@ public enum ResponseCode {
 	
 	NO_ACCESS(2001, "无权访问"),
 	LOGIN_ERROR(2002, "登录失败"),
-	TOKEN_ERROR(2003, "token有误");
+	TOKEN_ERROR(2003, "token有误"),
+	REFRESH_TOKEN_ERROR(2004, "刷新token失败");
 	
 	private Integer code;
 	private String message;

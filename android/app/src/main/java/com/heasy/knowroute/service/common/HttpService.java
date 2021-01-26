@@ -1,18 +1,24 @@
 package com.heasy.knowroute.service.common;
 
 import com.heasy.knowroute.GenericHeaderInterceptor;
+import com.heasy.knowroute.bean.LoginResultBean;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
+import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.okhttp.OkHttpClientHelper;
 import com.heasy.knowroute.core.okhttp.RequestBuilder;
 import com.heasy.knowroute.core.okhttp.interceptor.LogInterceptor;
 import com.heasy.knowroute.core.okhttp.interceptor.RetryInterceptor;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
+import com.heasy.knowroute.core.utils.DatetimeUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.event.FixedPointNavigationEvent;
 import com.heasy.knowroute.event.TokenEvent;
+import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.LoginServiceImpl;
+import com.heasy.knowroute.service.backend.UserAPI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.Map;
 
 import okhttp3.Request;
@@ -57,12 +64,20 @@ public class HttpService {
     }
 
     public static ResponseBean get(HeasyContext heasyContext, String requestUrl){
+        return get(heasyContext, requestUrl, true);
+    }
+
+    public static ResponseBean get(HeasyContext heasyContext, String requestUrl, boolean needVerifyToken){
         try {
             String result = getOkHttpClientHelper().synGet(getApiRootAddress(heasyContext) + requestUrl);
 
             if (StringUtil.isNotEmpty(result)) {
                 ResponseBean responseBean = FastjsonUtil.string2JavaBean(result, ResponseBean.class);
-                verifyToken(responseBean);
+
+                if(needVerifyToken) {
+                    verifyToken(responseBean);
+                }
+
                 return responseBean;
             }
         }catch (SocketTimeoutException | SocketException | UnknownHostException ex){
@@ -123,10 +138,35 @@ public class HttpService {
      * token有误时，需要重新登录
      */
     private static void verifyToken(ResponseBean responseBean){
-        if(responseBean != null && responseBean.getCode() == 2003){
-            logger.debug("token有误时，需要重新登录");
+        if(responseBean == null){
+            return;
+        }
+
+        //token有误
+        if(responseBean.getCode() == 2003){
+            logger.debug("token有误，需要重新登录");
             ServiceEngineFactory.getServiceEngine().getEventService()
                     .postEvent(new TokenEvent(okHttpClientHelper, "token error"));
+        }else{
+            try {
+                //自动刷新token
+                LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
+                Date tokenExpiresDate = DatetimeUtil.toDate(loginService.getTokenExpiresDate());
+                long differMinutes = DatetimeUtil.differMinutes(DatetimeUtil.nowDate(), tokenExpiresDate);
+                if (differMinutes <= 4 * 60) { //剩余4小时时就自动刷新token
+                    new DefaultDaemonThread(){
+                        @Override
+                        public void run() {
+                            LoginResultBean loginResultBean = UserAPI.refreshToken();
+                            if(loginResultBean != null){
+                                loginService.refreshToken(loginResultBean);
+                            }
+                        }
+                    }.start();
+                }
+            }catch (Exception ex){
+                logger.error("", ex);
+            }
         }
     }
 

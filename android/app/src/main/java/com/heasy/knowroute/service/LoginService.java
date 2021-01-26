@@ -1,5 +1,6 @@
 package com.heasy.knowroute.service;
 
+import com.heasy.knowroute.bean.LoginResultBean;
 import com.heasy.knowroute.core.service.Service;
 
 /**
@@ -13,6 +14,8 @@ public interface LoginService extends Service{
     String getNickname();
     void setNickname(String nickname);
     String getToken();
+    String getTokenExpiresDate();
+    void refreshToken(LoginResultBean loginResultBean);
     boolean isLogin();
     boolean cleanCache();
 }

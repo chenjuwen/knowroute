@@ -1,5 +1,6 @@
 package com.heasy.knowroute.controller;
 
+import java.util.Date;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -113,8 +115,8 @@ public class UserController extends BaseController{
 				String token = JWTUtil.generateToken(String.valueOf(user.getId()), phone);
 				String expiresDate = DatetimeUtil.formatDate(JWTUtil.getExpiresDate(token));
 				
-				String data = JsonUtil.toJSONString("userId", String.valueOf(id), "nickname", 
-						user.getNickname(), "token", token, "expiresDate", expiresDate);
+				String data = JsonUtil.toJSONString("userId", String.valueOf(id), "phone", phone, 
+						"nickname", user.getNickname(), "token", token, "expiresDate", expiresDate);
 				
 				return WebResponse.success(data);
 			}
@@ -179,6 +181,36 @@ public class UserController extends BaseController{
 			return WebResponse.success();
 		}else {
 			return WebResponse.failure();
+		}
+	}
+	
+	@ApiOperation(value="refreshToken", notes="刷新Token")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="token", paramType="header", required=true, dataType="String")
+	})
+	@RequestMapping(value="/refreshToken", method=RequestMethod.GET)
+	public WebResponse refreshToken(@RequestHeader(value="token") String token) {
+		logger.debug("token=" + token);
+		if(!JWTUtil.verify(token)) {
+			return WebResponse.failure(ResponseCode.REFRESH_TOKEN_ERROR);
+		}
+		
+		Date expiresDate = JWTUtil.getExpiresDate(token);
+		long differMinutes = DatetimeUtil.differMinutes(DatetimeUtil.nowDate(), expiresDate);
+		if(differMinutes <= JWTUtil.REFRESH_TOKEN_REMAINING_MINUTES) {
+			String userId = JWTUtil.getClaimFromToken(token, JWTUtil.CLAIM_USERID);
+			String phone = JWTUtil.getClaimFromToken(token, JWTUtil.CLAIM_PHONE);
+
+			UserBean user = userService.getUserById(Integer.parseInt(userId));
+			
+			String newToken = JWTUtil.generateToken(userId, phone);
+			String newExpiresDate = DatetimeUtil.formatDate(JWTUtil.getExpiresDate(newToken));
+			
+			String data = JsonUtil.toJSONString("userId", userId, "phone", phone, 
+					"nickname", user.getNickname(), "token", newToken, "expiresDate", newExpiresDate);
+			return WebResponse.success(data);
+		}else {
+			return WebResponse.failure(ResponseCode.REFRESH_TOKEN_ERROR);
 		}
 	}
 	

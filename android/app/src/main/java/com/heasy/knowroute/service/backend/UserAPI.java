@@ -79,14 +79,26 @@ public class UserAPI extends BaseAPI {
         if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
             String data = (String) responseBean.getData();
             LoginResultBean bean = FastjsonUtil.string2JavaBean(data, LoginResultBean.class);
-            bean.setPhone(phone);
             bean.setErrorMessage("");
             return bean;
         } else {
             LoginResultBean bean = new LoginResultBean();
-            bean.setPhone(phone);
             bean.setErrorMessage(HttpService.getFailureMessage(responseBean));
             return bean;
+        }
+    }
+
+    public static LoginResultBean refreshToken(){
+        String requestUrl = "user/refreshToken";
+        ResponseBean responseBean = HttpService.get(getHeasyContext(), requestUrl, false);
+        if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
+            String data = (String) responseBean.getData();
+            LoginResultBean bean = FastjsonUtil.string2JavaBean(data, LoginResultBean.class);
+            bean.setErrorMessage("");
+            return bean;
+        }else{
+            logger.error(HttpService.getFailureMessage(responseBean));
+            return null;
         }
     }
 
