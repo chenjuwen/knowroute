@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import com.heasy.knowroute.utils.RequestUtil;
+
 /**
  * log拦截器
  */
@@ -15,20 +17,26 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 public class LogInterceptor extends HandlerInterceptorAdapter{
 	private static Logger logger = LoggerFactory.getLogger(LogInterceptor.class);
 	
+	//方法被调用前执行
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
 			Object handler) throws Exception {
-//		Enumeration<String> e = request.getHeaderNames();
-//		while(e.hasMoreElements()) {
-//			String name = e.nextElement();
-//			logger.debug(name + "=" + request.getHeader(name));
+		String userAgent = request.getHeader("user-agent");
+		String method = request.getMethod();
+		String queryString = request.getQueryString();
+		String requestURI = request.getRequestURI();
+		String front = request.getHeader("front");
+		String remoteAddress = RequestUtil.getClientIp(request);
 		
-		logger.debug("user-agent=" + request.getHeader("user-agent"));
-		logger.debug("Method: " + request.getMethod());
-		logger.debug("QueryString: " + request.getQueryString());
-		logger.debug("RequestURI: " + request.getRequestURI());
-		logger.debug("front=" + request.getHeader("front"));
+		String requestBody = "";
+		if(request instanceof CustomHttpServletRequestWrapper) {
+			requestBody = ((CustomHttpServletRequestWrapper)request).getRequestBody();
+		}
 		
+		logger.debug("\n userAgent = {} \n method = {} \n queryString = {} \n requestBody = {} \n requestURI = {} \n front = {} \n remoteAddress = {}", 
+				userAgent, method, queryString, requestBody, requestURI, front, remoteAddress);
+		
+		//返回true，则继续调用下一个拦截器
 		return true;
 	}	
 }

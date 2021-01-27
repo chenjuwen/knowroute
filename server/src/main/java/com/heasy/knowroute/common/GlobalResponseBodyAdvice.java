@@ -31,9 +31,9 @@ public class GlobalResponseBodyAdvice implements ResponseBodyAdvice<Object>{
 			Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
 			ServerHttpResponse response) {
 		if(body instanceof WebResponse) {
-			logger.debug(JsonUtil.object2String(body));
+			logger.debug("ResponseBody = " + JsonUtil.object2String(body));
 		}else {
-			logger.debug(body.toString());
+			logger.debug("ResponseBody = " + body.toString());
 		}
 		return body;
 	}

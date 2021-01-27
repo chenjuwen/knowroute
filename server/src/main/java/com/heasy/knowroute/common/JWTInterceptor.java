@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -22,23 +23,30 @@ import com.heasy.knowroute.utils.JsonUtil;
 public class JWTInterceptor extends HandlerInterceptorAdapter{
 	private static Logger logger = LoggerFactory.getLogger(JWTInterceptor.class);
 	
+	//是否需要验证token的开关
+	@Value("${token.verify.enabled}")
+	private boolean tokenVerifyEnabled = true;
+	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, 
 			Object handler) throws Exception {
 		String requestURI = request.getRequestURI();
-		logger.debug("requestURI=" + requestURI);
 		
 		//排除
 		if(requestURI.indexOf("swagger") >= 0 || requestURI.indexOf("webjars") >= 0) {
 			return true;
 		}
 		
-		//客户端传来的token
-		String token = request.getHeader("token");
-		logger.debug("token=" + token);
-		if(!JWTUtil.verify(token)) {
-			responseError(response, ResponseCode.TOKEN_ERROR);
-			return false;
+		logger.debug("tokenVerifyEnabled=" + tokenVerifyEnabled);
+		//需要验证token
+		if(tokenVerifyEnabled) {
+			String token = request.getHeader("token");
+			logger.debug("token=" + token);
+			
+			if(!JWTUtil.verify(token)) {
+				responseError(response, ResponseCode.TOKEN_ERROR);
+				return false;
+			}
 		}
 		
 		return true;
