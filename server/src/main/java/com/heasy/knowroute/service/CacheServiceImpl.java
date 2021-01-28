@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 public class CacheServiceImpl implements CacheService{
     @Autowired
     private CacheManager cacheManager;
+	public static final String CACHE_NAME_CAPTCHA = "CaptchaCache";
     
 	@Override
 	public Cache getCache(String name) {

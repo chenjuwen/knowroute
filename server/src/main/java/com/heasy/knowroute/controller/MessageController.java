@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.bean.MessageBean;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.utils.JsonUtil;
 
@@ -25,6 +26,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags="消息管理")
 @RestController
 @RequestMapping("/message")
+@RequestLimitAnnotation
 public class MessageController extends BaseController{
     private static final Logger logger = LoggerFactory.getLogger(MessageController.class);
     

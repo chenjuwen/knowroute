@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.heasy.knowroute.bean.MessageBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.bean.VersionBean;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.service.VersionService;
@@ -18,6 +19,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @ApiIgnore
 @Controller
+@RequestLimitAnnotation
 public class MapController extends BaseController{
 	@Autowired
 	private UserService userService;

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.FixedPointInfoService;
 import com.heasy.knowroute.utils.JsonUtil;
 
@@ -25,6 +26,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags="定点属性信息管理")
 @RestController
 @RequestMapping("/fixedPointInfo")
+@RequestLimitAnnotation
 public class FixedPointInfoController extends BaseController{
     private static final Logger logger = LoggerFactory.getLogger(FixedPointInfoController.class);
     

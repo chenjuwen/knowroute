@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.bean.VersionBean;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.VersionService;
 
 import io.swagger.annotations.Api;
@@ -17,6 +18,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags="版本管理")
 @RestController
 @RequestMapping("/version")
+@RequestLimitAnnotation
 public class VersionController extends BaseController{
     private static final Logger logger = LoggerFactory.getLogger(VersionController.class);
     

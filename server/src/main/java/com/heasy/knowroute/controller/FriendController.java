@@ -20,6 +20,7 @@ import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.common.EnumConstants;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.FriendService;
 import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.service.UserService;
@@ -34,6 +35,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags="好友管理")
 @RestController
 @RequestMapping("/friend")
+@RequestLimitAnnotation
 public class FriendController extends BaseController{
     private static final Logger logger = LoggerFactory.getLogger(FriendController.class);
     

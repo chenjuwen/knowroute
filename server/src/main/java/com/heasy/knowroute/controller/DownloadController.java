@@ -15,12 +15,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.utils.StringUtil;
 
 import springfox.documentation.annotations.ApiIgnore;
 
 @ApiIgnore
 @Controller
+@RequestLimitAnnotation
 public class DownloadController {
 	private static Logger logger = LoggerFactory.getLogger(DownloadController.class);
 	

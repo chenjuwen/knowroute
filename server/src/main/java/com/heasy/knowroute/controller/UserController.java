@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.bean.WebResponse;
-import com.heasy.knowroute.service.CacheService;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
+import com.heasy.knowroute.service.DataCacheService;
 import com.heasy.knowroute.service.SMSService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.DatetimeUtil;
@@ -35,8 +35,10 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags="用户管理")
 @RestController
 @RequestMapping("/user")
+@RequestLimitAnnotation
 public class UserController extends BaseController{
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final String CAPTCHA_KEY_PREFIX = "captcha:";
     
 	@Autowired
 	private UserService userService;
@@ -45,7 +47,7 @@ public class UserController extends BaseController{
 	private SMSService smsService;
 	
 	@Autowired
-	private CacheService cacheService;
+	private DataCacheService dataCacheService;
 
 	@ApiOperation(value="getCaptcha", notes="获取登陆验证码")
 	@ApiImplicitParams({
@@ -56,6 +58,10 @@ public class UserController extends BaseController{
 		if(!StringUtil.isMobile(phone)) {
 			return WebResponse.failure(ResponseCode.PHONE_INVALID);
 		}
+		
+		if(dataCacheService.exists(CAPTCHA_KEY_PREFIX + phone)) {
+			return WebResponse.failure(ResponseCode.GET_CAPTCHA_ERROR);
+		}
 
 		//获取6位长度的验证码
 		String captcha = StringUtil.getRandomNumber(6);
@@ -64,19 +70,11 @@ public class UserController extends BaseController{
 		//发送短信
 		boolean b = smsService.sendVerificationCode(phone, captcha);
 		if(b) {
-			cacheService.put(getCaptchaCache(), phone, captcha);
+			dataCacheService.set(CAPTCHA_KEY_PREFIX + phone, captcha, 60); //有效期60秒
 			return WebResponse.success();
 		}else {
 			return WebResponse.failure(ResponseCode.GET_CAPTCHA_ERROR);
 		}
-	}
-
-	/**
-	 * 获取验证码对应的Cache
-	 */
-	private Cache getCaptchaCache() {
-		Cache cache = cacheService.getCache(CacheService.CACHE_NAME_CAPTCHA);
-		return cache;
 	}
 
 	@ApiOperation(value="login", notes="系统登陆")
@@ -94,7 +92,7 @@ public class UserController extends BaseController{
 			return WebResponse.failure(ResponseCode.PHONE_INVALID);
 		}
 
-		String validCaptcha = cacheService.get(getCaptchaCache(), phone);
+		String validCaptcha = (String)dataCacheService.get(CAPTCHA_KEY_PREFIX + phone);
 		logger.debug("validCaptcha=" + validCaptcha);
 		
 		if(StringUtil.isEmpty(captcha) || StringUtil.isEmpty(validCaptcha)) {
@@ -108,7 +106,7 @@ public class UserController extends BaseController{
 		try {
 			int id = userService.login(phone);
 			if(id > 0) {
-				cacheService.evict(getCaptchaCache(), phone);
+				dataCacheService.delete(CAPTCHA_KEY_PREFIX + phone);
 				
 				//生成token
 				UserBean user = userService.getUserById(id);
@@ -184,6 +182,7 @@ public class UserController extends BaseController{
 		}
 	}
 	
+	@RequestLimitAnnotation(seconds=60*60, maxCount=1) //一个小时只能访问一次
 	@ApiOperation(value="refreshToken", notes="刷新Token")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="token", paramType="header", required=true, dataType="String")

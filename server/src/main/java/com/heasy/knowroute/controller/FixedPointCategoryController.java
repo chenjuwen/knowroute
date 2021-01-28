@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.heasy.knowroute.bean.FixedPointCategoryBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.FixedPointCategoryService;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
@@ -27,6 +28,7 @@ import net.sf.json.JsonConfig;
 @Api(tags="定点类别管理")
 @RestController
 @RequestMapping("/fixedPointCategory")
+@RequestLimitAnnotation
 public class FixedPointCategoryController extends BaseController{
 	@Autowired
 	private FixedPointCategoryService fixedPointCategoryService;

@@ -18,6 +18,7 @@ import com.heasy.knowroute.bean.PointBean;
 import com.heasy.knowroute.bean.PositionBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.PositionService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.DatetimeUtil;
@@ -31,6 +32,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags="轨迹点管理")
 @RestController
 @RequestMapping("/position")
+@RequestLimitAnnotation
 public class PositionController extends BaseController{
     private static final Logger logger = LoggerFactory.getLogger(PositionController.class);
     

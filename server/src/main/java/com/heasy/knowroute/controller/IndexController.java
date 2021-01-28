@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.heasy.knowroute.bean.VersionBean;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.VersionService;
 import com.heasy.knowroute.utils.DatetimeUtil;
 
@@ -18,6 +19,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 @ApiIgnore
 @Controller
+@RequestLimitAnnotation
 public class IndexController extends BaseController{
     private static final Logger logger = LoggerFactory.getLogger(IndexController.class);
     

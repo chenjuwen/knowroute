@@ -8,7 +8,8 @@ import java.lang.annotation.Target;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface OnlyAdminAnnotation {
-	
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface RequestLimitAnnotation {
+	int seconds() default 3;
+	long maxCount() default 1;
 }
