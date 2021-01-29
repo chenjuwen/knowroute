@@ -94,36 +94,30 @@
 			</tr>
 		</table>
 
-		<table class="tabbar" width="100%">
-			<tr>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('main.html')">
-					<img src="images/home.jpg">
-					<div>主页</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('contact.html')">
-					<img src="images/alert.jpg">
-					<div>求助</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="pointNavigation">
-					<img src="images/navigation.png">
-					<div>寻点</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('messages.html')">
-					<img src="images/message.jpg">
-					<div class="tabbar-item-selected">消息</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('me.html')">
-					<img src="images/person.jpg">
-					<div>我的</div>
-				</td>
-			</tr>
-		</table>
+		<mt-tabbar v-model="selected" fixed>
+			<mt-tab-item id="tab1">
+				<img slot="icon" src="images/home.jpg">主页
+			</mt-tab-item>
+			<mt-tab-item id="tab2">
+				<img slot="icon" src="images/alert.jpg">求助
+			</mt-tab-item>
+			<mt-tab-item id="tab3">
+				<img slot="icon" src="images/navigation.png">寻点
+			</mt-tab-item>
+			<mt-tab-item id="tab4">
+				<img slot="icon" src="images/message.jpg">消息
+			</mt-tab-item>
+			<mt-tab-item id="tab5">
+				<img slot="icon" src="images/person.jpg">我的
+			</mt-tab-item>
+		</mt-tabbar>
 	</div>
 
 	<script>
 		var vm = new Vue({
 			el: '#app',
 			data: {
+				selected: "tab4",
 				messageList: [
 					//{"owner": 12,"result": "","senderPhone": "13798189352","senderNickname": "1379818","receiver": "18318400143","sender": "5","id": 16,"category": "ADD_FRIEND","title": "请求添加您为好友", "content": "","createDate": "2020-12-10 18:13:52","status": 0},
 					//{"owner": 12,"result": "已忽略","senderPhone": "13798189353","senderNickname": "1379818","receiver": "18318400144","sender": "5","id": 17,"category": "ADD_FRIEND","title": "请求添加您为好友", "content": "","createDate": "2020-12-10 18:13:52","status": 1},
@@ -131,12 +125,6 @@
 				]
 			},
 			methods: {
-				changeTabPage: function(pageURL){
-					transferPage(pageURL);
-				},
-				pointNavigation: function(){
-					jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
-				},
 				confirmAddFriend: function(id, pass){
 					var result = jsBridge.dispatchAction("FriendAction", JSON.stringify({"id": id, "pass":pass}), "confirm_add");
 					if(result == "success"){
@@ -147,6 +135,21 @@
 				},
 				helpMap: function(userId){
 					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": userId}), "helpMap");
+				}
+			},
+			watch: {
+				"selected": function(){
+					if(this.selected == "tab1"){
+						transferPage("main.html");
+					}else if(this.selected == "tab2"){
+						transferPage("contact.html");
+					}else if(this.selected == "tab3"){
+						jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
+					}else if(this.selected == "tab4"){
+						transferPage("messages.html");
+					}else if(this.selected == "tab5"){
+						transferPage("me.html");
+					}
 				}
 			}
 		})

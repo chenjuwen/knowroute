@@ -54,16 +54,20 @@
 		}
 
 		.position-info .track{
-			font-size: 14px;
+			font-size: 12px;
 			width: 75px;
 			height: 30px;
 		}
 
 		.position-info .setting {
-			font-size: 14px;
+			font-size: 12px;
 			width: 75px;
 			height: 30px;
 			margin-top: 5px;
+		}
+
+		.position-info .contact-item{
+			border-top:1px solid #eee;
 		}
 	</style>
 </HEAD>
@@ -76,7 +80,7 @@
 		</mt-header>
 
 		<div class="position-info">
-			<table width="100%" border="0" v-for="(item,index) in friendList" style="border-top:2px solid #eee;">
+			<table width="100%" border="0" v-for="(item,index) in friendList" v-bind:class="index!=0 ? 'contact-item' : ''">
 				<tr>
 					<td rowspan="2" width="50" align="center" class="head">
 						<img src="images/head1.png" width="48" height="48" alt="头像">
@@ -96,30 +100,23 @@
 			</table>
 		</div>
 
-		<table class="tabbar" width="100%">
-			<tr>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('main.html')">
-					<img src="images/home.jpg">
-					<div class="tabbar-item-selected">主页</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('contact.html')">
-					<img src="images/alert.jpg">
-					<div>求助</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="pointNavigation">
-					<img src="images/navigation.png">
-					<div>寻点</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('messages.html')">
-					<img src="images/message.jpg">
-					<div>消息</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('me.html')">
-					<img src="images/person.jpg">
-					<div>我的</div>
-				</td>
-			</tr>
-		</table>
+		<mt-tabbar v-model="selected" fixed>
+			<mt-tab-item id="tab1">
+				<img slot="icon" src="images/home.jpg">主页
+			</mt-tab-item>
+			<mt-tab-item id="tab2">
+				<img slot="icon" src="images/alert.jpg">求助
+			</mt-tab-item>
+			<mt-tab-item id="tab3">
+				<img slot="icon" src="images/navigation.png">寻点
+			</mt-tab-item>
+			<mt-tab-item id="tab4">
+				<img slot="icon" src="images/message.jpg">消息
+			</mt-tab-item>
+			<mt-tab-item id="tab5">
+				<img slot="icon" src="images/person.jpg">我的
+			</mt-tab-item>
+		</mt-tabbar>
 	</div>
 
 	<script>
@@ -141,18 +138,13 @@
 		var vm = new Vue({
 			el: '#app',
 			data: {
+				selected: "tab1",
 				friendList: [
 					//{id:0, userId:5, relatedUserId:5, phone:"13798189352", nickname:"我自己", longitude:111.563127, latitude:22.617793, address:"广东省云浮市罗定市罗平镇大路口附近", positionTimes:"2020-10-14 14:29:35"},
 					//{id:4, userId:5, relatedUserId:10, phone:"18218324742", nickname:"1821832", longitude:111.563128, latitude:22.617794, address:"广东省云浮市罗定市大路口附近", positionTimes:"2020-10-15 14:29:35"}
 				]
 			},
 			methods: {
-				changeTabPage: function(pageURL){
-					transferPage(pageURL);
-				},
-				pointNavigation: function(){
-					jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
-				},
 				viewTrack: function(userId, nickName){
 					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": userId, "nickName":nickName}), "viewTrack");
 				},
@@ -162,6 +154,21 @@
 				friendSetting: function(id, nickname){
 					var parameters = "id=" + id + "&nickname=" + nickname;
 					transferPage("friend-setting.html", parameters);
+				}
+			},
+			watch: {
+				"selected": function(){
+					if(this.selected == "tab1"){
+						transferPage("main.html");
+					}else if(this.selected == "tab2"){
+						transferPage("contact.html");
+					}else if(this.selected == "tab3"){
+						jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
+					}else if(this.selected == "tab4"){
+						transferPage("messages.html");
+					}else if(this.selected == "tab5"){
+						transferPage("me.html");
+					}
 				}
 			}
 		})

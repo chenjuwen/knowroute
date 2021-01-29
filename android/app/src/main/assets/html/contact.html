@@ -117,30 +117,23 @@
 			</tr>
 		</table>
 
-		<table class="tabbar" width="100%">
-			<tr>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('main.html')">
-					<img src="images/home.jpg">
-					<div>主页</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('contact.html')">
-					<img src="images/alert.jpg">
-					<div class="tabbar-item-selected">求助</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="pointNavigation">
-					<img src="images/navigation.png">
-					<div>寻点</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('messages.html')">
-					<img src="images/message.jpg">
-					<div>消息</div>
-				</td>
-				<td width="25%" align="center" class="tabbar-item" @click="changeTabPage('me.html')">
-					<img src="images/person.jpg">
-					<div>我的</div>
-				</td>
-			</tr>
-		</table>
+		<mt-tabbar v-model="selected" fixed>
+			<mt-tab-item id="tab1">
+				<img slot="icon" src="images/home.jpg">主页
+			</mt-tab-item>
+			<mt-tab-item id="tab2">
+				<img slot="icon" src="images/alert.jpg">求助
+			</mt-tab-item>
+			<mt-tab-item id="tab3">
+				<img slot="icon" src="images/navigation.png">寻点
+			</mt-tab-item>
+			<mt-tab-item id="tab4">
+				<img slot="icon" src="images/message.jpg">消息
+			</mt-tab-item>
+			<mt-tab-item id="tab5">
+				<img slot="icon" src="images/person.jpg">我的
+			</mt-tab-item>
+		</mt-tabbar>
 
 		<mu-dialog transition="slide-left" width="260"
 				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openAddContactDialog">
@@ -211,6 +204,7 @@
 		var vm = new Vue({
 			el: '#app',
 			data: {
+				selected: "tab2",
 				contactList:[
 					//{id:1, userId:5, contactName:"张三风", contactPhone:"13798178123"},
 					//{id:2, userId:5, contactName:"李四", contactPhone:"13798178124"},
@@ -227,12 +221,6 @@
 				contact_phone2: ""
 			},
 			methods: {
-				changeTabPage: function(pageURL){
-					transferPage(pageURL);
-				},
-				pointNavigation: function(){
-					jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
-				},
 				addContact: function(){
 					this.contact_name = "";
 					this.contact_phone = "";
@@ -368,6 +356,21 @@
 							}
 						}
       				});
+				}
+			},
+			watch: {
+				"selected": function(){
+					if(this.selected == "tab1"){
+						transferPage("main.html");
+					}else if(this.selected == "tab2"){
+						transferPage("contact.html");
+					}else if(this.selected == "tab3"){
+						jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
+					}else if(this.selected == "tab4"){
+						transferPage("messages.html");
+					}else if(this.selected == "tab5"){
+						transferPage("me.html");
+					}
 				}
 			}
 		})
