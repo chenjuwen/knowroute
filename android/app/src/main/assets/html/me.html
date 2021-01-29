@@ -132,19 +132,19 @@
 		</div>
 
 		<mt-tabbar v-model="selected" fixed>
-			<mt-tab-item id="tab1">
+			<mt-tab-item id="tab1" @click.native="changePage('main.html')">
 				<img slot="icon" src="images/home.jpg">主页
 			</mt-tab-item>
-			<mt-tab-item id="tab2">
+			<mt-tab-item id="tab2" @click.native="changePage('contact.html')">
 				<img slot="icon" src="images/alert.jpg">求助
 			</mt-tab-item>
-			<mt-tab-item id="tab3">
+			<mt-tab-item id="tab3" @click.native="pointNavigation">
 				<img slot="icon" src="images/navigation.png">寻点
 			</mt-tab-item>
-			<mt-tab-item id="tab4">
+			<mt-tab-item id="tab4" @click.native="changePage('messages.html')">
 				<img slot="icon" src="images/message.jpg">消息
 			</mt-tab-item>
-			<mt-tab-item id="tab5">
+			<mt-tab-item id="tab5" @click.native="changePage('me.html')">
 				<img slot="icon" src="images/person.jpg">我的
 			</mt-tab-item>
 		</mt-tabbar>
@@ -185,6 +185,12 @@
 				new_nickname: ""
 			},
 			methods: {
+				changePage: function(pageURL){
+					transferPage(pageURL);
+				},
+				pointNavigation: function(){
+					jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
+				},
 				viewTrack: function(){
 					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": "me", "nickName":"我自己"}), "viewTrack");
 				},
@@ -264,21 +270,6 @@
 							jsBridge.dispatchAction(actionNames.ExitApp, "", "");
 						}
 					});
-				}
-			},
-			watch: {
-				"selected": function(){
-					if(this.selected == "tab1"){
-						transferPage("main.html");
-					}else if(this.selected == "tab2"){
-						transferPage("contact.html");
-					}else if(this.selected == "tab3"){
-						jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
-					}else if(this.selected == "tab4"){
-						transferPage("messages.html");
-					}else if(this.selected == "tab5"){
-						transferPage("me.html");
-					}
 				}
 			}
 		})
