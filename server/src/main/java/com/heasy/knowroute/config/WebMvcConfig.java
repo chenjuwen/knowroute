@@ -33,7 +33,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(logInterceptor).addPathPatterns("/**")
-			.excludePathPatterns("/js/**", "/css/**", "/images/**", "/**/*.js", "/**/*.css");
+			.excludePathPatterns("/js/**", "/css/**", "/images/**");
 		
 		registry.addInterceptor(jwtInterceptor).addPathPatterns("/**")
 			.excludePathPatterns("/", "/index", "/download", "/helpme", "/aboutme", "/invite", "/user/getCaptcha", "/user/login", "/doc.html", "/js/**", "/css/**", "/images/**", "/**/*.js", "/**/*.css");

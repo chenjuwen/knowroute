@@ -67,16 +67,18 @@ public class WebViewWrapper {
     }
 
     public void destroy(){
-        webView.loadDataWithBaseURL(null,"","text/html","utf-8", null);
-        webView.setVisibility(View.GONE);
-        webView.getSettings().setJavaScriptEnabled(false);
-        webView.stopLoading();
-        webView.clearHistory();
-        webView.clearCache(true);
-        webView.clearFormData();
-        webView.removeAllViews();
-        webView.loadUrl("about:blank");
-        webView.destroy();
+        if(webView != null) {
+            webView.loadDataWithBaseURL(null, "", "text/html", "utf-8", null);
+            webView.setVisibility(View.GONE);
+            webView.getSettings().setJavaScriptEnabled(false);
+            webView.stopLoading();
+            webView.clearHistory();
+            webView.clearCache(true);
+            webView.clearFormData();
+            webView.removeAllViews();
+            webView.loadUrl("about:blank");
+            webView.destroy();
+        }
     }
 
     public static class Builder{

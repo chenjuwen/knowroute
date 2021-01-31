@@ -42,6 +42,7 @@ public class PositionController extends BaseController{
     @Autowired
     private UserService userService;
 
+    @RequestLimitAnnotation(seconds=1, maxCount=1)
 	@ApiOperation(value="insert", notes="添加轨迹点信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="positionBean", paramType="body", required=true, dataType="PositionBean")

@@ -65,7 +65,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     private AbstractMapLocationClient mapLocationClient;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fixed_point_navigation);
 

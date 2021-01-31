@@ -3,6 +3,7 @@ package com.heasy.knowroute.service.backend;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.Constants;
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.service.LoginService;
@@ -76,7 +77,7 @@ public class ContactAPI extends BaseAPI{
         LoginService loginService = getLoginService();
 
         String message = "【知途】您好，您的朋友" + loginService.getPhone() + "向您发起了紧急求助！";
-        message += "点击详情查看TA的位置 http://www.knowroute.cn/knowroute/helpme?u=" + loginService.getUserId();
+        message += "点击详情查看TA的位置 " + HttpService.getApiRootAddress(ServiceEngineFactory.getServiceEngine().getHeasyContext()) + "helpme?u=" + loginService.getUserId();
         message += "&p=" + loginService.getPhone();
 
         if (StringUtil.isNotEmpty(phones)) {

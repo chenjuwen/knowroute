@@ -158,8 +158,12 @@
 -dontwarn com.alibaba.**
 
 -keep class com.baidu.** {*;}
--dontwarn com.baidu.**
+-keep class vi.com.** {*;}
+-keep class com.baidu.vi.** {*;}
 -keep class mapsdkvi.com.** {*;}
+-dontwarn com.baidu.**
+-dontwarn vi.com.**
+-dontwarn com.baidu.vi.**
 -dontwarn mapsdkvi.com.**
 
 -keep class com.example.** {*;}

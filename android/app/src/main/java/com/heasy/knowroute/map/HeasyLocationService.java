@@ -9,7 +9,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.heasy.knowroute.R;
 
@@ -21,6 +23,10 @@ import org.slf4j.LoggerFactory;
  */
 public class HeasyLocationService extends Service {
     private static final Logger logger = LoggerFactory.getLogger(HeasyLocationService.class);
+    public static final int NOTIFICATION_ID = 2021;
+    public static final String CHANNEL_ID = "channel2021";
+    public static final int REQUEST_CODE = 2021;
+
     private static HeasyLocationClient heasyLocationClient;
 
     @Override
@@ -32,20 +38,18 @@ public class HeasyLocationService extends Service {
 
         logger.info("sdk int is " + Build.VERSION.SDK_INT);
         Notification notification = getNotification();
-        startForeground(2010, notification);
+        startForeground(NOTIFICATION_ID, notification);
 
         logger.info("HeasyLocationService created");
     }
 
     @TargetApi(26)
     private Notification.Builder getNotificationBuilderWithChannel() {
-        String channelId = "channel2010";
-
         NotificationManager manager = (NotificationManager)getSystemService (NOTIFICATION_SERVICE);
-        NotificationChannel channel = new NotificationChannel (channelId, "知途前台服务", NotificationManager.IMPORTANCE_HIGH);
+        NotificationChannel channel = new NotificationChannel (CHANNEL_ID, "前台服务", NotificationManager.IMPORTANCE_HIGH);
         manager.createNotificationChannel (channel);
 
-        Notification.Builder builder = new Notification.Builder (this, channelId);
+        Notification.Builder builder = new Notification.Builder (this, CHANNEL_ID);
         return builder;
     }
 
@@ -56,7 +60,7 @@ public class HeasyLocationService extends Service {
 
     private Notification getNotification() {
         Notification.Builder builder = null;
-        if(Build.VERSION.SDK_INT >= 26) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder = getNotificationBuilderWithChannel();
         }else{
             builder = getNotificationBuilder();
@@ -70,7 +74,7 @@ public class HeasyLocationService extends Service {
         builder.setWhen(System.currentTimeMillis()); //设置该通知发生的时间
 
         Intent notifyIntent = new Intent(this, NotificationReceiver.class);
-        PendingIntent pIntent = PendingIntent.getBroadcast(this, 100, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pIntent);
 
         return builder.build();
@@ -91,12 +95,7 @@ public class HeasyLocationService extends Service {
             heasyLocationClient = null;
         }
 
-        //if(Build.VERSION.SDK_INT >= HeasyApplication.ANDROID8_SDK_INT) {
-        //    heasyLocationClient.disableLocInForeground();
-        //}else{
-            //停止前台Service
-            stopForeground(true);
-        //}
+        stopForeground(true);
 
         logger.info("HeasyLocationService destroy");
     }

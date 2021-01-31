@@ -5,6 +5,7 @@ import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.Constants;
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.map.HeasyLocationService;
 import com.heasy.knowroute.map.bean.LocationBean;
@@ -56,7 +57,7 @@ public class FriendAPI extends BaseAPI {
             double longitude = locationBean.getLongitude();
             double latitude = locationBean.getLatitude();
 
-            String message = "分享给您一个app，定位寻人用【知途】：http://www.knowroute.cn/knowroute/invite?mid=" + mid;
+            String message = "分享给您一个app，定位寻人用【知途】：" + HttpService.getApiRootAddress(ServiceEngineFactory.getServiceEngine().getHeasyContext()) + "invite?mid=" + mid;
             message += "&lng=" + longitude + "&lat=" + latitude;
 
             AndroidBuiltinService.sendSMS(phone, message);

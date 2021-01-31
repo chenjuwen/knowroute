@@ -33,7 +33,7 @@ public class MainActivity extends BaseActivity{
     private WebViewWrapper webViewWrapper;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         hideActionBar();
@@ -60,7 +60,7 @@ public class MainActivity extends BaseActivity{
 
     private void doStartService(Intent serviceIntent){
         logger.debug("doStartService >> " + Build.VERSION.SDK_INT);
-        if(Build.VERSION.SDK_INT >= 26) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startServiceForSDK26(serviceIntent);
         }else{
             startService(serviceIntent);

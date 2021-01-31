@@ -80,7 +80,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     private RouteTrackMapMarkerService mapMarkerService;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_route_track);
 

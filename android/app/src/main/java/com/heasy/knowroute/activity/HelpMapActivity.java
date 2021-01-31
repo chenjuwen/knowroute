@@ -41,7 +41,7 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
     private AbstractMapLocationClient mapLocationClient;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_help_map);
 
@@ -56,7 +56,7 @@ public class HelpMapActivity extends BaseMapActivity implements View.OnClickList
         initViewComponents();
 
         mMapView = ((MapView) findViewById(R.id.mapView));
-        initBaiduMap(MyLocationConfiguration.LocationMode.NORMAL, BitmapDescriptorFactory.fromResource(R.drawable.icon_location_1), null);
+        initBaiduMap(MyLocationConfiguration.LocationMode.NORMAL, null, null);
         initPosition();
 
         this.mapLocationClient = new DefaultMapLocationClient(mBaiduMap, HelpMapActivity.this);

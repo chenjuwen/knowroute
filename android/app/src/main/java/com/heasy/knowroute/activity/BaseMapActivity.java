@@ -39,7 +39,7 @@ public abstract class BaseMapActivity extends BaseActivity  implements SensorEve
     private AbstractMapMarkerService markerService;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // 获取传感器管理服务
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);

@@ -159,7 +159,7 @@ public class DataCacheServiceImpl implements DataCacheService {
             }else if(valueObject instanceof ValueItem){
                     ValueItem item = (ValueItem)valueObject;
                     if(item.getExpireTimeMillis() <= System.currentTimeMillis()){ //已过期
-                        logger.debug("key already :expired " + key);
+                        logger.debug("key already expired: " + key);
                         dataMap.remove(key);
                         return null;
                     }else{

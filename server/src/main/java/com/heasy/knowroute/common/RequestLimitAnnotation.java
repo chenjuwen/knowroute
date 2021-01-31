@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface RequestLimitAnnotation {
-	int seconds() default 3;
+	int seconds() default 2;
 	long maxCount() default 1;
 }

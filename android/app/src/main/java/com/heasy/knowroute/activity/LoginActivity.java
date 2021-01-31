@@ -40,7 +40,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     private Handler handler = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         hideStatusBar();
         setContentView(R.layout.activity_login);
@@ -62,7 +62,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                     }
 
                     captchaObtained = true;
-                    AndroidUtil.showToast(getApplicationContext(), "获取验证码成功");
 
                     final String oldText = btnGetCaptcha.getText().toString();
                     int seconds = 60;
