@@ -2,7 +2,9 @@ package com.heasy.knowroute.activity;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,16 +12,22 @@ import android.widget.Toast;
 
 import com.heasy.knowroute.HeasyApplication;
 import com.heasy.knowroute.WebViewWrapperFactory;
+import com.heasy.knowroute.bean.VersionInfoBean;
+import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.event.ExitAppEvent;
-import com.heasy.knowroute.core.event.ToastEvent;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
+import com.heasy.knowroute.core.utils.AndroidDownloadUtil;
 import com.heasy.knowroute.core.utils.AndroidUtil;
+import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.core.webview.WebViewWrapper;
 import com.heasy.knowroute.event.TokenEvent;
+import com.heasy.knowroute.event.UpdateVersionEvent;
 import com.heasy.knowroute.map.HeasyLocationService;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
+import com.heasy.knowroute.service.VersionService;
+import com.heasy.knowroute.service.VersionServiceImpl;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -31,6 +39,7 @@ import java.util.List;
 public class MainActivity extends BaseActivity{
     private static final Logger logger = LoggerFactory.getLogger(MainActivity.class);
     private WebViewWrapper webViewWrapper;
+    private boolean versionChecked = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,6 +129,16 @@ public class MainActivity extends BaseActivity{
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        logger.debug("MainActivity resume...");
+
+        if(!versionChecked) {
+            checkAndUpdateVersion();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -161,4 +180,45 @@ public class MainActivity extends BaseActivity{
             startActivity(intent);
         }
     }
+
+    private void checkAndUpdateVersion(){
+        new DefaultDaemonThread(){
+            @Override
+            public void run() {
+                try {
+                    logger.debug("check and update version...");
+                    VersionService versionService = ServiceEngineFactory.getServiceEngine().getService(VersionServiceImpl.class);
+                    VersionInfoBean versionInfoBean = versionService.getVersionInfo();
+                    if(StringUtil.isNotEmpty(versionInfoBean.getLastedVersionURL())) {
+                        ServiceEngineFactory.getServiceEngine().getEventService()
+                                .postEvent(new UpdateVersionEvent(this,
+                                        versionInfoBean.getLastedVersion(), versionInfoBean.getLastedVersionURL()));
+                    }else{
+                        versionChecked = true;
+                    }
+                }catch (Exception ex){
+                    logger.error("", ex);
+                }
+            }
+        }.start();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleUpdateVersionEvent(final UpdateVersionEvent event){
+        if(event != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("版本更新");
+            builder.setMessage("发现新版本 V" + event.getVersionName());
+            builder.setCancelable(false);
+            builder.setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    versionChecked = true;
+                    AndroidDownloadUtil.enqueue(MainActivity.this, event.getDownloadURL());
+                }
+            });
+            builder.show();
+        }
+    }
+
 }

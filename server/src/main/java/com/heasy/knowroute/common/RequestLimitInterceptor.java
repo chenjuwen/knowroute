@@ -76,6 +76,8 @@ public class RequestLimitInterceptor extends HandlerInterceptorAdapter{
 		OutputStream out = response.getOutputStream();
 		
 		String responseContent = JsonUtil.object2String(WebResponse.failure(responseCode));
+		logger.debug(responseContent);
+		
 		out.write(responseContent.getBytes("UTF-8"));
         out.flush();
         out.close();

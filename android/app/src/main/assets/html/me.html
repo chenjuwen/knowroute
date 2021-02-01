@@ -223,7 +223,7 @@
 					}
 				},
 				getLastedVersion: function(){
-                    if(downloadURL == ""){
+                    if(downloadURL == null || downloadURL == ""){
                         this.$toast.message("当前已是最新版本");
                     }else{
                         this.$confirm("有新版本，是否要更新？", '提示', {

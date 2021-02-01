@@ -9,11 +9,16 @@
 		
 		<link rel="stylesheet" type="text/css" href="css/map.css" />
 		<link rel="stylesheet" type="text/css" href="css/muse-ui.css" />
+		<link rel="stylesheet" type="text/css" href="css/material-icons.css" />
+		<link rel="stylesheet" type="text/css" href="css/muse-ui-loading.all.css" />
 		<link rel="stylesheet" type="text/css" href="css/muse-ui-message.all.css" />
+		<link rel="stylesheet" type="text/css" href="css/muse-ui-toast.all.css" />
 			
 		<script type="text/javascript" src="js/vue.min.js"></script>
 		<script type="text/javascript" src="js/muse-ui.js"></script>
+		<script type="text/javascript" src="js/muse-ui-loading.js"></script>
 		<script type="text/javascript" src="js/muse-ui-message.js"></script>
+		<script type="text/javascript" src="js/muse-ui-toast.js"></script>
 		<script type="text/javascript" src="js/jquery.min-1.11.3.js"></script>
 		<script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=dznCIamw2fFeqGOxQGHKYAxACOYw143G"></script>
 		<script type="text/javascript" src="js/map.js"></script>

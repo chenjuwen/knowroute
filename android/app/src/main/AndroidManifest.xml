@@ -55,7 +55,14 @@
 
         <receiver
             android:name=".map.NotificationReceiver"
-            android:process=":push" /> <!-- Service -->
+            android:process=":push" />
+
+        <receiver android:name=".DownLoadCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+            </intent-filter>
+        </receiver>
+
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"

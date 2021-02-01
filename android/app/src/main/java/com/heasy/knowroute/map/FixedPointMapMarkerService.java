@@ -398,7 +398,7 @@ public class FixedPointMapMarkerService extends AbstractMapMarkerService impleme
                     FixedPointInfoEvent event = new FixedPointInfoEvent(this, FixedPointInfoEvent.ACTION_NAME.UPDATE_DISTANCE.name(), distance);
                     ServiceEngineFactory.getServiceEngine().getEventService().postEvent(event);
                 }catch (Exception ex){
-                    logger.error("", ex);
+                    logger.error(ex.toString());
                 }
             }
         }

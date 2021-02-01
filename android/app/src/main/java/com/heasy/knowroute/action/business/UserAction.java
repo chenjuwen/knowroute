@@ -2,6 +2,7 @@ package com.heasy.knowroute.action.business;
 
 import com.alibaba.fastjson.JSONObject;
 import com.heasy.knowroute.bean.ResponseCode;
+import com.heasy.knowroute.bean.VersionInfoBean;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.annotation.JSActionAnnotation;
@@ -36,8 +37,10 @@ public class UserAction implements Action {
         }else if("my-info".equalsIgnoreCase(extend)){
             try {
                 VersionService versionService = heasyContext.getServiceEngine().getService(VersionServiceImpl.class);
-                String currentVersion = "V" + versionService.getCurrentVersion(); //当前版本
-                String downloadURL = versionService.getLastedVersionDownloadURL(); //最新版本下载地址
+                VersionInfoBean versionInfoBean = versionService.getVersionInfo();
+
+                String currentVersion = "V" + versionInfoBean.getCurrentVersion(); //当前版本
+                String downloadURL = versionInfoBean.getLastedVersionURL(); //最新版本下载地址
                 String nickname = loginService.getNickname();
 
                 String jsonStr = FastjsonUtil.toJSONString("currentVersion", currentVersion,

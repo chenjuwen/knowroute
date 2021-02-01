@@ -2,6 +2,7 @@ package com.heasy.knowroute.service;
 
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
+import com.heasy.knowroute.bean.VersionInfoBean;
 import com.heasy.knowroute.core.service.AbstractService;
 import com.heasy.knowroute.core.utils.VersionUtil;
 import com.heasy.knowroute.service.common.HttpService;
@@ -21,42 +22,32 @@ public class VersionServiceImpl extends AbstractService implements VersionServic
     }
 
     @Override
-    public String getCurrentVersion() {
-        return VersionUtil.getVersionName(getHeasyContext().getServiceEngine().getAndroidContext());
-    }
-
-    @Override
-    public String getLastedVersion() {
+    public VersionInfoBean getVersionInfo() {
+        VersionInfoBean versionInfoBean = new VersionInfoBean();
         try {
+            //获取最新的版本号
+            String lastedVersion = "";
             String url = "version/lasted";
             ResponseBean responseBean = HttpService.get(getHeasyContext(), url);
             if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-                String lastedVersion = (String) responseBean.getData();
-                return lastedVersion;
+                lastedVersion = (String) responseBean.getData();
+                versionInfoBean.setLastedVersion(lastedVersion);
             }
-        }catch (Exception ex){
-            logger.error("", ex);
-        }
-        return "";
-    }
 
-    @Override
-    public String getLastedVersionDownloadURL() {
-        String lastedVersionDownloadURL = "";
-        try {
-            String lastedVersion = getLastedVersion();
-            String currentVersion = getCurrentVersion();
+            //当前版本
+            String currentVersion = VersionUtil.getVersionName(getHeasyContext().getServiceEngine().getAndroidContext());
+            versionInfoBean.setCurrentVersion(currentVersion);
             logger.debug("lastedVersion: " + lastedVersion + ", currentVersion: " + currentVersion);
 
             if (lastedVersion.compareTo(currentVersion) > 0) {
                 String downloadURL = HttpService.getApiRootAddress(getHeasyContext()) + "download?filename=knowroute-" + lastedVersion + ".apk";
                 logger.debug(downloadURL);
-                lastedVersionDownloadURL = downloadURL;
+                versionInfoBean.setLastedVersionURL(downloadURL);
             }
         }catch (Exception ex){
             logger.error("", ex);
         }
-        return lastedVersionDownloadURL;
+        return versionInfoBean;
     }
 
 }
