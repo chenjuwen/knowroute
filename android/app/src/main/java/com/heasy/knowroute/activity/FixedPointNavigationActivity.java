@@ -57,7 +57,9 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     private ListView list_view;
 
     private UserBean userBean;
+    //类别集合
     private List<FixedPointCategoryBean> categoryList = new ArrayList<>();
+    //某个类别的点集合
     private List<FixedPointInfoBean> pointList;
 
     private FixedPointMapMarkerService mapMarkerService;
@@ -184,10 +186,12 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                         drawer_layout.closeDrawer(Gravity.END);
 
                         Integer newCategoryId = categoryList.get(position).getId();
-                        Integer oldCategoryId = (Integer) ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FIXED_POINT_CATEGORY_ID);
-                        if(newCategoryId == oldCategoryId){
-                            return;
-                        }
+
+                        //点击同一个类别，不再加载数据
+                       //Integer oldCategoryId = (Integer) ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FIXED_POINT_CATEGORY_ID);
+                        //if(newCategoryId == oldCategoryId){
+                        //    return;
+                        //}
 
                         //categoryId set to cache
                         ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().set(FIXED_POINT_CATEGORY_ID, newCategoryId);
@@ -216,6 +220,8 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                 });
 
                 openDrawer();
+            }else{
+                AndroidUtil.showToast(FixedPointNavigationActivity.this, "可到【我的>定点位置类别设置】添加类别");
             }
         }
     }

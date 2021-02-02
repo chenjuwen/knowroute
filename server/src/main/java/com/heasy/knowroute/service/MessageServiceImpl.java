@@ -120,7 +120,7 @@ public class MessageServiceImpl extends BaseService implements MessageService {
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
 	public void confirmMessage(int id, String result) {
-    	String sql = "update messages set status=1,result=? where id=?";
+    	String sql = "update messages set status=1,result=? where status=0 and id=?";
     	jdbcTemplate.update(sql, result, id);
 	}
 	

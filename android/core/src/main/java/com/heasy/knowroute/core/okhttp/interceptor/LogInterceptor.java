@@ -1,10 +1,16 @@
 package com.heasy.knowroute.core.okhttp.interceptor;
 
+import com.heasy.knowroute.core.service.ServiceEngineFactory;
+import com.heasy.knowroute.core.utils.AndroidUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
+
+import javax.net.ssl.SSLException;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -44,6 +50,9 @@ public class LogInterceptor implements Interceptor {
             MediaType mediaType = response.body().contentType();
             response = response.newBuilder().body(ResponseBody.create(mediaType, responseBody)).build();
 
+        } catch (SocketTimeoutException | SSLException ex){
+            AndroidUtil.showToast(ServiceEngineFactory.getServiceEngine().getAndroidContext(), "网络异常");
+            errorMessage = ex.toString();
         } catch (Exception ex) {
             errorMessage = ex.toString();
            logger.error("", ex);

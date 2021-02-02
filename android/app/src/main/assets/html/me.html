@@ -230,7 +230,8 @@
                             okLabel: "下载"
                         }).then(({ result }) => {
                             if (result) {
-                                window.open(downloadURL);
+								var obj = {"downloadURL": downloadURL};
+                                jsBridge.dispatchAction("VersionAction", JSON.stringify(obj), "download");
                             }
                         });
                     }

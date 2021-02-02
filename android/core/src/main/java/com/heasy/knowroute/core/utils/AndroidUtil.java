@@ -21,7 +21,7 @@ import com.heasy.knowroute.core.R;
  */
 public class AndroidUtil {
     public static void showToast(Context context, String msg){
-        showToast(context, msg, Toast.LENGTH_SHORT);
+        showToast(context, msg, Toast.LENGTH_LONG);
     }
 
     public static void showToast(Context context, String msg, int duration){
