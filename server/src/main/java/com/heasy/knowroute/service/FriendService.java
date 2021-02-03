@@ -14,4 +14,6 @@ public interface FriendService {
 	public void insert(int userId, String phone);
 	public void updateNickname(int id, String newNickname);
 	public boolean delete(int id);
+	public void forbidLookTrace(int id, int traceFlag);
+	public boolean checkForbid(int userId, int viewTrackUserId);
 }

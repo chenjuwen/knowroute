@@ -37,6 +37,11 @@
 			border-bottom:1px solid #ddd;
 		}
 
+		.menu-item-cell{
+			color:#999;
+			padding-right:20px;
+		}
+
 		/** dialog css **/
         .nickname-edit-dialog .mu-dialog-body{
             padding: 0px 0px 10px 0;
@@ -72,9 +77,12 @@
 			<mt-button icon="back" slot="left" @click="goBack">&nbsp;</mt-button>
 		</mt-header>
 
-		<div @click="editNickname" class="menu-item">
-			<mt-cell title="昵称" is-link>
-				<span style="color:#999;padding-right:20px;">{{ nickname }}</span>
+		<div class="menu-item">
+			<mt-cell title="昵称" @click.native="editNickname" is-link>
+				<span class="menu-item-cell">{{ nickname }}</span>
+			</mt-cell>
+			<mt-cell title="禁止查看轨迹" style="border-top:1px solid #ddd;">
+				<mt-switch v-model="forbidLookTrace"></mt-switch>
 			</mt-cell>
 		</div>
 
@@ -110,6 +118,7 @@
 			data: {
 				id: "",
 				nickname: "",
+				forbidLookTrace: false,
 
 				openEditDialog: false,
 				new_nickname: ""
@@ -162,14 +171,34 @@
 						this.$toast.message(result);
 					}
 				}
+			},
+			watch: {
+				"forbidLookTrace": function(){
+					if(isCallback){
+						isCallback = false;
+						return;
+					}
+
+					var obj = {"id": this.id, "forbidLookTrace": ""+this.forbidLookTrace};
+					var result = jsBridge.dispatchAction("FriendAction", JSON.stringify(obj), "forbidLookTrace");
+
+					if(result == "success"){
+						this.$toast.message('保存成功');
+					}else{
+						this.$toast.message(result);
+					}
+				}
 			}
 		})
 	</script>
 
 	<script type="text/javascript">
+		var isCallback = false;
         function pageFinishCallback(){
+        	isCallback = true;
 			vm.id = getPageParameter("id");
 			vm.nickname = getPageParameter("nickname");
+			vm.forbidLookTrace = (parseInt(getPageParameter("forbidLookTrace"))==1);
         }
     </script>
 </BODY>

@@ -202,5 +202,27 @@ public class FriendController extends BaseController{
 			return WebResponse.failure();
 		}
 	}
+
+	@ApiOperation(value="forbidLookTrace", notes="设置禁止好友查看轨迹")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="id", paramType="path", required=true, dataType="Integer"),
+		@ApiImplicitParam(name="traceFlag", paramType="path", required=true, dataType="Integer")
+	})
+	@RequestMapping(value="/forbidLookTrace/{id}/{traceFlag}", method=RequestMethod.POST, consumes="application/json")
+	public WebResponse forbidLookTrace(@PathVariable Integer id, @PathVariable Integer traceFlag) {
+		friendService.forbidLookTrace(id, traceFlag);
+		return WebResponse.success();
+	}
+
+	@ApiOperation(value="checkForbid", notes="判断是否禁止好友查看轨迹")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer"),
+		@ApiImplicitParam(name="viewTrackUserId", paramType="path", required=true, dataType="Integer")
+	})
+	@RequestMapping(value="/checkForbid/{userId}/{viewTrackUserId}", method=RequestMethod.GET)
+	public WebResponse checkForbid(@PathVariable Integer userId, @PathVariable Integer viewTrackUserId) {
+		boolean b = friendService.checkForbid(userId, viewTrackUserId);
+		return WebResponse.success(JsonUtil.toJSONString("forbid", String.valueOf(b)));
+	}
 	
 }

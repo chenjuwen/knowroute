@@ -3,6 +3,7 @@ package com.heasy.knowroute.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -88,7 +89,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 		try{
 			StringBuffer sb = new StringBuffer();
 			sb.append(" select a.id,a.user_id,a.related_user_id,b.phone,a.nickname ");
-			sb.append(" ,b.longitude,b.latitude,b.address,b.position_times ");
+			sb.append(" ,b.longitude,b.latitude,b.address,b.position_times,a.forbid_look_trace ");
 			sb.append(" from friends a left join users b on a.related_user_id=b.id ");
 			sb.append(" where a.user_id=? and b.phone=? ");
         	
@@ -108,7 +109,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 		try{
 			StringBuffer sb = new StringBuffer();
 			sb.append(" select a.id,a.user_id,a.related_user_id,b.phone,a.nickname ");
-			sb.append(" ,b.longitude,b.latitude,b.address,b.position_times ");
+			sb.append(" ,b.longitude,b.latitude,b.address,b.position_times,a.forbid_look_trace ");
 			sb.append(" from friends a left join users b on a.related_user_id=b.id ");
 			sb.append(" where a.id=? ");
         	
@@ -132,11 +133,11 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 			StringBuffer sb = new StringBuffer();
 			sb.append(" select * from ");
 			sb.append(" ( ");
-			sb.append(" 	select 1 as type,0 as id,id as user_id,id as related_user_id,phone,'我自己' as nickname,longitude,latitude,address,position_times ");
+			sb.append(" 	select 1 as type,0 as id,id as user_id,id as related_user_id,phone,'我自己' as nickname,longitude,latitude,address,position_times,0 as forbid_look_trace ");
 			sb.append(" 	from users where id=? ");
 			sb.append(" 	union ");
 			sb.append(" 	select 2 as type,a.id,a.user_id,a.related_user_id,b.phone,a.nickname ");
-			sb.append(" 	,b.longitude,b.latitude,b.address,b.position_times ");
+			sb.append(" 	,b.longitude,b.latitude,b.address,b.position_times,a.forbid_look_trace ");
 			sb.append(" 	from friends a left join users b on a.related_user_id=b.id ");
 			sb.append(" 	where a.user_id=? ");
 			sb.append(" ) order by type asc ");
@@ -229,6 +230,35 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
+	@Override
+	public void forbidLookTrace(int id, int traceFlag) {
+		String sql = "update friends set forbid_look_trace=? where id=?";
+    	jdbcTemplate.update(sql, traceFlag, id);
+	}
+
+	/**
+	 * 是否禁止好友查看轨迹
+	 * viewTrackUserId想看userId的轨迹
+	 */
+	@Override
+	public boolean checkForbid(int userId, int viewTrackUserId) {
+		try{
+			StringBuffer sb = new StringBuffer();
+			sb.append("select forbid_look_trace from friends where user_id=? and related_user_id=?");
+			Map<String, Object> map = jdbcTemplate.queryForMap(sb.toString(), userId, viewTrackUserId);
+			if(map != null) {
+				int forbid_look_trace = (Integer)map.get("forbid_look_trace");
+				if(forbid_look_trace == 1) {
+					return true;
+				}
+			}
+	    }catch (Exception ex){
+	        logger.error("", ex);
+	    }
+		return false;
+	}
+
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	/**
 	 * 删除好友关系
 	 */
@@ -263,6 +293,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 			double latitude = rs.getDouble("latitude");
 			String address = rs.getString("address");
 			String position_times = DatetimeUtil.formatDate(DatetimeUtil.toDate(rs.getString("position_times")));
+			int forbid_look_trace = rs.getInt("forbid_look_trace");
 			
 			FriendBean bean = new FriendBean();
 			bean.setId(id);
@@ -274,6 +305,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 			bean.setLatitude(latitude);
 			bean.setAddress(address);
 			bean.setPositionTimes(position_times);
+			bean.setForbidLookTrace(forbid_look_trace);
 			
 			return bean;
 		}

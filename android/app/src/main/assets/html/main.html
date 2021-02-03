@@ -87,8 +87,8 @@
 					</td>
 					<td class="nickname">&nbsp;{{ item.nickname }}</td>
 					<td rowspan="3" width="80" align="center">
-						<mt-button type="primary" size="normal" class="track" @click="viewTrack(item.relatedUserId,item.nickname)">轨迹</mt-button>
-						<mt-button v-if="item.id != 0" type="primary" plain size="normal" class="setting" @click="friendSetting(item.id, item.nickname)">好友设置</mt-button>
+						<mt-button type="primary" size="normal" class="track" @click="viewTrack(item)">轨迹</mt-button>
+						<mt-button v-if="item.id != 0" type="primary" plain size="normal" class="setting" @click="friendSetting(item.id, item.nickname, item.forbidLookTrace)">好友设置</mt-button>
 					</td>
 				</tr>
 				<tr>
@@ -140,8 +140,8 @@
 			data: {
 				selected: "tab1",
 				friendList: [
-					//{id:0, userId:5, relatedUserId:5, phone:"13798189352", nickname:"我自己", longitude:111.563127, latitude:22.617793, address:"广东省云浮市罗定市罗平镇大路口附近", positionTimes:"2020-10-14 14:29:35"},
-					//{id:4, userId:5, relatedUserId:10, phone:"18218324742", nickname:"1821832", longitude:111.563128, latitude:22.617794, address:"广东省云浮市罗定市大路口附近", positionTimes:"2020-10-15 14:29:35"}
+					//{id:0, userId:5, relatedUserId:5, phone:"13798189352", nickname:"我自己", longitude:111.563127, latitude:22.617793, address:"广东省云浮市罗定市罗平镇大路口附近", positionTimes:"2020-10-14 14:29:35", forbidLookTrace:0},
+					//{id:4, userId:5, relatedUserId:10, phone:"18218324742", nickname:"1821832", longitude:111.563128, latitude:22.617794, address:"广东省云浮市罗定市大路口附近", positionTimes:"2020-10-15 14:29:35", forbidLookTrace:0}
 				]
 			},
 			methods: {
@@ -151,14 +151,14 @@
 				pointNavigation: function(){
 					jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
 				},
-				viewTrack: function(userId, nickName){
-					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": userId, "nickName":nickName}), "viewTrack");
+				viewTrack: function(item){
+					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId":item.userId, "relatedUserId":item.relatedUserId, "nickname":item.nickname}), "viewTrack");
 				},
 				addFriend: function(){
 					transferPage("friend-add.html");
 				},
-				friendSetting: function(id, nickname){
-					var parameters = "id=" + id + "&nickname=" + nickname;
+				friendSetting: function(id, nickname, forbidLookTrace){
+					var parameters = "id=" + id + "&nickname=" + nickname + "&forbidLookTrace=" + forbidLookTrace;
 					transferPage("friend-setting.html", parameters);
 				}
 			}

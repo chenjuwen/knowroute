@@ -73,6 +73,16 @@ public class FriendAction extends AbstractAction {
             String id = FastjsonUtil.getString(jsonObject, "id");
             String newNickname = FastjsonUtil.getString(jsonObject, "newNickname");
             return FriendAPI.updateNickname(id, newNickname);
+        }else if("forbidLookTrace".equalsIgnoreCase(extend)){
+            String id = FastjsonUtil.getString(jsonObject, "id");
+            String forbidLookTrace = FastjsonUtil.getString(jsonObject, "forbidLookTrace");
+
+            int traceFlag = 0; //0表示不禁止，1表示禁止
+            if("true".equalsIgnoreCase(forbidLookTrace)){
+                traceFlag = 1;
+            }
+
+            return FriendAPI.forbidLookTrace(id, traceFlag);
         }
 
         return Constants.SUCCESS;

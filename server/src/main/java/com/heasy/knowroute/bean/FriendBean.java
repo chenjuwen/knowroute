@@ -15,6 +15,8 @@ public class FriendBean {
 	private String address;
 	private String positionTimes;
 	
+	private int forbidLookTrace; //禁止好友查看轨迹
+	
 	public int getId() {
 		return id;
 	}
@@ -85,6 +87,14 @@ public class FriendBean {
 
 	public void setPositionTimes(String positionTimes) {
 		this.positionTimes = positionTimes;
+	}
+
+	public int getForbidLookTrace() {
+		return forbidLookTrace;
+	}
+
+	public void setForbidLookTrace(int forbidLookTrace) {
+		this.forbidLookTrace = forbidLookTrace;
 	}
 	
 }

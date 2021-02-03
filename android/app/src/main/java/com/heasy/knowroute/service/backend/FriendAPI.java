@@ -119,4 +119,33 @@ public class FriendAPI extends BaseAPI {
         }
     }
 
+    public static String forbidLookTrace(String id, int traceFlag){
+        String requestURL = "friend/forbidLookTrace/" + id + "/" + traceFlag;
+        ResponseBean responseBean = HttpService.postJson(getHeasyContext(), requestURL, "");
+        if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
+            return Constants.SUCCESS;
+        }else{
+            return HttpService.getFailureMessage(responseBean);
+        }
+    }
+
+    /**
+     * 是否禁止好友查看轨迹
+     * viewTrackUserId想看userId的轨迹
+     * @param userId 轨迹被看的用户
+     * @param  viewTrackUserId 想看轨迹的用户
+     */
+    public static boolean checkForbid(int userId, int viewTrackUserId){
+        String requestURL = "friend/checkForbid/" + userId + "/" + viewTrackUserId;
+        ResponseBean responseBean = HttpService.get(getHeasyContext(), requestURL);
+        if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
+            String data = (String)responseBean.getData();
+            String forbid = FastjsonUtil.getString(FastjsonUtil.string2JSONObject(data), "forbid");
+            if("true".equalsIgnoreCase(forbid)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

@@ -153,7 +153,7 @@ public class HttpService {
                 LoginService loginService = ServiceEngineFactory.getServiceEngine().getService(LoginServiceImpl.class);
                 Date tokenExpiresDate = DatetimeUtil.toDate(loginService.getTokenExpiresDate());
                 long differMinutes = DatetimeUtil.differMinutes(DatetimeUtil.nowDate(), tokenExpiresDate);
-                if (differMinutes <= 4 * 60) { //剩余4小时时就自动刷新token
+                if (differMinutes <= 12 * 60) { //剩余12小时时就自动刷新token
                     new DefaultDaemonThread(){
                         @Override
                         public void run() {

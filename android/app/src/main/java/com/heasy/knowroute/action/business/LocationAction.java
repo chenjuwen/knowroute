@@ -9,10 +9,12 @@ import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.annotation.JSActionAnnotation;
+import com.heasy.knowroute.core.utils.AndroidUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.ParameterUtil;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
+import com.heasy.knowroute.service.backend.FriendAPI;
 import com.heasy.knowroute.service.backend.UserAPI;
 
 import org.slf4j.Logger;
@@ -35,7 +37,15 @@ public class LocationAction extends AbstractAction {
 
         if("viewTrack".equalsIgnoreCase(extend)){ //查看历史轨迹
             String userId = FastjsonUtil.getString(jsonObject, "userId");
-            String nickName = FastjsonUtil.getString(jsonObject, "nickName");
+            String relatedUserId = FastjsonUtil.getString(jsonObject, "relatedUserId");
+            String nickName = FastjsonUtil.getString(jsonObject, "nickname");
+
+            //好友是否设置了禁止查看轨迹
+            boolean forbid = FriendAPI.checkForbid(Integer.parseInt(relatedUserId), Integer.parseInt(userId));
+            if(forbid){
+                AndroidUtil.showToast(heasyContext.getServiceEngine().getAndroidContext(), "禁止查看轨迹");
+                return "";
+            }
 
             if("me".equalsIgnoreCase(userId)){
                 userId = String.valueOf(loginService.getUserId());
