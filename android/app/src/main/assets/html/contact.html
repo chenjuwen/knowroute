@@ -65,12 +65,21 @@
 			height: 60px;
 		}
 
+		.dialog-form-item2{
+			height: 30px;
+		}
+
 		.sendConfirm{
 			padding: 0 10px;
 		}
 
 		.mu-dialog-title{
 			font-size: 20px;
+		}
+
+		.select-button{
+			color: #6A5ACD;
+			text-decoration: underline;
 		}
 	</style>
 </HEAD>
@@ -141,11 +150,16 @@
 				<tr>
 					<td colspan="2" align="center" class="dialog-form-title">添加紧急联系人</td>
 				</tr>
+				<tr class="dialog-form-item2">
+					<td colspan="2" align="right">
+						<span @click="selectFromContacts" class="select-button">通讯录</span>&nbsp;&nbsp;
+						<span @click="selectFromFriends" class="select-button">好友列表</span>&nbsp;&nbsp;
+					</td>
+				</tr>
 				<tr class="dialog-form-item">
 					<td width="70" align="right">姓名：</td>
 					<td>
 						<input type="text" size="15" maxlength="20" v-model.trim="contact_name"/>
-						<img src="images/contact.jpg" @click="selectContact"/>
 					</td>
 				</tr>
 				<tr class="dialog-form-item">
@@ -159,8 +173,8 @@
 				</tr>
 				<tr class="dialog-form-item">
 					<td colspan="2" align="center">
-						<mt-button type="default" size="small" @click="closeAddContactDialog" style="width:60px;">取消</mt-button>&nbsp;
 						<mt-button type="primary" id="btnSaveContact" size="small" @click="saveContact" style="width:60px;">保存</mt-button>
+						<mt-button type="default" size="small" @click="closeAddContactDialog" style="width:60px;">取消</mt-button>&nbsp;
 					</td>
 				</tr>
 			</table>
@@ -173,11 +187,16 @@
 				<tr>
 					<td colspan="2" align="center" class="dialog-form-title">修改紧急联系人</td>
 				</tr>
+				<tr class="dialog-form-item2">
+					<td colspan="2" align="right">
+						<span @click="selectFromContacts" class="select-button">通讯录</span>&nbsp;&nbsp;
+						<span @click="selectFromFriends" class="select-button">好友列表</span>&nbsp;&nbsp;
+					</td>
+				</tr>
 				<tr class="dialog-form-item">
 					<td width="70" align="right">姓名：</td>
 					<td>
 						<input type="text" size="15" maxlength="20" v-model.trim="contact_name2"/>
-						<img src="images/contact.jpg" @click="selectContact"/>
 					</td>
 				</tr>
 				<tr class="dialog-form-item">
@@ -237,8 +256,11 @@
 					this.contact_phone = "";
 					this.openAddContactDialog = false;
 				},
-				selectContact: function(){
+				selectFromContacts: function(){
 					jsBridge.dispatchAction("AndroidBuiltin", JSON.stringify({}), "getContactInfo");
+				},
+				selectFromFriends: function(){
+					jsBridge.dispatchAction("ContactsAction", JSON.stringify({}), "selectFromFriends");
 				},
 				saveContact: function(){
 					if(this.contact_name == ""){

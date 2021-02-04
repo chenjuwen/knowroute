@@ -28,7 +28,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:theme">
-        <activity android:name=".activity.HelpMapActivity"></activity>
+        <activity android:name=".activity.FriendListActivity"></activity>
+        <activity android:name=".activity.HelpMapActivity" />
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
@@ -56,10 +57,9 @@
         <receiver
             android:name=".map.NotificationReceiver"
             android:process=":push" />
-
         <receiver android:name=".DownLoadCompleteReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
         </receiver>
 

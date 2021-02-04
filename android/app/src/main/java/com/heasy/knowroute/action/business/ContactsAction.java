@@ -1,6 +1,15 @@
 package com.heasy.knowroute.action.business;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+
 import com.alibaba.fastjson.JSONObject;
+import com.example.library.ActivityBackWrapper;
+import com.example.library.RxActivity;
+import com.heasy.knowroute.HeasyApplication;
+import com.heasy.knowroute.activity.FriendListActivity;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
@@ -11,6 +20,8 @@ import com.heasy.knowroute.service.backend.ContactAPI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import rx.functions.Action1;
 
 @JSActionAnnotation(name = "ContactsAction")
 public class ContactsAction implements Action {
@@ -66,8 +77,36 @@ public class ContactsAction implements Action {
                 logger.error("", ex);
                 return "发送求助信息失败";
             }
+        }else if("selectFromFriends".equalsIgnoreCase(extend)){
+            HeasyApplication heasyApplication = (HeasyApplication)heasyContext.getServiceEngine().getAndroidContext();
+            final FragmentActivity activity = (FragmentActivity)heasyApplication.getMainActivity();
+            final Intent intent = new Intent(activity, FriendListActivity.class);
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    RxActivity
+                        .startActivityForResult(activity, intent, 11)
+                        .subscribe(new Action1<ActivityBackWrapper>() {
+                            @Override
+                            public void call(ActivityBackWrapper activityBackWrapper) {
+                                logger.debug("ResultCode=" + activityBackWrapper.getResultCode());
+                                if(activityBackWrapper.getResultCode() == Activity.RESULT_OK) {
+                                    Intent intent = activityBackWrapper.getIntent();
+                                    Bundle bundle = intent.getExtras();
+                                    String userName = bundle.getString("userName");
+                                    String userNumber = bundle.getString("userNumber");
+
+                                    String script = "javascript: try{ getContactInfo_callback(\"" + userName + "\",\"" + userNumber + "\"); }catch(e){ }";
+                                    heasyContext.getJsInterface().loadUrl(script);
+                                }
+                            }
+                        });
+                }
+            });
         }
 
         return Constants.SUCCESS;
     }
+
 }

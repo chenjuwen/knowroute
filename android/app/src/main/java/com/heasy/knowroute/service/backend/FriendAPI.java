@@ -1,6 +1,7 @@
 package com.heasy.knowroute.service.backend;
 
 import com.alibaba.fastjson.JSONObject;
+import com.heasy.knowroute.bean.FriendBean;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
@@ -12,7 +13,35 @@ import com.heasy.knowroute.map.bean.LocationBean;
 import com.heasy.knowroute.service.common.AndroidBuiltinService;
 import com.heasy.knowroute.service.common.HttpService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class FriendAPI extends BaseAPI {
+    private static final Logger logger = LoggerFactory.getLogger(FriendAPI.class);
+    private static List<FriendBean> friendList = new ArrayList<>();
+
+    public static void cleanCache(){
+        friendList.clear();
+    }
+
+    public static List<FriendBean> getFriendList(boolean removeFirstRecord){
+        if(friendList.size() == 0){
+            try {
+                String jsonData = list();
+                friendList = FastjsonUtil.arrayString2List(jsonData, FriendBean.class);
+                if(removeFirstRecord && friendList.size() > 0){
+                    friendList.remove(0);
+                }
+            }catch (Exception ex){
+                logger.error("", ex);
+            }
+        }
+        return friendList;
+    }
+
     public static String list(){
         String url = "friend/list?userId=" + getLoginService().getUserId();
         ResponseBean responseBean = HttpService.get(getHeasyContext(), url);
