@@ -50,7 +50,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     public static final String FIXED_POINT_CATEGORY_ID = "fixedPointCategoryId";
 
     private DrawerLayout drawer_layout;
-    private Button btnBack;
+    private TextView btnBack;
     private TextView selectedCategory;
     private ImageButton btnDrawPoint;
     private ImageButton btnShowMenu;
@@ -98,7 +98,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
         selectedCategory = (TextView)findViewById(R.id.selectedCategory);
         list_view = (ListView) findViewById(R.id.list_view);
 
-        btnBack = (Button)findViewById(R.id.btnBack);
+        btnBack = (TextView)findViewById(R.id.btnBack);
         btnBack.setOnClickListener(this);
         btnDrawPoint = (ImageButton)findViewById(R.id.btnDrawPoint);
         btnDrawPoint.setOnClickListener(this);

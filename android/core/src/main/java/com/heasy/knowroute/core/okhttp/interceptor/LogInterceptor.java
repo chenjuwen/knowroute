@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 
@@ -50,7 +51,7 @@ public class LogInterceptor implements Interceptor {
             MediaType mediaType = response.body().contentType();
             response = response.newBuilder().body(ResponseBody.create(mediaType, responseBody)).build();
 
-        } catch (SocketTimeoutException | SSLException ex){
+        } catch (SocketTimeoutException | SocketException | SSLException ex){
             AndroidUtil.showToast(ServiceEngineFactory.getServiceEngine().getAndroidContext(), "网络异常");
             errorMessage = ex.toString();
         } catch (Exception ex) {
