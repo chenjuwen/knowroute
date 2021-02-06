@@ -55,7 +55,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
     /**
      * 轨迹线宽
      */
-    public static final int LINE_WIDTH = 7;
+    public static final int LINE_WIDTH = 10;
     /**
      * 轨迹线颜色
      */

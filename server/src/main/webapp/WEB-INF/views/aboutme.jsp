@@ -36,7 +36,7 @@
 	</style>
 </head>
 <body style="margin:0;">
-	<table id="table1" width="90%" border="0" align="left">
+	<table id="table1" width="100%" border="0" align="left">
 		<tr>
 			<td>
 				<table width="100%" border="0">
@@ -72,9 +72,9 @@
 		<tr>
 			<td style="font-size:14px; padding:15px 10px;">
 				<div style="font-weight:600;">主要功能：</div>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;查看好友位置/轨迹：用户之间相互成为好友后，可以随时随地查看对方的当前位置和历史轨迹。<br><br>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;紧急求助：用户可以从通讯录或者好友列表中选择紧急联系人，当遇到紧急情况时可以将当前位置信息发送给紧急联系人。<br><br>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;位置分类管理与导航：对位置点进行分类管理，并可以调起百度地图APP进行目的地导航。<br><br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1、查看好友位置/轨迹：用户之间相互成为好友后，可以随时随地查看对方的当前位置和历史轨迹。<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2、紧急求助：用户可以从通讯录或者好友列表中选择紧急联系人，当遇到紧急情况时可以将当前位置信息发送给紧急联系人。<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3、位置分类管理与导航：对位置点进行分类管理，并可以调起百度地图APP进行目的地导航。<br>
 				</div>
 			</td>
 		</tr>
@@ -92,7 +92,7 @@
 			window.open(url);
 		}
 		
-		var tableWidth = document.getElementById("table1").offsetWidth;
+		var tableWidth = document.getElementById("table1").offsetWidth - 30;
 		jQuery(".box_container").css("width", tableWidth + "px");
 	</Script>
 </body>

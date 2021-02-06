@@ -51,7 +51,7 @@ public class OkHttpClientHelper {
         	    .writeTimeout(DEFAULT_WRITE_TIMEOUT_MILLISECONDS, TimeUnit.MILLISECONDS)
                 .connectionPool(connectionPool)
                 .cookieJar(cookieJar)
-                .retryOnConnectionFailure(false);
+                .retryOnConnectionFailure(true);
     }
     
     public OkHttpClientHelper connectTimeout(long timeout, TimeUnit unit){
