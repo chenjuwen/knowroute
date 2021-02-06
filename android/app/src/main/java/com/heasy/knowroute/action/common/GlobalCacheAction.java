@@ -29,7 +29,7 @@ public class GlobalCacheAction implements Action {
         }else if("add".equalsIgnoreCase(extend)){
             cache.add(key, value);
         }else if("del".equalsIgnoreCase(extend)){
-            cache.decr(key);
+            cache.delete(key);
         }
 
         return Constants.SUCCESS;

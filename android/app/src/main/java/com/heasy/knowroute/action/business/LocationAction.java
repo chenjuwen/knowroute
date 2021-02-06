@@ -40,15 +40,15 @@ public class LocationAction extends AbstractAction {
             String relatedUserId = FastjsonUtil.getString(jsonObject, "relatedUserId");
             String nickName = FastjsonUtil.getString(jsonObject, "nickname");
 
-            //好友是否设置了禁止查看轨迹
-            boolean forbid = FriendAPI.checkForbid(Integer.parseInt(relatedUserId), Integer.parseInt(userId));
-            if(forbid){
-                AndroidUtil.showToast(heasyContext.getServiceEngine().getAndroidContext(), "禁止查看轨迹");
-                return "";
-            }
-
             if("me".equalsIgnoreCase(userId)){
                 userId = String.valueOf(loginService.getUserId());
+            }else{
+                //好友是否设置了禁止查看轨迹
+                boolean forbid = FriendAPI.checkForbid(Integer.parseInt(relatedUserId), Integer.parseInt(userId));
+                if(forbid){
+                    AndroidUtil.showToast(heasyContext.getServiceEngine().getAndroidContext(), "禁止查看轨迹");
+                    return "";
+                }
             }
 
             Map<String, String> params = new HashMap<>();

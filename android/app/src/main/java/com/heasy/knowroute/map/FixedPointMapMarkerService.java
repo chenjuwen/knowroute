@@ -20,7 +20,6 @@ import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
 import com.baidu.mapapi.navi.BaiduMapNavigation;
 import com.baidu.mapapi.navi.NaviParaOption;
 import com.heasy.knowroute.R;
-import com.heasy.knowroute.activity.FixedPointNavigationActivity;
 import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.core.DefaultDaemonThread;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
@@ -45,6 +44,8 @@ import java.util.concurrent.TimeUnit;
 
 public class FixedPointMapMarkerService extends AbstractMapMarkerService implements BaiduMap.OnMapLongClickListener {
     private static final Logger logger = LoggerFactory.getLogger(FixedPointMapMarkerService.class);
+
+    public static final String FIXED_POINT_CATEGORY_ID = "fixedPointCategoryId";
     public static final int DISTANCE_UPDATE_INTERVAL_SECONDS = 5;
 
     private InfoWindow infoWindow;
@@ -90,6 +91,10 @@ public class FixedPointMapMarkerService extends AbstractMapMarkerService impleme
 
     @Override
     public void onMapLongClick(LatLng location) {
+        if(getCategoryIdFromCache() == null){
+            return;
+        }
+
         loadingDialog = AndroidUtil.showLoadingDialog(activity);
 
         getReverseGeoCode.getReverseGeoCode(location, new ReverseGeoCodeResultCallback() {
@@ -111,7 +116,7 @@ public class FixedPointMapMarkerService extends AbstractMapMarkerService impleme
 
         FixedPointInfoBean bean = new FixedPointInfoBean();
         bean.setUserId(loginService.getUserId());
-        bean.setCategoryId((Integer) ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FixedPointNavigationActivity.FIXED_POINT_CATEGORY_ID));
+        bean.setCategoryId(getCategoryIdFromCache());
         bean.setLongitude(longitude);
         bean.setLatitude(latitude);
         bean.setAddress(address);
@@ -122,6 +127,24 @@ public class FixedPointMapMarkerService extends AbstractMapMarkerService impleme
         addMarkerOverlay(bean, BitmapDescriptorFactory.fromBitmap(bitmap));
 
         updateMapStatus(new LatLng(latitude, longitude));
+    }
+
+    public Integer getCategoryIdFromCache() {
+        return (Integer) ServiceEngineFactory.getServiceEngine().getDataService()
+                .getGlobalMemoryDataCache()
+                .get(FIXED_POINT_CATEGORY_ID);
+    }
+
+    public void setCategoryIdToCache(Integer categoryId){
+        ServiceEngineFactory.getServiceEngine().getDataService()
+                .getGlobalMemoryDataCache()
+                .set(FIXED_POINT_CATEGORY_ID, categoryId);
+    }
+
+    public void deleteCategoryIdFromCache(){
+        ServiceEngineFactory.getServiceEngine().getDataService()
+                .getGlobalMemoryDataCache()
+                .delete(FIXED_POINT_CATEGORY_ID);
     }
 
     /**

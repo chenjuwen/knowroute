@@ -39,12 +39,13 @@ public class UserAction implements Action {
                 VersionService versionService = heasyContext.getServiceEngine().getService(VersionServiceImpl.class);
                 VersionInfoBean versionInfoBean = versionService.getVersionInfo();
 
-                String currentVersion = "V" + versionInfoBean.getCurrentVersion(); //当前版本
+                String currentVersion = versionInfoBean.getCurrentVersion(); //当前版本
                 String downloadURL = versionInfoBean.getLastedVersionURL(); //最新版本下载地址
                 String nickname = loginService.getNickname();
+                String phone = loginService.getPhone();
 
                 String jsonStr = FastjsonUtil.toJSONString("currentVersion", currentVersion,
-                        "downloadURL", downloadURL, "nickname", nickname);
+                        "downloadURL", downloadURL, "nickname", nickname, "phone", phone);
                 logger.debug(jsonStr);
 
                 return jsonStr;

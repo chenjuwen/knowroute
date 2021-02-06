@@ -1,6 +1,7 @@
 package com.heasy.knowroute;
 
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
+import com.heasy.knowroute.core.utils.VersionUtil;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
 
@@ -22,6 +23,7 @@ public class GenericHeaderInterceptor implements Interceptor {
         Request newRequest = originalRequest.newBuilder()
                 .header("token", loginService.getToken())
                 .header("front", "KR_APP")
+                .header("current_version", VersionUtil.getVersionName(ServiceEngineFactory.getServiceEngine().getAndroidContext()))
                 .build();
         return chain.proceed(newRequest);
     }

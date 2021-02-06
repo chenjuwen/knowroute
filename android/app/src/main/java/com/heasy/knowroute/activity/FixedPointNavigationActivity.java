@@ -7,7 +7,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -47,7 +46,6 @@ import java.util.List;
 
 public class FixedPointNavigationActivity extends BaseMapActivity implements View.OnClickListener{
     private static final Logger logger = LoggerFactory.getLogger(FixedPointNavigationActivity.class);
-    public static final String FIXED_POINT_CATEGORY_ID = "fixedPointCategoryId";
 
     private DrawerLayout drawer_layout;
     private TextView btnBack;
@@ -194,7 +192,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                         //}
 
                         //categoryId set to cache
-                        ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().set(FIXED_POINT_CATEGORY_ID, newCategoryId);
+                        mapMarkerService.setCategoryIdToCache(newCategoryId);
 
                         selectedCategory.setText(categoryList.get(position).getName());
 
@@ -207,7 +205,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
                             @Override
                             public void run() {
                                 try{
-                                    Integer categoryId = (Integer)ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FIXED_POINT_CATEGORY_ID);
+                                    Integer categoryId = mapMarkerService.getCategoryIdFromCache();
                                     pointList = FixedPointInfoAPI.list(categoryId);
                                     ServiceEngineFactory.getServiceEngine().getEventService().postEvent(new FixedPointCategoryChangeEvent(this, ""));
                                 }catch (Exception ex){
@@ -286,7 +284,7 @@ public class FixedPointNavigationActivity extends BaseMapActivity implements Vie
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().delete(FIXED_POINT_CATEGORY_ID);
+        mapMarkerService.deleteCategoryIdFromCache();
         this.fixedPointAddWindow.destroy();
         this.mapMarkerService.destroy();
         this.mapLocationClient.destroy();

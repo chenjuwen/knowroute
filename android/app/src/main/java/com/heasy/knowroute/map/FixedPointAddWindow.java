@@ -239,7 +239,7 @@ public class FixedPointAddWindow {
 
         FixedPointInfoBean bean = new FixedPointInfoBean();
         bean.setUserId(loginService.getUserId());
-        bean.setCategoryId((Integer) ServiceEngineFactory.getServiceEngine().getDataService().getGlobalMemoryDataCache().get(FixedPointNavigationActivity.FIXED_POINT_CATEGORY_ID));
+        bean.setCategoryId(mapMarkerService.getCategoryIdFromCache());
         bean.setLongitude(longitude);
         bean.setLatitude(latitude);
         bean.setAddress(address);
