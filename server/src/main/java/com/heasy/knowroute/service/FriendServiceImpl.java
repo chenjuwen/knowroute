@@ -213,8 +213,9 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 		if(friendBean == null) {
 			UserBean friendUserBean = userService.getUserByPhone(phone); //好友
 			if(friendUserBean != null) {
-				String sql = "insert into friends(user_id,related_user_id,nickname) values (?,?,?)";
-	        	jdbcTemplate.update(sql, userId, friendUserBean.getId(), friendUserBean.getNickname());
+				String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+				String sql = "insert into friends(user_id,related_user_id,nickname,update_date) values (?,?,?,?)";
+	        	jdbcTemplate.update(sql, userId, friendUserBean.getId(), friendUserBean.getNickname(), date);
 	        	logger.info("添加好友关系： " + userId + " >> " + phone);
 			}else {
 				logger.warn("好友 " + phone + " 不在系统中");
@@ -225,15 +226,17 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
 	public void updateNickname(int id, String newNickname) {
-    	String sql = "update friends set nickname=? where id=?";
-    	jdbcTemplate.update(sql, newNickname, id);
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    	String sql = "update friends set nickname=?,update_date=? where id=?";
+    	jdbcTemplate.update(sql, newNickname, date, id);
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
 	public void forbidLookTrace(int id, int traceFlag) {
-		String sql = "update friends set forbid_look_trace=? where id=?";
-    	jdbcTemplate.update(sql, traceFlag, id);
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+		String sql = "update friends set forbid_look_trace=?,update_date=? where id=?";
+    	jdbcTemplate.update(sql, traceFlag, date, id);
 	}
 
 	/**

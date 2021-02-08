@@ -3,15 +3,35 @@ package com.heasy.knowroute.map.bean;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.baidu.mapapi.model.LatLng;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2020/10/26.
  */
-public class LocationBean {
+public class LocationBean implements Serializable {
+    private String id;
+    private int userId;
     private double longitude;
     private double latitude;
-    private float radius = 0.0f;
     private String address;
-    private String time;
+    private float radius = 0.0f;
+    private String times;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
     public double getLongitude() {
         return longitude;
@@ -45,12 +65,12 @@ public class LocationBean {
         this.address = address;
     }
 
-    public String getTime() {
-        return time;
+    public String getTimes() {
+        return times;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setTimes(String times) {
+        this.times = times;
     }
 
     /**

@@ -45,17 +45,22 @@ public class PositionController extends BaseController{
     @RequestLimitAnnotation(seconds=1, maxCount=1)
 	@ApiOperation(value="insert", notes="添加轨迹点信息")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name="positionBean", paramType="body", required=true, dataType="PositionBean")
+		@ApiImplicitParam(name="positionList", paramType="body", required=true, dataType="List<PositionBean>")
 	})
 	@RequestMapping(value="/insert", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse insert(@RequestBody PositionBean positionBean){
+	public WebResponse insert(@RequestBody List<PositionBean> positionList){
 		try {
-			//更新用户的位置信息
-			userService.updatePositionInfo(positionBean.getUserId(), 
-					positionBean.getLongitude(), positionBean.getLatitude(), 
-					positionBean.getAddress(), positionBean.getTimes());
+			if(CollectionUtils.isNotEmpty(positionList)) {
+				PositionBean positionBean = positionList.get(positionList.size()-1);
+				
+				//更新用户的位置信息
+				userService.updatePositionInfo(positionBean.getUserId(), 
+						positionBean.getLongitude(), positionBean.getLatitude(), 
+						positionBean.getAddress(), positionBean.getTimes());
+				
+				positionService.insert(positionList);
+			}
 			
-			positionService.insert(positionBean);
 			return WebResponse.success();
 			
 		}catch(Exception ex) {

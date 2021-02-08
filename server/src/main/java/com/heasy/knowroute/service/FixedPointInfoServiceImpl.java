@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.heasy.knowroute.bean.FixedPointInfoBean;
+import com.heasy.knowroute.utils.DatetimeUtil;
 
 @Service
 public class FixedPointInfoServiceImpl extends BaseService implements FixedPointInfoService {
@@ -42,8 +43,9 @@ public class FixedPointInfoServiceImpl extends BaseService implements FixedPoint
 	@Override
 	public int insert(final FixedPointInfoBean bean) {
 		KeyHolder keyHolder = new GeneratedKeyHolder(); 
-		
-		final String sql = "insert into fixed_point_infos(user_id,category_id,longitude,latitude,address,comments,label) values (?,?,?,?,?,?,?)";
+
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+		final String sql = "insert into fixed_point_infos(user_id,category_id,longitude,latitude,address,comments,label,update_date) values (?,?,?,?,?,?,?,?)";
     	jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
@@ -55,6 +57,7 @@ public class FixedPointInfoServiceImpl extends BaseService implements FixedPoint
 				ps.setString(5, bean.getAddress());
 				ps.setString(6, bean.getComments());
 				ps.setString(7, bean.getLabel());
+				ps.setString(8, date);
 				return ps;
 			}
 		}, keyHolder);
@@ -67,8 +70,9 @@ public class FixedPointInfoServiceImpl extends BaseService implements FixedPoint
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
 	public void update(FixedPointInfoBean bean) {
-        String sql = "update fixed_point_infos set address=?,comments=?,label=? where id=? and user_id=?";
-        jdbcTemplate.update(sql, bean.getAddress(), bean.getComments(), bean.getLabel(), bean.getId(), bean.getUserId());          
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+        String sql = "update fixed_point_infos set address=?,comments=?,label=?,update_date=? where id=? and user_id=?";
+        jdbcTemplate.update(sql, bean.getAddress(), bean.getComments(), bean.getLabel(), date, bean.getId(), bean.getUserId());          
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)

@@ -6,7 +6,6 @@ import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.core.utils.DatetimeUtil;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.ParameterUtil;
-import com.heasy.knowroute.core.utils.StringUtil;
 import com.heasy.knowroute.map.bean.LocationBean;
 import com.heasy.knowroute.service.common.HttpService;
 
@@ -35,17 +34,9 @@ public class PositionAPI extends BaseAPI {
         }
     }
 
-    public static String insert(LocationBean locationBean){
+    public static String insert(List<LocationBean> dataList){
         String requestUrl = "position/insert";
-
-        String jsonData = FastjsonUtil.toJSONString(
-                "id", StringUtil.getUUIDString(),
-                "userId", String.valueOf(getLoginService().getUserId()),
-                "longitude", String.valueOf(locationBean.getLongitude()),
-                "latitude", String.valueOf(locationBean.getLatitude()),
-                "address", locationBean.getAddress(),
-                "times", locationBean.getTime());
-
+        String jsonData = FastjsonUtil.object2ArrayString(dataList);
         ResponseBean responseBean = HttpService.postJson(getHeasyContext(), requestUrl, jsonData);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
             return "";

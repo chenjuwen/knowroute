@@ -30,7 +30,7 @@ public class MessageServiceImpl extends BaseService implements MessageService {
     @Override
     public List<MessageBean> getMessageList(int owner) {
     	try{
-			String sql = "select * from messages where owner=? order by create_date desc";
+			String sql = "select * from messages where owner=? order by update_date desc";
         	List<MessageBean> list = jdbcTemplate.query(sql, new MessageRowMapper(), owner);
         	return list;
         }catch (Exception ex){
@@ -56,7 +56,7 @@ public class MessageServiceImpl extends BaseService implements MessageService {
 	@Override
 	public MessageBean getMessage(String sender, String receiver, String category) {
 		try{
-			String sql = "select * from messages where status=0 and sender=? and receiver=? and category=? order by create_date desc";
+			String sql = "select * from messages where status=0 and sender=? and receiver=? and category=? order by update_date desc";
         	List<MessageBean> list = jdbcTemplate.query(sql, new MessageRowMapper(), sender, receiver, category);
         	if(!CollectionUtils.isEmpty(list)) {
         		return list.get(0);
@@ -89,7 +89,7 @@ public class MessageServiceImpl extends BaseService implements MessageService {
 	@Override
 	public int insert(MessageBean bean) {
 		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-		final String sql = "insert into messages(title,content,category,result,sender,sender_nickname,sender_phone,receiver,create_date,status,owner) values(?,?,?,?,?,?,?,?,?,?,?)";
+		final String sql = "insert into messages(title,content,category,result,sender,sender_nickname,sender_phone,receiver,create_date,status,owner,update_date) values(?,?,?,?,?,?,?,?,?,?,?,?)";
 		
 		KeyHolder keyHolder = new GeneratedKeyHolder(); 
 		
@@ -108,6 +108,7 @@ public class MessageServiceImpl extends BaseService implements MessageService {
 				ps.setString(9, date);
 				ps.setInt(10, bean.getStatus());
 				ps.setInt(11, bean.getOwner()==null ? 0 : bean.getOwner());
+				ps.setString(12, date);
 				return ps;
 			}
 		}, keyHolder);
@@ -120,8 +121,9 @@ public class MessageServiceImpl extends BaseService implements MessageService {
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
 	public void confirmMessage(int id, String result) {
-    	String sql = "update messages set status=1,result=? where status=0 and id=?";
-    	jdbcTemplate.update(sql, result, id);
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    	String sql = "update messages set status=1,result=?,update_date=? where status=0 and id=?";
+    	jdbcTemplate.update(sql, result, date, id);
 	}
 	
 	class MessageRowMapper implements RowMapper<MessageBean>{

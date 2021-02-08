@@ -22,7 +22,7 @@ public class FixedPointCategoryServiceImpl extends BaseService implements FixedP
 	@Override
 	public List<FixedPointCategoryBean> list(int userId) {
 		try{
-        	String sql = "select * from fixed_point_categorys where user_id=? order by topping desc,create_date desc";
+        	String sql = "select * from fixed_point_categorys where user_id=? order by topping desc,update_date desc";
         	List<FixedPointCategoryBean> list = jdbcTemplate.query(sql, new RowMapperImpl(), userId);
         	return list;
         }catch (Exception ex){
@@ -35,15 +35,16 @@ public class FixedPointCategoryServiceImpl extends BaseService implements FixedP
 	@Override
 	public void insert(int userId, String name) {
 		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-    	String sql = "insert into fixed_point_categorys(user_id,name,create_date) values (?,?,?)";
-    	jdbcTemplate.update(sql, userId, name, date);
+    	String sql = "insert into fixed_point_categorys(user_id,name,create_date,update_date) values (?,?,?,?)";
+    	jdbcTemplate.update(sql, userId, name, date, date);
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
 	public void update(int id, String name) {
-    	String sql = "update fixed_point_categorys set name=? where id=?";
-    	jdbcTemplate.update(sql, name, id);
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    	String sql = "update fixed_point_categorys set name=?,update_date=? where id=?";
+    	jdbcTemplate.update(sql, name, date, id);
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
@@ -56,14 +57,15 @@ public class FixedPointCategoryServiceImpl extends BaseService implements FixedP
 	@Override
 	public void topping(int id) {
 		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-    	String sql = "update fixed_point_categorys set topping=1,create_date=? where id=?";
+    	String sql = "update fixed_point_categorys set topping=1,update_date=? where id=?";
     	jdbcTemplate.update(sql, date, id);
 	}
 
 	@Override
 	public void cancelTopping(int id) {
-    	String sql = "update fixed_point_categorys set topping=0 where id=?";
-    	jdbcTemplate.update(sql, id);
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    	String sql = "update fixed_point_categorys set topping=0,update_date=? where id=?";
+    	jdbcTemplate.update(sql, date, id);
 	}
 
 	class RowMapperImpl implements RowMapper<FixedPointCategoryBean>{

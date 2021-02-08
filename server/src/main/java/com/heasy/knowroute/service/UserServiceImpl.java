@@ -123,7 +123,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     	}
     	
 		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-		final String sql = "insert into users(phone,nickname,invite_code,create_date,last_login_date) values(?,?,?,?,?)";
+		final String sql = "insert into users(phone,nickname,invite_code,create_date,last_login_date,update_date) values(?,?,?,?,?,?)";
 		
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(new PreparedStatementCreator() {
@@ -135,6 +135,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 				ps.setString(3, inviteCode);
 				ps.setString(4, date);
 				ps.setString(5, date);
+				ps.setString(6, date);
 				return ps;
 			}
 		}, keyHolder);
@@ -150,8 +151,9 @@ public class UserServiceImpl extends BaseService implements UserService {
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
     @Override
     public void updateNickname(int id, String newNickname) {
-	    String sql = "update users set nickname=? where id=?";
-	    jdbcTemplate.update(sql, newNickname, id);
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+	    String sql = "update users set nickname=?,update_date=? where id=?";
+	    jdbcTemplate.update(sql, newNickname, date, id);
     }
     
     /**
@@ -161,8 +163,8 @@ public class UserServiceImpl extends BaseService implements UserService {
     public boolean updateLastLoginDate(int id) {
     	try {
     		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-	    	String sql = "update users set last_login_date=? where id=?";
-	    	int count = jdbcTemplate.update(sql, date, id);
+	    	String sql = "update users set last_login_date=?,update_date=? where id=?";
+	    	int count = jdbcTemplate.update(sql, date, date, id);
 	    	return count > 0;
     	}catch(Exception ex) {
     		logger.error("", ex);
@@ -177,9 +179,10 @@ public class UserServiceImpl extends BaseService implements UserService {
     public boolean updatePositionInfo(int id, double longitude, double latitude, String address, Date positionTimes) {
     	try {
     		if(StringUtil.isNotEmpty(address)) {
+        		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
     			String times = DatetimeUtil.formatDate(positionTimes);
-		    	String sql = "update users set longitude=?,latitude=?,address=?,position_times=? where id=?";
-		    	int count = jdbcTemplate.update(sql, longitude, latitude, address, times, id);
+		    	String sql = "update users set longitude=?,latitude=?,address=?,position_times=?,update_date=? where id=?";
+		    	int count = jdbcTemplate.update(sql, longitude, latitude, address, times, date, id);
 		    	return count > 0;
     		}
 		}catch(Exception ex) {

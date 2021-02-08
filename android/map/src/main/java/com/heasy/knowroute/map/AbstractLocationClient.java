@@ -136,7 +136,7 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
         locationBean.setLatitude(latitude);
         locationBean.setRadius(radius);
         locationBean.setAddress(address);
-        locationBean.setTime(time);
+        locationBean.setTimes(time);
 
         setLastedLocation(locationBean);
 
@@ -147,9 +147,9 @@ public abstract class AbstractLocationClient extends BDAbstractLocationListener 
             //两点间隔一定距离才处理
             //计算两点之间的距离，单位为 米
             long distance = new Double(DistanceUtil.getDistance(getCurrentLocation().getLatLng(), locationBean.getLatLng())).longValue();
+            logger.debug("distance=" + distance);
 
             if(distance >= acceptMinDistance){
-                logger.debug("distance=" + distance);
                 setCurrentLocation(locationBean);
                 handleReceiveLocation(dbLocation, locationBean);
             }

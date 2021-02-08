@@ -1,5 +1,6 @@
 package com.heasy.knowroute.core.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -60,6 +61,10 @@ public class FastjsonUtil {
         }else{
             return JSONObject.toJSONString(object);
         }
+    }
+
+    public static String object2ArrayString(List<?> dataList) {
+        return JSON.toJSONString(dataList);
     }
 
     /**

@@ -60,7 +60,7 @@ public class LogInterceptor implements Interceptor {
         } finally {
             long end = System.currentTimeMillis();
             String duration = String.valueOf(end - start);
-            logger.info("\n responseTime={}\n method={}\n requestUrl={}\n params={}\n responseCode={}\n result={}\n errorMessage={}",
+            logger.info("responseTime={}, method={}, requestUrl={}, params={}, responseCode={}, result={}, errorMessage={}",
                                 duration, mothod, url, requestBody, responseCode, responseBody, errorMessage);
         }
         return response;

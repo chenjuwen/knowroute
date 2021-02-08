@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -23,10 +24,15 @@ public class PositionServiceImpl extends BaseService implements PositionService 
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public void insert(PositionBean bean) {
-    	String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-    	final String sql = "insert into positions(id,user_id,longitude,latitude,times) values(?,?,?,?,?)";
-    	jdbcTemplate.update(sql, bean.getId(), bean.getUserId(), bean.getLongitude(), bean.getLatitude(), date);
+	public void insert(List<PositionBean> positionList) {
+		if(CollectionUtils.isNotEmpty(positionList)) {
+	    	for(int i=0; i<positionList.size(); i++) {
+	    		PositionBean bean = positionList.get(i);
+		    	String date = DatetimeUtil.formatDate(bean.getTimes(), DatetimeUtil.DEFAULT_PATTERN_DT);
+	        	String sql = "insert into positions(id,user_id,longitude,latitude,times) values(?,?,?,?,?)";
+	        	jdbcTemplate.update(sql, bean.getId(), bean.getUserId(), bean.getLongitude(), bean.getLatitude(), date);
+	    	}
+		}
 	}
 
 	@Override

@@ -20,7 +20,6 @@ import java.io.File;
  */
 public class LoginServiceImpl extends AbstractService implements LoginService {
     private static final Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
-
     private LoginResultBean loginResult;
 
     @Override

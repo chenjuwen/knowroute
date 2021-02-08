@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.heasy.knowroute.bean.ContactBean;
+import com.heasy.knowroute.utils.DatetimeUtil;
 
 @Service
 public class ContactServiceImpl extends BaseService implements ContactService {
@@ -25,9 +26,10 @@ public class ContactServiceImpl extends BaseService implements ContactService {
 		if(existsContact(bean)) {
 			return false;
 		}
-		
-    	String sql = "insert into contacts(user_id,contact_name,contact_phone) values (?,?,?)";
-    	jdbcTemplate.update(sql, bean.getUserId(), bean.getContactName(), bean.getContactPhone());
+
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    	String sql = "insert into contacts(user_id,contact_name,contact_phone,update_date) values (?,?,?,?)";
+    	jdbcTemplate.update(sql, bean.getUserId(), bean.getContactName(), bean.getContactPhone(), date);
     	
         return true;
 	}
@@ -38,9 +40,10 @@ public class ContactServiceImpl extends BaseService implements ContactService {
 		if(existsContact(bean)) {
 			return false;
 		}
-		
-    	String sql = "update contacts set contact_name=?,contact_phone=? where id=?";
-    	jdbcTemplate.update(sql, bean.getContactName(), bean.getContactPhone(), bean.getId());
+
+		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
+    	String sql = "update contacts set contact_name=?,contact_phone=?,update_date=? where id=?";
+    	jdbcTemplate.update(sql, bean.getContactName(), bean.getContactPhone(), date, bean.getId());
         return true;
 	}
 

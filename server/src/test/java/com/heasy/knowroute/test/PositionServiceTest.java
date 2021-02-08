@@ -1,5 +1,6 @@
 package com.heasy.knowroute.test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +29,8 @@ public class PositionServiceTest {
 
 	@Test
 	public void insert() {
+		List<PositionBean> dataList = new ArrayList<>();
+		
 		PositionBean bean = new PositionBean();
 		bean.setId(StringUtil.getUUIDString());
 		bean.setUserId(5);
@@ -35,7 +38,8 @@ public class PositionServiceTest {
 		bean.setLatitude(22.617776);
 		bean.setTimes(DatetimeUtil.nowDate());
 		
-		positionService.insert(bean);
+		dataList.add(bean);
+		positionService.insert(dataList);
 	}
 	
 	@Test
