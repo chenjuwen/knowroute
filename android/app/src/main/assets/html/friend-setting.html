@@ -78,11 +78,14 @@
 		</mt-header>
 
 		<div class="menu-item">
-			<mt-cell title="昵称" @click.native="editNickname" is-link>
+			<mt-cell title="TA的昵称" @click.native="editNickname" is-link>
 				<span class="menu-item-cell">{{ nickname }}</span>
 			</mt-cell>
-			<mt-cell title="禁止查看轨迹" style="border-top:1px solid #ddd;">
-				<mt-switch v-model="forbidLookTrace"></mt-switch>
+			<mt-cell title="查看我的轨迹" @click.native="editLookTrace" style="border-top:1px solid #ddd;" is-link>
+				<span class="menu-item-cell">
+					<span v-if="forbidLookTrace===true" style="color:red;">禁止</span>
+					<span v-if="forbidLookTrace===false" style="color:green;">允许</span>
+				</span>
 			</mt-cell>
 		</div>
 
@@ -104,12 +107,14 @@
 				</tr>
 				<tr class="dialog-form-button">
 					<td align="center">
-						<mt-button type="default" size="small" @click="closeEditDialog" style="width:80px;">取消</mt-button>&nbsp;&nbsp;
 						<mt-button type="primary" size="small" @click="saveNickname" style="width:80px;">保存</mt-button>
+						<mt-button type="default" size="small" @click="closeEditDialog" style="width:80px;">取消</mt-button>&nbsp;&nbsp;
 					</td>
 				</tr>
 			</table>
 		</mu-dialog>
+
+		<mt-actionsheet :actions="actionSheetLookTrace" v-model="actionSheetLookTrace_Visible" cancel-text=""> </mt-actionsheet>
 	</div>
 
 	<script>
@@ -121,7 +126,13 @@
 				forbidLookTrace: false,
 
 				openEditDialog: false,
-				new_nickname: ""
+				new_nickname: "",
+
+				actionSheetLookTrace_Visible: false,
+				actionSheetLookTrace: [
+					{name:"禁止", method: forbidLookTrace},
+					{name:"允许", method: allowLookTrace}
+				]
 			},
 			methods: {
 				goBack: function(){
@@ -170,32 +181,42 @@
 					}else{
 						this.$toast.message(result);
 					}
-				}
-			},
-			watch: {
-				"forbidLookTrace": function(){
-					if(isCallback){
-						isCallback = false;
-						return;
-					}
-
-					var obj = {"id": this.id, "forbidLookTrace": ""+this.forbidLookTrace};
-					var result = jsBridge.dispatchAction("FriendAction", JSON.stringify(obj), "forbidLookTrace");
-
-					if(result == "success"){
-						this.$toast.message('保存成功');
-					}else{
-						this.$toast.message(result);
-					}
+				},
+				editLookTrace: function(){
+					this.actionSheetLookTrace_Visible = true;
 				}
 			}
-		})
+		});
+
+        function forbidLookTrace(){
+			vm.actionSheetLookTrace_Visible = false;
+
+			var obj = {"id": vm.id, "forbidLookTrace": "true"};
+			var result = jsBridge.dispatchAction("FriendAction", JSON.stringify(obj), "forbidLookTrace");
+			if(result == "success"){
+				vm.$toast.message('保存成功');
+				vm.forbidLookTrace = true;
+			}else{
+				vm.$toast.message(result);
+			}
+        }
+
+        function allowLookTrace(){
+			vm.actionSheetLookTrace_Visible = false;
+
+			var obj = {"id": vm.id, "forbidLookTrace": "false"};
+			var result = jsBridge.dispatchAction("FriendAction", JSON.stringify(obj), "forbidLookTrace");
+			if(result == "success"){
+				vm.$toast.message('保存成功');
+				vm.forbidLookTrace = false;
+			}else{
+				vm.$toast.message(result);
+			}
+        }
 	</script>
 
 	<script type="text/javascript">
-		var isCallback = false;
         function pageFinishCallback(){
-        	isCallback = true;
 			vm.id = getPageParameter("id");
 			vm.nickname = getPageParameter("nickname");
 			vm.forbidLookTrace = (parseInt(getPageParameter("forbidLookTrace"))==1);

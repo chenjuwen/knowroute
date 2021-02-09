@@ -1,4 +1,4 @@
-package com.heasy.knowroute.common;
+package com.heasy.knowroute.interceptor;
 
 import java.io.OutputStream;
 import java.lang.reflect.Method;
@@ -16,12 +16,13 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.DataCacheService;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.RequestUtil;
 
 /**
- * API防刷拦截器
+ * 请求限制拦截器
  */
 @Component
 public class RequestLimitInterceptor extends HandlerInterceptorAdapter{

@@ -1,4 +1,4 @@
-package com.heasy.knowroute.common;
+package com.heasy.knowroute.interceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import com.heasy.knowroute.common.CustomHttpServletRequestWrapper;
 import com.heasy.knowroute.utils.RequestUtil;
 
 /**

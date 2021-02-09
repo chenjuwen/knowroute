@@ -218,7 +218,7 @@
             if(result == "success"){
                 pageFinishCallback();
             }else{
-                this.$toast.message(msg);
+                vm.$toast.message(msg);
             }
         }
 
@@ -229,7 +229,7 @@
             if(result == "success"){
                 pageFinishCallback();
             }else{
-                this.$toast.message(msg);
+                vm.$toast.message(msg);
             }
         }
 
@@ -245,7 +245,7 @@
 						vm.$toast.message('删除成功');
                         pageFinishCallback();
                     }else{
-                        this.$toast.message(msg);
+                        vm.$toast.message(msg);
                     }
                 }
             });

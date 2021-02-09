@@ -1,4 +1,4 @@
-package com.heasy.knowroute.common;
+package com.heasy.knowroute.interceptor;
 
 import java.io.OutputStream;
 
@@ -17,11 +17,11 @@ import com.heasy.knowroute.utils.JWTUtil;
 import com.heasy.knowroute.utils.JsonUtil;
 
 /**
- * JWT拦截器
+ * 身份认证拦截器
  */
 @Component
-public class JWTInterceptor extends HandlerInterceptorAdapter{
-	private static Logger logger = LoggerFactory.getLogger(JWTInterceptor.class);
+public class AuthenticationInterceptor extends HandlerInterceptorAdapter{
+	private static Logger logger = LoggerFactory.getLogger(AuthenticationInterceptor.class);
 	
 	//是否需要验证token的开关
 	@Value("${token.verify.enabled}")

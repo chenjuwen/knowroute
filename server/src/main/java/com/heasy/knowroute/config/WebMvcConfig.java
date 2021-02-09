@@ -6,9 +6,9 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.heasy.knowroute.common.JWTInterceptor;
-import com.heasy.knowroute.common.LogInterceptor;
-import com.heasy.knowroute.common.RequestLimitInterceptor;
+import com.heasy.knowroute.interceptor.AuthenticationInterceptor;
+import com.heasy.knowroute.interceptor.LogInterceptor;
+import com.heasy.knowroute.interceptor.RequestLimitInterceptor;
 
 /**
  * WebMVC配置类
@@ -18,7 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Autowired
     private LogInterceptor logInterceptor;
 	@Autowired
-    private JWTInterceptor jwtInterceptor;
+    private AuthenticationInterceptor authenticationInterceptor;
 	@Autowired
 	private RequestLimitInterceptor requestLimitInterceptor;
 	
@@ -35,7 +35,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(logInterceptor).addPathPatterns("/**")
 			.excludePathPatterns("/js/**", "/css/**", "/images/**");
 		
-		registry.addInterceptor(jwtInterceptor).addPathPatterns("/**")
+		registry.addInterceptor(authenticationInterceptor).addPathPatterns("/**")
 			.excludePathPatterns("/", "/index", "/download", "/helpme", "/aboutme", "/invite", "/user/getCaptcha", "/message/confirm", "/user/login", "/doc.html", "/js/**", "/css/**", "/images/**", "/**/*.js", "/**/*.css");
 		
 		registry.addInterceptor(requestLimitInterceptor).addPathPatterns("/**")

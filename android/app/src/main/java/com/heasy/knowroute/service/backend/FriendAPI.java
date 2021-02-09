@@ -10,6 +10,8 @@ import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.map.HeasyLocationService;
 import com.heasy.knowroute.map.bean.LocationBean;
+import com.heasy.knowroute.service.LoginService;
+import com.heasy.knowroute.service.LoginServiceImpl;
 import com.heasy.knowroute.service.common.AndroidBuiltinService;
 import com.heasy.knowroute.service.common.HttpService;
 
@@ -109,6 +111,10 @@ public class FriendAPI extends BaseAPI {
 
         ResponseBean responseBean = HttpService.postJson(getHeasyContext(), requestURL, data);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
+            LoginService loginService = getHeasyContext().getServiceEngine().getService(LoginServiceImpl.class);
+            String message = "【知途】" + loginService.getPhone() + " 请求添加您为好友，请登录知途APP了解详细信息。";
+            AndroidBuiltinService.sendSMS(phone, message);
+
             return Constants.SUCCESS;
         }else{
             return HttpService.getFailureMessage(responseBean);
