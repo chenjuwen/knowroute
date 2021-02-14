@@ -9,6 +9,7 @@ import java.net.URLConnection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.heasy.knowroute.utils.JsonUtil;
@@ -22,12 +23,24 @@ import com.heasy.knowroute.utils.ParameterUtil;
 @Service
 public class SMSServiceImpl implements SMSService {
     private static final Logger logger = LoggerFactory.getLogger(SMSServiceImpl.class);
-	public static final String API_URL = "http://www.lokapi.cn/smsUTF8.aspx";
 	
-	private String username = "13798189352";
-	private String password = "FF2A0C0EAF4503645477C1340C59084A";
-	private String token = "e43e2773";
-	private String templateid = "E6D74CE2";
+	@Value("${sms.ignoreSend}")
+	private boolean ignoreSend = true;
+	
+	@Value("${sms.apiAddress}")
+	private String apiAddress;
+	
+	@Value("${sms.username}")
+	private String username;
+	
+	@Value("${sms.password}")
+	private String password;
+	
+	@Value("${sms.token}")
+	private String token;
+	
+	@Value("${sms.templateid}")
+	private String templateid;
 	
 	/**
 	 * 发送验证码
@@ -37,6 +50,11 @@ public class SMSServiceImpl implements SMSService {
     @Override
     public boolean sendVerificationCode(String phone, String captcha) {
     	try {
+    		if(ignoreSend) {
+    			logger.debug("发送验证码短信 设置为忽略，即不发短信");
+    			return true;
+    		}
+    		
     		String timestamp = String.valueOf(System.currentTimeMillis());
     		
 	    	String beforSign = ParameterUtil.toParamString(
@@ -56,7 +74,7 @@ public class SMSServiceImpl implements SMSService {
 	    			"param", phone + "|" + captcha,
 	    			"sign", MD5Util.md5(beforSign));
 	    	
-			String result = sendPost(API_URL, postData);
+			String result = sendPost(apiAddress, postData);
 			logger.debug(result);
 			
 			String status = JsonUtil.getString(JsonUtil.string2object(result), "returnstatus", "");
