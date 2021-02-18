@@ -14,7 +14,8 @@ public enum ResponseCode {
 	LOGIN_ERROR(2002, "登录失败"),
 	TOKEN_ERROR(2003, "token有误"),
 	REFRESH_TOKEN_ERROR(2004, "刷新token失败"),
-	REQUEST_LIMIT(2005, "访问过于频繁");
+	REQUEST_LIMIT(2005, "访问过于频繁"),
+	NO_DATA_ACCESS(2006, "无数据访问权限");
 	
 	private Integer code;
 	private String message;

@@ -32,7 +32,7 @@ public class FixedPointCategoryAPI extends BaseAPI{
 
     public static String update(String id, String name){
         String url = "fixedPointCategory/update";
-        String data = FastjsonUtil.toJSONString("id", id, "name", name);
+        String data = FastjsonUtil.toJSONString("id", id, "name", name, "userId", String.valueOf(getLoginService().getUserId()));
 
         ResponseBean responseBean = HttpService.postJson(getHeasyContext(), url, data);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
@@ -43,7 +43,7 @@ public class FixedPointCategoryAPI extends BaseAPI{
     }
 
     public static String delete(String id){
-        String url = "fixedPointCategory/delete/" + id;
+        String url = "fixedPointCategory/delete/" + getLoginService().getUserId() + "/" + id;
         ResponseBean responseBean = HttpService.postJson(getHeasyContext(), url, "");
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
             return Constants.SUCCESS;
@@ -53,7 +53,7 @@ public class FixedPointCategoryAPI extends BaseAPI{
     }
 
     public static String topping(String id){
-        String url = "fixedPointCategory/topping/" + id;
+        String url = "fixedPointCategory/topping/" + getLoginService().getUserId() + "/" + id;
         ResponseBean responseBean = HttpService.postJson(getHeasyContext(), url, "");
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
             return Constants.SUCCESS;
@@ -63,7 +63,7 @@ public class FixedPointCategoryAPI extends BaseAPI{
     }
 
     public static String cancelTopping(String id){
-        String url = "fixedPointCategory/cancelTopping/" + id;
+        String url = "fixedPointCategory/cancelTopping/" + getLoginService().getUserId() + "/" + id;
         ResponseBean responseBean = HttpService.postJson(getHeasyContext(), url, "");
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
             return Constants.SUCCESS;

@@ -53,8 +53,8 @@ public class ContactAPI extends BaseAPI{
     }
 
     public static String delete(String id){
-        String url = "contact/delete?id=" + id;
-        ResponseBean responseBean = HttpService.get(getHeasyContext(), url);
+        String url = "contact/delete/" + getLoginService().getUserId() + "/" + id;
+        ResponseBean responseBean = HttpService.postJson(getHeasyContext(), url, "");
         if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
             return Constants.SUCCESS;
         } else {
@@ -62,9 +62,8 @@ public class ContactAPI extends BaseAPI{
         }
     }
 
-    public static String getAll(){
-        LoginService loginService = getLoginService();
-        String url = "contact/getAll?userId=" + loginService.getUserId();
+    public static String list(){
+        String url = "contact/list?userId=" + getLoginService().getUserId();
         ResponseBean responseBean = HttpService.get(getHeasyContext(), url);
         if (responseBean.getCode() == ResponseCode.SUCCESS.code()) {
             return (String) responseBean.getData();

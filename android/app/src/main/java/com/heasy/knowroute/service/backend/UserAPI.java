@@ -3,8 +3,10 @@ package com.heasy.knowroute.service.backend;
 import com.heasy.knowroute.bean.LoginResultBean;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
+import com.heasy.knowroute.bean.SimpleUserBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.core.Constants;
+import com.heasy.knowroute.core.utils.AESEncrpt;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
 import com.heasy.knowroute.core.utils.ParameterUtil;
 import com.heasy.knowroute.service.common.HttpService;
@@ -28,11 +30,11 @@ public class UserAPI extends BaseAPI {
         }
     }
 
-    public static UserBean getByPhone(String phone){
+    public static SimpleUserBean getByPhone(String phone){
         String requestUrl = "user/getByPhone?phone=" + phone;
         ResponseBean responseBean = HttpService.get(getHeasyContext(), requestUrl);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()) {
-            UserBean userBean = FastjsonUtil.string2JavaBean((String) responseBean.getData(), UserBean.class);
+            SimpleUserBean userBean = FastjsonUtil.string2JavaBean((String) responseBean.getData(), SimpleUserBean.class);
             return userBean;
         }else{
             return null;

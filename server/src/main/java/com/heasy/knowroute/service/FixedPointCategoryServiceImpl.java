@@ -41,31 +41,31 @@ public class FixedPointCategoryServiceImpl extends BaseService implements FixedP
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public void update(int id, String name) {
+	public void update(int id, String name, int userId) {
 		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-    	String sql = "update fixed_point_categorys set name=?,update_date=? where id=?";
-    	jdbcTemplate.update(sql, name, date, id);
+    	String sql = "update fixed_point_categorys set name=?,update_date=? where id=? and user_id=?";
+    	jdbcTemplate.update(sql, name, date, id, userId);
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public void delete(int id) {
-    	String sql = "delete from fixed_point_categorys where id=?";
-    	jdbcTemplate.update(sql, id);
+	public void delete(int userId, int id) {
+    	String sql = "delete from fixed_point_categorys where id=? and user_id=?";
+    	jdbcTemplate.update(sql, id, userId);
 	}
 
 	@Override
-	public void topping(int id) {
+	public void topping(int userId, int id) {
 		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-    	String sql = "update fixed_point_categorys set topping=1,update_date=? where id=?";
-    	jdbcTemplate.update(sql, date, id);
+    	String sql = "update fixed_point_categorys set topping=1,update_date=? where id=? and user_id=?";
+    	jdbcTemplate.update(sql, date, id, userId);
 	}
 
 	@Override
-	public void cancelTopping(int id) {
+	public void cancelTopping(int userId, int id) {
 		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-    	String sql = "update fixed_point_categorys set topping=0,update_date=? where id=?";
-    	jdbcTemplate.update(sql, date, id);
+    	String sql = "update fixed_point_categorys set topping=0,update_date=? where id=? and user_id=?";
+    	jdbcTemplate.update(sql, date, id, userId);
 	}
 
 	class RowMapperImpl implements RowMapper<FixedPointCategoryBean>{

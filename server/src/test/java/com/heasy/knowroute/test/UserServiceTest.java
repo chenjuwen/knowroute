@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.heasy.Main;
+import com.heasy.knowroute.bean.SimpleUserBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.service.SMSService;
 import com.heasy.knowroute.service.UserService;
@@ -39,17 +40,17 @@ public class UserServiceTest {
 
 	@Test
 	public void getUser(){
-		UserBean bean = userService.getUserByPhone("13798189352");
+		SimpleUserBean bean = userService.getUserByPhone("13798189352");
 		if(bean != null) {
 			System.out.println(JSONObject.fromObject(bean).toString(2));
 		}else {
 			System.out.println("user not found");
 		}
 		
-		bean = userService.getUserById(8);
-		if(bean != null) {
-			System.out.println(DatetimeUtil.formatDate(bean.getCreateDate()));
-			System.out.println(DatetimeUtil.formatDate(bean.getLastLoginDate()));
+		UserBean bean2 = userService.getUserById(8);
+		if(bean2 != null) {
+			System.out.println(DatetimeUtil.formatDate(bean2.getCreateDate()));
+			System.out.println(DatetimeUtil.formatDate(bean2.getLastLoginDate()));
 		}else {
 			System.out.println("user not found");
 		}
@@ -63,7 +64,7 @@ public class UserServiceTest {
 	
 	@Test
 	public void updateUser() {
-		UserBean bean = userService.getUserByPhone("13798189356");
+		SimpleUserBean bean = userService.getUserByPhone("13798189356");
 		if(bean != null) {
 			userService.updateNickname(bean.getId(), "张三");
 			userService.updateLastLoginDate(bean.getId());

@@ -49,9 +49,9 @@ public class ContactServiceImpl extends BaseService implements ContactService {
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public void delete(int id) {
-    	String sql = "delete from contacts where id=?";
-    	jdbcTemplate.update(sql, id);
+	public void delete(int userId, int id) {
+    	String sql = "delete from contacts where user_id=? and id=?";
+    	jdbcTemplate.update(sql, userId, id);
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class ContactServiceImpl extends BaseService implements ContactService {
 	}
 
 	@Override
-	public List<ContactBean> getAll(int userId) {
+	public List<ContactBean> list(int userId) {
 		try{
         	String sql = "select * from contacts where user_id=? order by id desc limit 3";
         	

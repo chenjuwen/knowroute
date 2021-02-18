@@ -1,5 +1,7 @@
 package com.heasy.knowroute.core.okhttp.interceptor;
 
+import android.widget.Toast;
+
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.AndroidUtil;
 
@@ -52,7 +54,7 @@ public class LogInterceptor implements Interceptor {
             response = response.newBuilder().body(ResponseBody.create(mediaType, responseBody)).build();
 
         } catch (SocketTimeoutException | SocketException | SSLException ex){
-            AndroidUtil.showToast(ServiceEngineFactory.getServiceEngine().getAndroidContext(), "网络异常");
+            AndroidUtil.showToast(ServiceEngineFactory.getServiceEngine().getAndroidContext(), "网络异常", Toast.LENGTH_SHORT);
             errorMessage = ex.toString();
         } catch (Exception ex) {
             errorMessage = ex.toString();

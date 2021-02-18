@@ -14,7 +14,6 @@ import com.heasy.knowroute.bean.ContactBean;
 import com.heasy.knowroute.service.ContactService;
 
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Main.class)
@@ -46,21 +45,8 @@ public class ContactServiceTest {
 	}
 	
 	@Test
-	public void delete() {
-		contactService.delete(1);
-	}
-	
-	@Test
-	public void get() {
-		ContactBean bean = contactService.get(1);
-		if(bean != null) {
-			System.out.println(JSONObject.fromObject(bean).toString());
-		}
-	}
-	
-	@Test
 	public void getAll(){
-		List<ContactBean> list = contactService.getAll(5);
+		List<ContactBean> list = contactService.list(5);
 		if(!CollectionUtils.isEmpty(list)) {
 			System.out.println(JSONArray.fromObject(list).toString());
 		}

@@ -59,16 +59,5 @@ public class FriendServiceTest {
 	public void insertFriend() {
 		friendService.insert(5, "13798189356");
 	}
-
-	@Test
-	public void update() {
-		friendService.updateNickname(3, "张三2");
-	}
-
-	@Test
-	public void delete() {
-		boolean b = friendService.delete(3);
-		System.out.println(b);
-	}
 	
 }

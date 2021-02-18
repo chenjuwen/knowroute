@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.heasy.knowroute.bean.FixedPointCategoryBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.DataSecurityAnnotation;
+import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.FixedPointCategoryService;
 import com.heasy.knowroute.utils.JsonUtil;
@@ -33,6 +35,7 @@ public class FixedPointCategoryController extends BaseController{
 	@Autowired
 	private FixedPointCategoryService fixedPointCategoryService;
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="list", notes="获取某个用户的所有定点类别信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer")
@@ -50,6 +53,7 @@ public class FixedPointCategoryController extends BaseController{
 		}
     }
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="insert", notes="添加一条定点类别信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
@@ -67,6 +71,7 @@ public class FixedPointCategoryController extends BaseController{
 		return WebResponse.success();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="update", notes="更新一条定点类别信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
@@ -75,42 +80,49 @@ public class FixedPointCategoryController extends BaseController{
 	public WebResponse update(@RequestBody Map<String,String> map) {
 		String id = map.get("id");
 		String name = map.get("name");
+		String userId = map.get("userId");
 		
-		if(StringUtil.isEmpty(id) || StringUtil.isEmpty(name)) {
+		if(StringUtil.isEmpty(id) || StringUtil.isEmpty(name) || StringUtil.isEmpty(userId)) {
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);
 		}
 		
-		fixedPointCategoryService.update(Integer.parseInt(id), name);
+		fixedPointCategoryService.update(Integer.parseInt(id), name, Integer.parseInt(userId));
 		return WebResponse.success();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="delete", notes="删除一条定点类别信息")
 	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer"),
 		@ApiImplicitParam(name="id", paramType="path", required=true, dataType="Integer")
 	})
-	@RequestMapping(value="/delete/{id}", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse delete(@PathVariable Integer id) {
-		fixedPointCategoryService.delete(id);
+	@RequestMapping(value="/delete/{userId}/{id}", method=RequestMethod.POST)
+	public WebResponse delete(@PathVariable Integer userId, @PathVariable Integer id) {
+		fixedPointCategoryService.delete(userId, id);
 		return WebResponse.success();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="topping", notes="定点类别信息置顶")
 	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer"),
 		@ApiImplicitParam(name="id", paramType="path", required=true, dataType="Integer")
 	})
-	@RequestMapping(value="/topping/{id}", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse topping(@PathVariable Integer id) {
-		fixedPointCategoryService.topping(id);
+	@RequestMapping(value="/topping/{userId}/{id}", method=RequestMethod.POST)
+	public WebResponse topping(@PathVariable Integer userId, @PathVariable Integer id) {
+		fixedPointCategoryService.topping(userId, id);
 		return WebResponse.success();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="cancelTopping", notes="定点类别信息取消置顶")
 	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer"),
 		@ApiImplicitParam(name="id", paramType="path", required=true, dataType="Integer")
 	})
-	@RequestMapping(value="/cancelTopping/{id}", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse cancelTopping(@PathVariable Integer id) {
-		fixedPointCategoryService.cancelTopping(id);
+	@RequestMapping(value="/cancelTopping/{userId}/{id}", method=RequestMethod.POST)
+	public WebResponse cancelTopping(@PathVariable Integer userId, @PathVariable Integer id) {
+		fixedPointCategoryService.cancelTopping(userId, id);
 		return WebResponse.success();
 	}
 	

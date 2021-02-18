@@ -2,6 +2,7 @@ package com.heasy.knowroute.service;
 
 import java.util.Date;
 
+import com.heasy.knowroute.bean.SimpleUserBean;
 import com.heasy.knowroute.bean.UserBean;
 
 /**
@@ -10,7 +11,7 @@ import com.heasy.knowroute.bean.UserBean;
 public interface UserService{
 	int login(String phone);
     UserBean getUserById(int id);
-    UserBean getUserByPhone(String phone);
+    SimpleUserBean getUserByPhone(String phone);
     int insert(String phone, String invite_code);
     void updateNickname(int id, String newNickname);
     boolean updateLastLoginDate(int id);

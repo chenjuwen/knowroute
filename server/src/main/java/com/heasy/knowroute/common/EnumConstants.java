@@ -70,4 +70,18 @@ public final class EnumConstants {
 		 */
 		UNKNOW
 	}
+
+	/**
+	 * 数据角色
+	 */
+	public static final String DATA_ROLE_SELF = "self"; //只允许本人查看数据
+	public static final String DATA_ROLE_FRIEND = "friend"; //允许好友查看数据
+	
+	/**
+	 * 参数放在哪个地方
+	 */
+	public static final String PARAM_TYPE_QUERY = "query"; //@RequestParam定义的参数
+	public static final String PARAM_TYPE_PATH = "path"; //@PathVariable定义的参数
+	public static final String PARAM_TYPE_BODY = "body"; //@RequestBody定义的参数
+	
 }

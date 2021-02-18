@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.bean.MessageBean;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.DataSecurityAnnotation;
+import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.utils.JsonUtil;
@@ -57,6 +59,7 @@ public class MessageController extends BaseController{
 		return WebResponse.success();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="list", notes="获取某个用户的所有消息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer")

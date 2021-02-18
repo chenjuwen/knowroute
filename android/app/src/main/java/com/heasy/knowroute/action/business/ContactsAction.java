@@ -63,7 +63,7 @@ public class ContactsAction implements Action {
 
         }else if("getAll".equalsIgnoreCase(extend)){
             try {
-                return ContactAPI.getAll();
+                return ContactAPI.list();
             }catch (Exception ex){
                 logger.error("", ex);
             }

@@ -19,6 +19,7 @@ import com.heasy.knowroute.bean.MessageBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.DataSecurityAnnotation;
 import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.FriendService;
@@ -65,6 +66,7 @@ public class FriendController extends BaseController{
 		return WebResponse.failure();
 	}
 	
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_QUERY, paramKey="userId")
 	@ApiOperation(value="list", notes="获取好友列表")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="userId", paramType="query", required=true, dataType="Integer")
@@ -82,6 +84,7 @@ public class FriendController extends BaseController{
 		return WebResponse.success("[]");
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="invite", notes="添加邀请好友的站内信")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
@@ -116,7 +119,8 @@ public class FriendController extends BaseController{
         
 		return WebResponse.failure();
 	}
-	
+
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="add", notes="添加好友的站内信")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
@@ -176,6 +180,7 @@ public class FriendController extends BaseController{
 		}
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="updateNickname", notes="更新好友昵称")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
@@ -183,19 +188,26 @@ public class FriendController extends BaseController{
 	@RequestMapping(value="/updateNickname", method=RequestMethod.POST, consumes="application/json")
 	public WebResponse updateNickname(@RequestBody Map<String,String> map) {
 		String id = map.get("id");
+		String userId = map.get("userId");
 		String newNickname = map.get("newNickname");
 		
-		friendService.updateNickname(Integer.parseInt(id), newNickname);
+		if(StringUtil.isEmpty(id) || StringUtil.isEmpty(userId) || StringUtil.isEmpty(newNickname)) {
+			return WebResponse.failure(ResponseCode.PARAM_INVALID);
+		}
+		
+		friendService.updateNickname(Integer.parseInt(id), newNickname, Integer.parseInt(userId));
 		return WebResponse.success();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="delete", notes="删除好友")
 	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer"),
 		@ApiImplicitParam(name="id", paramType="path", required=true, dataType="Integer")
 	})
-	@RequestMapping(value="/delete/{id}", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse delete(@PathVariable Integer id) {
-		boolean b = friendService.delete(id);
+	@RequestMapping(value="/delete/{userId}/{id}", method=RequestMethod.POST)
+	public WebResponse delete(@PathVariable Integer userId, @PathVariable Integer id) {
+		boolean b = friendService.delete(id, userId);
 		if(b) {
 			return WebResponse.success();
 		}else {

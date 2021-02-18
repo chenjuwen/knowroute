@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.heasy.knowroute.bean.MessageBean;
+import com.heasy.knowroute.bean.SimpleUserBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.StringUtil;
@@ -42,7 +43,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
     @Override
     public int login(String phone) {
-    	UserBean userBean = getUserByPhone(phone);
+		SimpleUserBean userBean = getUserByPhone(phone);
     	if(userBean == null) {
     		//新用户注册
     		String inviteCode = StringUtil.getUUIDString(); //邀请码
@@ -92,10 +93,10 @@ public class UserServiceImpl extends BaseService implements UserService {
 	 * 根据手机号获取用户信息
 	 */
     @Override
-    public UserBean getUserByPhone(String phone) {
+    public SimpleUserBean getUserByPhone(String phone) {
         try {
         	String sql = "select * from users where phone=?";
-        	List<UserBean> list = jdbcTemplate.query(sql, new UserRowMapper(), phone);
+        	List<SimpleUserBean> list = jdbcTemplate.query(sql, new SimpleUserRowMapper(), phone);
         	if(!CollectionUtils.isEmpty(list)) {
         		return list.get(0);
         	}
@@ -116,7 +117,7 @@ public class UserServiceImpl extends BaseService implements UserService {
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
     @Override
     public int insert(String phone, String inviteCode) {
-    	UserBean bean = getUserByPhone(phone);
+		SimpleUserBean bean = getUserByPhone(phone);
     	if(bean != null) {
     		logger.warn("用户 " + phone + " 已存在");
     		return 0;
@@ -245,4 +246,19 @@ public class UserServiceImpl extends BaseService implements UserService {
 			return bean;
     	}
     }
+    
+    class SimpleUserRowMapper implements RowMapper<SimpleUserBean>{
+    	@Override
+    	public SimpleUserBean mapRow(ResultSet rs, int rowNum) throws SQLException {
+    		int id = rs.getInt("id");
+			String nickname = rs.getString("nickname");
+			
+			SimpleUserBean bean = new SimpleUserBean();
+			bean.setId(id);
+			bean.setNickname(nickname);
+			
+			return bean;
+    	}
+    }
+    
 }

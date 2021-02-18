@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.heasy.knowroute.bean.FriendBean;
 import com.heasy.knowroute.bean.ResponseBean;
 import com.heasy.knowroute.bean.ResponseCode;
-import com.heasy.knowroute.bean.UserBean;
+import com.heasy.knowroute.bean.SimpleUserBean;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.service.ServiceEngineFactory;
 import com.heasy.knowroute.core.utils.FastjsonUtil;
@@ -100,7 +100,7 @@ public class FriendAPI extends BaseAPI {
     }
 
     public static String add(String phone){
-        UserBean userBean = UserAPI.getByPhone(phone);
+        SimpleUserBean userBean = UserAPI.getByPhone(phone);
         if(userBean == null){
             return "用户不存在";
         }
@@ -134,7 +134,7 @@ public class FriendAPI extends BaseAPI {
     }
 
     public static String delete(String id){
-        String requestURL = "friend/delete/" + id;
+        String requestURL = "friend/delete/" + getLoginService().getUserId() + "/" + id;
         ResponseBean responseBean = HttpService.postJson(getHeasyContext(), requestURL, "");
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
             return Constants.SUCCESS;
@@ -145,7 +145,8 @@ public class FriendAPI extends BaseAPI {
 
     public static String updateNickname(String id, String newNickname){
         String requestURL = "friend/updateNickname";
-        String data = FastjsonUtil.toJSONString("id", id, "newNickname", newNickname);
+        String data = FastjsonUtil.toJSONString("id", id, "newNickname", newNickname,
+                "userId", String.valueOf(getLoginService().getUserId()));
         ResponseBean responseBean = HttpService.postJson(getHeasyContext(), requestURL, data);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
             return Constants.SUCCESS;
@@ -166,12 +167,11 @@ public class FriendAPI extends BaseAPI {
 
     /**
      * 是否禁止好友查看轨迹
-     * viewTrackUserId想看userId的轨迹
-     * @param userId 轨迹被看的用户
-     * @param  viewTrackUserId 想看轨迹的用户
+     * @param  userId 想看轨迹的用户
+     * @param relatedUserId 轨迹被看的用户
      */
-    public static boolean checkForbid(int userId, int viewTrackUserId){
-        String requestURL = "friend/checkForbid/" + userId + "/" + viewTrackUserId;
+    public static boolean checkForbid(int userId, int relatedUserId){
+        String requestURL = "friend/checkForbid/" + relatedUserId + "/" + userId;
         ResponseBean responseBean = HttpService.get(getHeasyContext(), requestURL);
         if(responseBean.getCode() == ResponseCode.SUCCESS.code()){
             String data = (String)responseBean.getData();

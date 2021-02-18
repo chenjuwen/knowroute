@@ -193,17 +193,16 @@ public class DataCacheServiceImpl implements DataCacheService {
      */
     @Override
     public long incr(String key) {
-        long initValue = 0L;
         lock.lock();
         try{
             if(!exists(key)){
-                storeCounter(key, initValue);
-                return initValue;
+                storeCounter(key, 1L);
+                return 1;
             }else{
                 Object valueObject = dataMap.get(key);
                 if(valueObject == null){
                     logger.debug("not a counter: " + key);
-                    return initValue;
+                    return 0;
                 }else{
                     if(valueObject instanceof AtomicLong){
                         AtomicLong atomicLong = (AtomicLong)valueObject;
@@ -216,7 +215,7 @@ public class DataCacheServiceImpl implements DataCacheService {
                         if(valueItem.getExpireTimeMillis() <= System.currentTimeMillis()){ //已过期
                             logger.debug("key already expired: " + key);
                             dataMap.remove(key);
-                            return initValue;
+                            return 0;
                         }else{
                             if(valueItem.getValue() instanceof AtomicLong){
                                 AtomicLong atomicLong = (AtomicLong)valueItem.getValue();
@@ -226,12 +225,12 @@ public class DataCacheServiceImpl implements DataCacheService {
                                 return value;
                             }else{
                                 logger.debug("not a counter: " + key);
-                                return initValue;
+                                return 0;
                             }
                         }
                     }else{
                         logger.debug("not a counter: " + key);
-                        return initValue;
+                        return 0;
                     }
                 }
             }
@@ -247,23 +246,22 @@ public class DataCacheServiceImpl implements DataCacheService {
      */
     @Override
     public long decr(String key) {
-        long initValue = 0L;
         lock.lock();
         try{
             if(!exists(key)){
-                storeCounter(key, initValue);
-                return initValue;
+                storeCounter(key, 0);
+                return 0;
             }else{
                 Object object = dataMap.get(key);
                 if(object == null){
                     logger.debug("not a counter: " + key);
-                    return initValue;
+                    return 0;
                 }else{
                     if(object instanceof AtomicLong){
                         AtomicLong atomicLong = (AtomicLong)object;
                         long value = atomicLong.decrementAndGet();
-                        if(value < initValue){
-                            value = initValue;
+                        if(value < 0){
+                            value = 0;
                         }
                         dataMap.remove(key);
                         storeCounter(key, value);
@@ -273,25 +271,25 @@ public class DataCacheServiceImpl implements DataCacheService {
                         if(item.getExpireTimeMillis() <= System.currentTimeMillis()){ //已过期
                             logger.debug("key already expired: " + key);
                             dataMap.remove(key);
-                            return initValue;
+                            return 0;
                         }else{
                             if(item.getValue() instanceof AtomicLong){
                                 AtomicLong atomicLong = (AtomicLong)item.getValue();
                                 long value = atomicLong.decrementAndGet();
-                                if(value < initValue){
-                                    value = initValue;
+                                if(value < 0){
+                                    value = 0;
                                 }
                                 dataMap.remove(key);
                                 storeCounter(key, value, item.getExpireTimeMillis());
                                 return value;
                             }else{
                                 logger.debug("not a counter: " + key);
-                                return initValue;
+                                return 0;
                             }
                         }
                     }else{
                         logger.debug("not a counter: " + key);
-                        return initValue;
+                        return 0;
                     }
                 }
             }

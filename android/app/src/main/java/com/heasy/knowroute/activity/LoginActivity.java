@@ -60,26 +60,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                         AndroidUtil.showToast(getApplicationContext(), "获取验证码失败");
                         return;
                     }
-
                     captchaObtained = true;
-
-                    final String oldText = btnGetCaptcha.getText().toString();
-                    int seconds = 60;
-
-                    //倒计时
-                    new CountDownTimer(seconds * 1000 + 1050, 1000) {
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                            btnGetCaptcha.setEnabled(false);
-                            btnGetCaptcha.setText((millisUntilFinished / 1000 - 1) + "秒后重试"); //剩余时间
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            btnGetCaptcha.setEnabled(true);
-                            btnGetCaptcha.setText(oldText);
-                        }
-                    }.start();
+                    handleCountDownTimer();
 
                 }else if(type == 2){ //登录
                     if(Constants.SUCCESS.equalsIgnoreCase(result)){
@@ -96,6 +78,26 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         };
 
         initComponent();
+    }
+
+    private void handleCountDownTimer() {
+        final String oldText = btnGetCaptcha.getText().toString();
+        int seconds = 60;
+
+        //倒计时
+        new CountDownTimer(seconds * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                btnGetCaptcha.setEnabled(false);
+                btnGetCaptcha.setText((millisUntilFinished / 1000) + "秒后重试"); //剩余时间
+            }
+
+            @Override
+            public void onFinish() {
+                btnGetCaptcha.setEnabled(true);
+                btnGetCaptcha.setText(oldText);
+            }
+        }.start();
     }
 
     private void initComponent(){

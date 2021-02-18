@@ -16,12 +16,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.bean.ResponseCode;
+import com.heasy.knowroute.bean.SimpleUserBean;
 import com.heasy.knowroute.bean.UserBean;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.DataSecurityAnnotation;
+import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.DataCacheService;
 import com.heasy.knowroute.service.SMSService;
 import com.heasy.knowroute.service.UserService;
+import com.heasy.knowroute.utils.AESEncrpt;
 import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.JWTUtil;
 import com.heasy.knowroute.utils.JsonUtil;
@@ -39,6 +43,11 @@ import io.swagger.annotations.ApiOperation;
 public class UserController extends BaseController{
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private static final String CAPTCHA_KEY_PREFIX = "captcha:";
+    
+	/**
+	 * 每天获取验证码的最大次数
+	 */
+	public static int GET_CAPTCHA_MAX_COUNT = 3;
     
 	@Autowired
 	private UserService userService;
@@ -59,6 +68,16 @@ public class UserController extends BaseController{
 			return WebResponse.failure(ResponseCode.PHONE_INVALID);
 		}
 		
+		String dayKey = CAPTCHA_KEY_PREFIX + phone + DatetimeUtil.getToday("yyyyMMdd");
+		if(dataCacheService.exists(dayKey)) {
+			long count = (Long)dataCacheService.get(dayKey);
+			logger.debug("count=" + count);
+			if(count >= GET_CAPTCHA_MAX_COUNT) {
+				logger.debug("获取验证码的次数达到最大值：phone=" + phone + ", count=" + GET_CAPTCHA_MAX_COUNT);
+				return WebResponse.failure(ResponseCode.GET_CAPTCHA_ERROR);
+			}
+		}
+		
 		if(dataCacheService.exists(CAPTCHA_KEY_PREFIX + phone)) {
 			return WebResponse.failure(ResponseCode.GET_CAPTCHA_ERROR);
 		}
@@ -70,7 +89,15 @@ public class UserController extends BaseController{
 		//发送短信
 		boolean b = smsService.sendVerificationCode(phone, captcha);
 		if(b) {
-			dataCacheService.set(CAPTCHA_KEY_PREFIX + phone, captcha, 60); //有效期60秒
+			dataCacheService.set(CAPTCHA_KEY_PREFIX + phone, captcha, DataCacheService.secondForMinute); //有效期60秒
+			
+			if(dataCacheService.exists(dayKey)) {
+				long value = (Long)dataCacheService.get(dayKey);
+				dataCacheService.set(dayKey, new Long(value + 1), DataCacheService.secondForDay);
+			}else {
+				dataCacheService.set(dayKey, new Long(1), DataCacheService.secondForDay);
+			}
+			
 			return WebResponse.success();
 		}else {
 			return WebResponse.failure(ResponseCode.GET_CAPTCHA_ERROR);
@@ -124,6 +151,8 @@ public class UserController extends BaseController{
 		return WebResponse.failure(ResponseCode.LOGIN_ERROR);
 	}
 
+	@DataSecurityAnnotation(dataRole=EnumConstants.DATA_ROLE_FRIEND, 
+			paramType=EnumConstants.PARAM_TYPE_QUERY, paramKey="id")
 	@ApiOperation(value="getById", notes="根据id获取用户信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="id", paramType="query", required=true, dataType="Integer")
@@ -145,7 +174,7 @@ public class UserController extends BaseController{
 	})
 	@RequestMapping(value="/getByPhone", method=RequestMethod.GET)
 	public WebResponse getByPhone(@RequestParam(value="phone") String phone){
-		UserBean bean = userService.getUserByPhone(phone);
+		SimpleUserBean bean = userService.getUserByPhone(phone);
 		if(bean != null) {
 			String data = JsonUtil.object2String(bean);
 			return new WebResponse(ResponseCode.SUCCESS, data);
@@ -154,6 +183,7 @@ public class UserController extends BaseController{
 		}
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="updateNickname", notes="更新用户昵称")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
@@ -167,6 +197,7 @@ public class UserController extends BaseController{
 		return WebResponse.success();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_QUERY, paramKey="id")
 	@ApiOperation(value="cancel", notes="注销账户")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="id", paramType="query", required=true, dataType="Integer")

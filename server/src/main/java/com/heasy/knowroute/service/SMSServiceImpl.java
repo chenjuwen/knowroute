@@ -124,4 +124,13 @@ public class SMSServiceImpl implements SMSService {
         return sb.toString();
     }
     
+    @Override
+    public boolean isIgnoreSend() {
+    	return this.ignoreSend;
+    }
+    
+    @Override
+    public void setIgnoreSend(boolean ignoreSend) {
+    	this.ignoreSend = ignoreSend;
+    }
 }

@@ -199,7 +199,7 @@
 					jsBridge.dispatchAction("LocationAction", JSON.stringify({}), "pointNavigation");
 				},
 				viewTrack: function(){
-					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": "me", "relatedUserId":"", "nickname":"我自己"}), "viewTrack");
+					jsBridge.dispatchAction("LocationAction", JSON.stringify({"userId": "0", "relatedUserId":"0", "nickname":"我自己"}), "viewTrack");
 				},
 				fixedPointCategory: function(){
 					transferPage("fixed_point_category_list.html");

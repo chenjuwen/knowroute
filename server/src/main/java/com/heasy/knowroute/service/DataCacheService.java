@@ -1,14 +1,14 @@
 package com.heasy.knowroute.service;
 
 public interface DataCacheService {
-    public static final long millisecondForSecond = 1000; //一秒的毫秒数
-    public static final long millisecondForMinute = 1000 * 60; //一分钟的毫秒数
-    public static final long millisecondForHour = 1000 * 60 * 60; //一小时的毫秒数
-    public static final long millisecondForDay = 1000 * 60 * 60 * 24; //一天的毫秒数
+    public static final int millisecondForSecond = 1000; //一秒的毫秒数
+    public static final int millisecondForMinute = 1000 * 60; //一分钟的毫秒数
+    public static final int millisecondForHour = 1000 * 60 * 60; //一小时的毫秒数
+    public static final int millisecondForDay = 1000 * 60 * 60 * 24; //一天的毫秒数
 
-    public static final long secondForMinute = 60; //一分钟的秒数
-    public static final long secondForHour = 60 * 60; //一小时的秒数
-    public static final long secondForDay = 60 * 60 * 24; //一天的秒数
+    public static final int secondForMinute = 60; //一分钟的秒数
+    public static final int secondForHour = 60 * 60; //一小时的秒数
+    public static final int secondForDay = 60 * 60 * 24; //一天的秒数
 
     boolean set(String key, Object value);
 

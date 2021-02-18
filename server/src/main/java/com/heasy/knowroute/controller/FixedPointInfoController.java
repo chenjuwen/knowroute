@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.bean.FixedPointInfoBean;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.DataSecurityAnnotation;
+import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.FixedPointInfoService;
 import com.heasy.knowroute.utils.JsonUtil;
@@ -33,6 +35,7 @@ public class FixedPointInfoController extends BaseController{
 	@Autowired
 	private FixedPointInfoService fixedPointInfoService;
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="list", notes="获取某个用户某个类别下的所有定点信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer"),
@@ -50,6 +53,7 @@ public class FixedPointInfoController extends BaseController{
 		}
     }
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="saveOrUpdate", notes="添加或修改一条定点信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="bean", paramType="body", required=true, dataType="FixedPointInfoBean")
@@ -68,6 +72,7 @@ public class FixedPointInfoController extends BaseController{
 		return WebResponse.failure();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="deleteById", notes="根据id删除定点信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer"),
@@ -79,6 +84,7 @@ public class FixedPointInfoController extends BaseController{
 		return WebResponse.success();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="deleteByCategory", notes="根据类别删除定点信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer"),
@@ -90,6 +96,7 @@ public class FixedPointInfoController extends BaseController{
 		return WebResponse.success();
 	}
 
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
 	@ApiOperation(value="deleteByCategory", notes="根据用户id删除定点信息")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer")

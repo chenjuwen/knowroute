@@ -220,6 +220,7 @@ public class RouteTrackActivity extends BaseMapActivity implements View.OnClickL
             @Override
             public void run() {
                 try {
+                    logger.debug("userId={}, startDate={}, endDate={}", userId, startDate, endDate);
                     List<PointBean> list = PositionAPI.getPoints(userId, startDate, endDate);
                     if(list == null || list.size() < 2){
                         ServiceEngineFactory.getServiceEngine().getEventService()

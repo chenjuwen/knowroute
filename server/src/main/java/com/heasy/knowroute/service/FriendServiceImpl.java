@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.heasy.knowroute.bean.FriendBean;
 import com.heasy.knowroute.bean.MessageBean;
-import com.heasy.knowroute.bean.UserBean;
+import com.heasy.knowroute.bean.SimpleUserBean;
 import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.StringUtil;
@@ -44,7 +44,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 				return EnumConstants.FriendStatusCode.INVALID_PHONE.name();
 			}
 			
-			UserBean userBean = userService.getUserByPhone(phone);
+			SimpleUserBean userBean = userService.getUserByPhone(phone);
 			
 			//不是系统用户
 			if(userBean == null) {
@@ -133,7 +133,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 			StringBuffer sb = new StringBuffer();
 			sb.append(" select * from ");
 			sb.append(" ( ");
-			sb.append(" 	select 1 as type,0 as id,id as user_id,id as related_user_id,phone,'我自己' as nickname,longitude,latitude,address,position_times,0 as forbid_look_trace ");
+			sb.append(" 	select 1 as type,0 as id,id as user_id,0 as related_user_id,phone,'我自己' as nickname,longitude,latitude,address,position_times,0 as forbid_look_trace ");
 			sb.append(" 	from users where id=? ");
 			sb.append(" 	union ");
 			sb.append(" 	select 2 as type,a.id,a.user_id,a.related_user_id,b.phone,a.nickname ");
@@ -161,7 +161,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 				messageService.confirmMessage(messageId, "已同意");
 				
 				//添加好友关系
-				UserBean receiverUser = userService.getUserByPhone(messageBean.getReceiver());
+				SimpleUserBean receiverUser = userService.getUserByPhone(messageBean.getReceiver());
 				addFriendRelationship(Integer.parseInt(messageBean.getSender()), messageBean.getReceiver(), 
 						receiverUser.getId(), messageBean.getSenderPhone());
 				
@@ -211,7 +211,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 	public void insert(int userId, String phone) {
 		FriendBean friendBean = getFriend(userId, phone);
 		if(friendBean == null) {
-			UserBean friendUserBean = userService.getUserByPhone(phone); //好友
+			SimpleUserBean friendUserBean = userService.getUserByPhone(phone); //好友
 			if(friendUserBean != null) {
 				String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
 				String sql = "insert into friends(user_id,related_user_id,nickname,update_date) values (?,?,?,?)";
@@ -225,10 +225,10 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
 	@Override
-	public void updateNickname(int id, String newNickname) {
+	public void updateNickname(int id, String newNickname, int userId) {
 		String date = DatetimeUtil.getToday(DatetimeUtil.DEFAULT_PATTERN_DT);
-    	String sql = "update friends set nickname=?,update_date=? where id=?";
-    	jdbcTemplate.update(sql, newNickname, date, id);
+    	String sql = "update friends set nickname=?,update_date=? where id=? and user_id=?";
+    	jdbcTemplate.update(sql, newNickname, date, id, userId);
 	}
 
 	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
@@ -266,13 +266,18 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 	 * 删除好友关系
 	 */
 	@Override
-	public boolean delete(int id) {
+	public boolean delete(int id, int userId) {
 		FriendBean bean = getFriend(id);
 		if(bean == null) {
+			logger.debug("记录不存在 " + id);
 			return false;
 		}
 		
-		int userId = bean.getUserId();
+		if(userId != bean.getUserId()) {
+			logger.debug("userId有误 " + userId);
+			return false;
+		}
+		
 		int relatedUserId = bean.getRelatedUserId();
 		
     	String sql = "delete from friends where user_id=? and related_user_id=?";
@@ -314,4 +319,42 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 		}
 	}
 	
+	@Override
+	public boolean isFriendRelationship(int aUserId, int bUserId) {
+		try{
+			String sql  = "select count(id) as count from friends where (user_id=? and related_user_id=?) or (user_id=? and related_user_id=?)";
+			Map<String, Object> map = jdbcTemplate.queryForMap(sql, aUserId, bUserId, bUserId, aUserId);
+			if(map != null) {
+				int count = (Integer)map.get("count");
+				if(count > 0) {
+					return true;
+				}
+			}
+	    }catch (Exception ex){
+	        logger.error("", ex);
+	    }
+		return false;
+	}
+	
+	@Override
+	public boolean isFriendRelationship(String aPhone, String bPhone) {
+		try{
+			StringBuffer sb = new StringBuffer();
+			sb.append(" select count(a.id) as count from friends a ");
+			sb.append(" left join users b on a.user_id=b.id ");
+			sb.append(" left join users c on a.related_user_id=c.id ");
+			sb.append(" where (b.phone=? and c.phone=?) or (b.phone=? and c.phone=?) ");
+			
+			Map<String, Object> map = jdbcTemplate.queryForMap(sb.toString(), aPhone, bPhone, bPhone, aPhone);
+			if(map != null) {
+				int count = (Integer)map.get("count");
+				if(count > 0) {
+					return true;
+				}
+			}
+	    }catch (Exception ex){
+	        logger.error("", ex);
+	    }
+		return false;
+	}
 }

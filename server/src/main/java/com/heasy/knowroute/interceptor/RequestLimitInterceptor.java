@@ -22,7 +22,7 @@ import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.RequestUtil;
 
 /**
- * 请求限制拦截器
+ * 请求限制拦截器：防刷
  */
 @Component
 public class RequestLimitInterceptor extends HandlerInterceptorAdapter{

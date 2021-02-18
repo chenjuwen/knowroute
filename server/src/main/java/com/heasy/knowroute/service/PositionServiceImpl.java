@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.heasy.knowroute.bean.PointBean;
 import com.heasy.knowroute.bean.PositionBean;
 import com.heasy.knowroute.utils.DatetimeUtil;
+import com.heasy.knowroute.utils.StringUtil;
 
 @Service
 public class PositionServiceImpl extends BaseService implements PositionService {
@@ -28,6 +29,8 @@ public class PositionServiceImpl extends BaseService implements PositionService 
 		if(CollectionUtils.isNotEmpty(positionList)) {
 	    	for(int i=0; i<positionList.size(); i++) {
 	    		PositionBean bean = positionList.get(i);
+	    		bean.setId(StringUtil.getUUIDString());
+	    		
 		    	String date = DatetimeUtil.formatDate(bean.getTimes(), DatetimeUtil.DEFAULT_PATTERN_DT);
 	        	String sql = "insert into positions(id,user_id,longitude,latitude,times) values(?,?,?,?,?)";
 	        	jdbcTemplate.update(sql, bean.getId(), bean.getUserId(), bean.getLongitude(), bean.getLatitude(), date);

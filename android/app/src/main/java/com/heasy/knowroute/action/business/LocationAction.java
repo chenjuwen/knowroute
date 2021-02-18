@@ -5,7 +5,7 @@ import com.heasy.knowroute.action.AbstractAction;
 import com.heasy.knowroute.activity.FixedPointNavigationActivity;
 import com.heasy.knowroute.activity.HelpMapActivity;
 import com.heasy.knowroute.activity.RouteTrackActivity;
-import com.heasy.knowroute.bean.UserBean;
+import com.heasy.knowroute.bean.SimpleUserBean;
 import com.heasy.knowroute.core.Constants;
 import com.heasy.knowroute.core.HeasyContext;
 import com.heasy.knowroute.core.annotation.JSActionAnnotation;
@@ -40,11 +40,11 @@ public class LocationAction extends AbstractAction {
             String relatedUserId = FastjsonUtil.getString(jsonObject, "relatedUserId");
             String nickName = FastjsonUtil.getString(jsonObject, "nickname");
 
-            if("me".equalsIgnoreCase(userId)){
-                userId = String.valueOf(loginService.getUserId());
+            if("0".equalsIgnoreCase(relatedUserId)){
+                relatedUserId = String.valueOf(loginService.getUserId());
             }else{
                 //好友是否设置了禁止查看轨迹
-                boolean forbid = FriendAPI.checkForbid(Integer.parseInt(relatedUserId), Integer.parseInt(userId));
+                boolean forbid = FriendAPI.checkForbid(Integer.parseInt(userId), Integer.parseInt(relatedUserId));
                 if(forbid){
                     AndroidUtil.showToast(heasyContext.getServiceEngine().getAndroidContext(), "禁止查看轨迹");
                     return "";
@@ -52,7 +52,7 @@ public class LocationAction extends AbstractAction {
             }
 
             Map<String, String> params = new HashMap<>();
-            params.put("userId", userId);
+            params.put("userId", relatedUserId);
             params.put("nickName", nickName);
 
             startActivity(heasyContext, RouteTrackActivity.class, params);
@@ -60,9 +60,16 @@ public class LocationAction extends AbstractAction {
         }else if("startLocate".equalsIgnoreCase(extend)){
             String phone = FastjsonUtil.getString(jsonObject, "phone");
 
-            UserBean userBean = UserAPI.getByPhone(phone);
+            SimpleUserBean userBean = UserAPI.getByPhone(phone);
             if(userBean == null){
                 return "无此用户";
+            }
+
+            //好友是否设置了禁止查看轨迹
+            boolean forbid = FriendAPI.checkForbid(loginService.getUserId(), userBean.getId());
+            if(forbid){
+                AndroidUtil.showToast(heasyContext.getServiceEngine().getAndroidContext(), "禁止查看轨迹");
+                return Constants.SUCCESS;
             }
 
             Map<String, String> params = new HashMap<>();

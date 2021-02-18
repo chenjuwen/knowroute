@@ -72,7 +72,6 @@ public class HeasyLocationClient extends AbstractLocationClient {
     public void handleReceiveLocation(BDLocation dbLocation, LocationBean locationBean) {
         queueLock.lock();
         try {
-            locationBean.setId(StringUtil.getUUIDString());
             locationBean.setUserId(getLoginService().getUserId());
             logger.debug(FastjsonUtil.object2String(locationBean));
 

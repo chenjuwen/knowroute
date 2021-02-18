@@ -12,8 +12,10 @@ public interface FriendService {
 	public boolean confirmAdd(int messageId, String pass);
 	public void addFriendRelationship(int aUserId, String bPhone, int bUserId, String aPhone);
 	public void insert(int userId, String phone);
-	public void updateNickname(int id, String newNickname);
-	public boolean delete(int id);
+	public void updateNickname(int id, String newNickname, int userId);
+	public boolean delete(int id, int userId);
 	public void forbidLookTrace(int id, int traceFlag);
 	public boolean checkForbid(int userId, int viewTrackUserId);
+	public boolean isFriendRelationship(int aUserId, int bUserId);
+	public boolean isFriendRelationship(String aPhone, String bPhone);
 }

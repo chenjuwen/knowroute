@@ -18,6 +18,8 @@ import com.heasy.knowroute.bean.PointBean;
 import com.heasy.knowroute.bean.PositionBean;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.WebResponse;
+import com.heasy.knowroute.common.DataSecurityAnnotation;
+import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.PositionService;
 import com.heasy.knowroute.service.UserService;
@@ -69,6 +71,8 @@ public class PositionController extends BaseController{
 		}
 	}
 
+	@DataSecurityAnnotation(dataRole=EnumConstants.DATA_ROLE_FRIEND, 
+			paramType=EnumConstants.PARAM_TYPE_QUERY, paramKey="userId")
 	@ApiOperation(value="getPoints", notes="获取某段时间的轨迹点")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="userId", paramType="query", required=true, dataType="Integer"),
