@@ -77,9 +77,9 @@ public class UserController extends BaseController{
 			}
 		}
 		
-		if(dataCacheService.exists(CAPTCHA_KEY_PREFIX + phone)) {
-			return WebResponse.failure(ResponseCode.GET_CAPTCHA_ERROR);
-		}
+//		if(dataCacheService.exists(CAPTCHA_KEY_PREFIX + phone)) {
+//			return WebResponse.failure(ResponseCode.GET_CAPTCHA_ERROR);
+//		}
 
 		//获取6位长度的验证码
 		String captcha = StringUtil.getRandomNumber(6);
