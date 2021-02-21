@@ -112,6 +112,11 @@
 			<mt-cell title="定点位置类别设置" is-link></mt-cell>
 		</div>
 
+		<div class="menu-item">
+			<div style="padding-left:10px; padding-top:10px; font-size:17px; ">数据管理</div>
+			<mt-cell title="清除历史轨迹数据" is-link style="padding-left:30px;" @click.native="openCleanDialog"></mt-cell>
+		</div>
+
 		<!--
 		<div class="menu-item">
 			<mt-cell title="用户协议" is-link></mt-cell>
@@ -174,6 +179,19 @@
                 </tr>
             </table>
         </mu-dialog>
+
+		<mu-dialog title="清除历史轨迹数据" width="260" dialog-class="nickname-edit-dialog"
+				   :overlay="false" :esc-press-close="false" :overlay-close="false" :open.sync="openClean">
+			<mu-list>
+				<mu-list-item :key="option" v-for="option in cleanOptions">
+					<mu-list-item-content>
+						<mu-radio  :label="option.text" :value="option.value" v-model="selectedCleanOption"></mu-radio>
+					</mu-list-item-content>
+				</mu-list-item>
+			</mu-list>
+			<mu-button slot="actions" flat color="primary" @click="okClean">确定</mu-button>
+			<mu-button slot="actions" flat color="secondary" @click="cancelClean">取消</mu-button>
+		</mu-dialog>
 	</div>
 
 	<script>
@@ -189,7 +207,16 @@
 				hasLastedVersion: false,
 
 				openEditDialog: false,
-				new_nickname: ""
+				new_nickname: "",
+
+				openClean: false,
+				selectedCleanOption: "12",
+				cleanOptions: [
+					{"text":"12个月前的数据", "value":"12"},
+					{"text":"6个月前的数据", "value":"6"},
+					{"text":"3个月前的数据", "value":"3"},
+					{"text":"全部数据", "value":"0"}
+				]
 			},
 			methods: {
 				changePage: function(pageURL){
@@ -278,6 +305,22 @@
 							jsBridge.dispatchAction(actionNames.ExitApp, "", "");
 						}
 					});
+				},
+				openCleanDialog: function(){
+					this.openClean = true;
+				},
+				okClean: function(){
+					var obj = {"monthsAgo": this.selectedCleanOption};
+					var result = jsBridge.dispatchAction("LocationAction", JSON.stringify(obj), "cleanup");
+					if(result == "success"){
+						this.$toast.message('数据已清除');
+						this.openClean = false;
+					}else{
+						this.$toast.message(result);
+					}
+				},
+				cancelClean: function(){
+					this.openClean = false;
 				}
 			}
 		})

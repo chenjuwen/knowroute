@@ -72,11 +72,15 @@ public class HeasyLocationClient extends AbstractLocationClient {
     public void handleReceiveLocation(BDLocation dbLocation, LocationBean locationBean) {
         queueLock.lock();
         try {
-            locationBean.setUserId(getLoginService().getUserId());
-            logger.debug(FastjsonUtil.object2String(locationBean));
+            if(getLoginService().isLogin()){
+                locationBean.setUserId(getLoginService().getUserId());
+                logger.debug(FastjsonUtil.object2String(locationBean));
 
-            queue.addLast(locationBean);
-            logger.debug("addLast 队列长度：" + queue.size());
+                queue.addLast(locationBean);
+                logger.debug("addLast 队列长度：" + queue.size());
+            }else{
+                logger.debug("尚未登录，不能上传位置信息");
+            }
         } catch (Exception ex) {
             logger.error("", ex);
         } finally {

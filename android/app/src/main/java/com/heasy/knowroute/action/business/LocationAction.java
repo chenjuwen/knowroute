@@ -15,6 +15,7 @@ import com.heasy.knowroute.core.utils.ParameterUtil;
 import com.heasy.knowroute.service.LoginService;
 import com.heasy.knowroute.service.LoginServiceImpl;
 import com.heasy.knowroute.service.backend.FriendAPI;
+import com.heasy.knowroute.service.backend.PositionAPI;
 import com.heasy.knowroute.service.backend.UserAPI;
 
 import org.slf4j.Logger;
@@ -84,6 +85,9 @@ public class LocationAction extends AbstractAction {
 
         }else if("pointNavigation".equalsIgnoreCase(extend)){ //定点导航
             startActivity(heasyContext, FixedPointNavigationActivity.class, null);
+        }else if("cleanup".equalsIgnoreCase(extend)){
+            String monthsAgo = FastjsonUtil.getString(jsonObject, "monthsAgo");
+            return PositionAPI.cleanup(monthsAgo);
         }
 
         return Constants.SUCCESS;

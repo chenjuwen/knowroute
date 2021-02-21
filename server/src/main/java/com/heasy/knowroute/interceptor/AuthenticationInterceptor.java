@@ -60,6 +60,7 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter{
 				return false;
 			}
 			
+			//验证数据安全
 			boolean b = verifyDataSecurity(request, handler, token);
 			logger.debug("b=" + b);
 			if(!b) {

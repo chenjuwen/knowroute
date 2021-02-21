@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataCacheServiceImpl implements DataCacheService {
     private static Logger logger = LoggerFactory.getLogger(DataCacheServiceImpl.class);
-    private Map<String, Object> dataMap = new ConcurrentHashMap<>(50);
+    private Map<String, Object> dataMap = new ConcurrentHashMap<>(1000);
     private ReentrantLock lock = new ReentrantLock();
 
     /**
@@ -143,7 +143,7 @@ public class DataCacheServiceImpl implements DataCacheService {
      */
     @Override
     public Object get(String key) {
-        if(!exists(key)){
+        if(!dataMap.containsKey(key)){
             logger.debug("not exists key: " + key);
             return null;
         }
@@ -183,6 +183,11 @@ public class DataCacheServiceImpl implements DataCacheService {
      */
     @Override
     public boolean exists(String key) {
+        //做过期清理处理
+        if(dataMap.containsKey(key)) {
+        	get(key);
+        }
+        
         return dataMap.containsKey(key);
     }
 
@@ -195,7 +200,7 @@ public class DataCacheServiceImpl implements DataCacheService {
     public long incr(String key) {
         lock.lock();
         try{
-            if(!exists(key)){
+            if(!dataMap.containsKey(key)){
                 storeCounter(key, 1L);
                 return 1;
             }else{
@@ -248,7 +253,7 @@ public class DataCacheServiceImpl implements DataCacheService {
     public long decr(String key) {
         lock.lock();
         try{
-            if(!exists(key)){
+            if(!dataMap.containsKey(key)){
                 storeCounter(key, 0);
                 return 0;
             }else{
@@ -308,7 +313,7 @@ public class DataCacheServiceImpl implements DataCacheService {
     public boolean storeCounter(String key, long counter) {
         lock.lock();
         try{
-            if(!exists(key)) {
+            if(!dataMap.containsKey(key)) {
                 AtomicLong atomicLong = new AtomicLong(counter);
                 dataMap.put(key, atomicLong);
                 return true;
@@ -331,7 +336,7 @@ public class DataCacheServiceImpl implements DataCacheService {
     public boolean storeCounter(String key, long counter, int expireSeconds) {
         lock.lock();
         try{
-            if(!exists(key)) {
+            if(!dataMap.containsKey(key)) {
                 AtomicLong atomicLong = new AtomicLong(counter);
                 ValueItem item = new ValueItem(atomicLong, expireSeconds);
                 dataMap.put(key, item);
@@ -355,7 +360,7 @@ public class DataCacheServiceImpl implements DataCacheService {
     public boolean storeCounter(String key, long counter, long expireTimeMillis) {
         lock.lock();
         try{
-            if(!exists(key)) {
+            if(!dataMap.containsKey(key)) {
                 AtomicLong atomicLong = new AtomicLong(counter);
                 ValueItem item = new ValueItem(atomicLong, expireTimeMillis);
                 dataMap.put(key, item);

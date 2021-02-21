@@ -1,5 +1,7 @@
 package com.heasy.knowroute.test.service;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,5 +23,16 @@ public class DataCacheServiceTest {
 		System.out.println(dataCacheService.get("count"));
 		count = dataCacheService.decr("count");
 		System.out.println(count);
+	}
+	
+	@Test
+	public void test2() {
+		dataCacheService.set("cjm", "123", 1);
+		try {
+			TimeUnit.SECONDS.sleep(2);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println(dataCacheService.exists("cjm"));
 	}
 }
