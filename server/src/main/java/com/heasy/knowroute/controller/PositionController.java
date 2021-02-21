@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -102,6 +103,19 @@ public class PositionController extends BaseController{
 			logger.error("", ex);
 			return WebResponse.failure(ResponseCode.FAILURE, "获取数据失败");
 		}
+    }
+
+
+	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_PATH, paramIndex=0)
+	@ApiOperation(value="cleanup", notes="清除历史轨迹数据")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="userId", paramType="path", required=true, dataType="Integer"),
+		@ApiImplicitParam(name="monthsAgo", paramType="path", required=true, dataType="Integer")
+	})
+	@RequestMapping(value="/cleanup/{userId}/{monthsAgo}", method=RequestMethod.POST)
+    public WebResponse cleanup(@PathVariable Integer userId, @PathVariable Integer monthsAgo) {
+		positionService.cleanup(userId, monthsAgo);
+		return WebResponse.success();
     }
 	
 }

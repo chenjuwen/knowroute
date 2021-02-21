@@ -65,4 +65,19 @@ public class PositionServiceImpl extends BaseService implements PositionService 
         }
 	}
 
+	@Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
+	@Override
+	public void cleanup(int userId, int monthsAgo) {
+		int months = -1 * Math.abs(monthsAgo);
+		if(months == 0) {
+			months = 1;
+		}
+		
+		String times = DatetimeUtil.add(Calendar.MONTH, months);
+		logger.debug(times);
+		
+		String sql = "delete from positions where times<=? and user_id=?";
+    	jdbcTemplate.update(sql, times, userId);
+	}
+
 }

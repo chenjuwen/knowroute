@@ -32,6 +32,9 @@ public class IndexController extends BaseController{
 		return WebResponse.success(DatetimeUtil.getToday());
 	}
 	
+	/**
+	 * 关于知途
+	 */
 	@RequestMapping(value="/aboutme", method=RequestMethod.GET)
 	public String aboutme(ModelMap modelMap){
 		//最新版本号

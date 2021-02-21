@@ -190,6 +190,7 @@ public class FriendServiceImpl extends BaseService implements FriendService {
 			}
 			return true;
 		}else {
+			logger.error("消息记录不存在：" + messageId);
 			return false;
 		}
 	}

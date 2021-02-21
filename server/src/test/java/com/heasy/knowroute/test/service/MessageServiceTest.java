@@ -1,19 +1,18 @@
-package com.heasy.knowroute.test;
+package com.heasy.knowroute.test.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import com.heasy.Main;
 import com.heasy.knowroute.bean.MessageBean;
 import com.heasy.knowroute.common.EnumConstants;
 import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.utils.JsonUtil;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = Main.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class MessageServiceTest {
 	@Autowired
     private MessageService messageService;

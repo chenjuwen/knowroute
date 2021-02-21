@@ -1,7 +1,6 @@
 package com.heasy.knowroute.controller;
 
 import java.util.Date;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,11 +24,11 @@ import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.DataCacheService;
 import com.heasy.knowroute.service.SMSService;
 import com.heasy.knowroute.service.UserService;
-import com.heasy.knowroute.utils.AESEncrpt;
 import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.JWTUtil;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
+import com.heasy.knowroute.vo.UserVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -186,12 +185,12 @@ public class UserController extends BaseController{
 	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="updateNickname", notes="更新用户昵称")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+		@ApiImplicitParam(name="vo", paramType="body", required=true, dataType="UserVO")
 	})
-	@RequestMapping(value="/updateNickname", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse updateNickname(@RequestBody Map<String,String> map){
-		String userId = map.get("userId");
-		String newNickname = map.get("newNickname");
+	@RequestMapping(value="/updateNickname", method=RequestMethod.POST)
+	public WebResponse updateNickname(@RequestBody UserVO vo){
+		String userId = vo.getUserId();
+		String newNickname = vo.getNewNickname();
 		
 		userService.updateNickname(Integer.parseInt(userId), newNickname);
 		return WebResponse.success();

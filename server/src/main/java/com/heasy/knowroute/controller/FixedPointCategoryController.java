@@ -1,7 +1,6 @@
 package com.heasy.knowroute.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import com.heasy.knowroute.common.RequestLimitAnnotation;
 import com.heasy.knowroute.service.FixedPointCategoryService;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
+import com.heasy.knowroute.vo.FixedPointCategoryVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -53,40 +53,44 @@ public class FixedPointCategoryController extends BaseController{
 		}
     }
 
+	/**
+	 * produces()属性 对应到 响应头的Content-Type
+	 * consumes()属性 对应到 请求头的Content-Type
+	 */
 	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="insert", notes="添加一条定点类别信息")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+		@ApiImplicitParam(name="vo", paramType="body", required=true, dataType="FixedPointCategoryVO")
 	})
-	@RequestMapping(value="/insert", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse insert(@RequestBody Map<String,String> map) {
-		String userId = map.get("userId");
-		String name = map.get("name");
+	@RequestMapping(value="/insert", method=RequestMethod.POST)
+	public WebResponse insert(@RequestBody FixedPointCategoryVO vo) {
+		int userId = vo.getUserId();
+		String name = vo.getName();
 		
-		if(StringUtil.isEmpty(userId) || StringUtil.isEmpty(name)) {
+		if(userId <= 0 || StringUtil.isEmpty(name)) {
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);
 		}
 		
-		fixedPointCategoryService.insert(Integer.parseInt(userId), name);
+		fixedPointCategoryService.insert(userId, name);
 		return WebResponse.success();
 	}
 
 	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="update", notes="更新一条定点类别信息")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+		@ApiImplicitParam(name="vo", paramType="body", required=true, dataType="FixedPointCategoryVO")
 	})
-	@RequestMapping(value="/update", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse update(@RequestBody Map<String,String> map) {
-		String id = map.get("id");
-		String name = map.get("name");
-		String userId = map.get("userId");
+	@RequestMapping(value="/update", method=RequestMethod.POST)
+	public WebResponse update(@RequestBody FixedPointCategoryVO vo) {
+		int id = vo.getId();
+		String name = vo.getName();
+		int userId = vo.getUserId();
 		
-		if(StringUtil.isEmpty(id) || StringUtil.isEmpty(name) || StringUtil.isEmpty(userId)) {
+		if(id <= 0 || StringUtil.isEmpty(name) || userId <= 0) {
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);
 		}
 		
-		fixedPointCategoryService.update(Integer.parseInt(id), name, Integer.parseInt(userId));
+		fixedPointCategoryService.update(id, name, userId);
 		return WebResponse.success();
 	}
 

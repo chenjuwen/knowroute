@@ -152,13 +152,6 @@ public class JWTUtil {
 //	public static void main(String[] args) throws Exception {
 //		String token = JWTUtil.generateToken("5", "13798189352");
 //		System.out.println(token);
-//		System.out.println(JWTUtil.verify(token));
-//		TimeUnit.SECONDS.sleep(3);
-//		System.out.println(JWTUtil.verify(token));
-//		Date date = JWTUtil.getExpiresDate(token);
-//		System.out.println(DatetimeUtil.formatDate(DatetimeUtil.nowDate()));
-//		System.out.println(DatetimeUtil.formatDate(date));
-//		System.out.println(DatetimeUtil.nowDate().after(date));
 //	}
 
 }

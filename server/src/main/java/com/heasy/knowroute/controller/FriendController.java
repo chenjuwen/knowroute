@@ -1,7 +1,6 @@
 package com.heasy.knowroute.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -27,6 +26,9 @@ import com.heasy.knowroute.service.MessageService;
 import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
+import com.heasy.knowroute.vo.FriendVO;
+import com.heasy.knowroute.vo.InviteUserVO;
+import com.heasy.knowroute.vo.MessageConfirmVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -87,12 +89,12 @@ public class FriendController extends BaseController{
 	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="invite", notes="添加邀请好友的站内信")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+		@ApiImplicitParam(name="vo", paramType="body", required=true, dataType="InviteUserVO")
 	})
-	@RequestMapping(value="/invite", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse invite(@RequestBody Map<String,String> map) {
-		String userId = map.get("userId");
-		String phone = map.get("phone");
+	@RequestMapping(value="/invite", method=RequestMethod.POST)
+	public WebResponse invite(@RequestBody InviteUserVO vo) {
+		String userId = vo.getUserId();
+		String phone = vo.getPhone();
 		
 		if(StringUtil.isEmpty(userId) || StringUtil.isEmpty(phone)) {
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);
@@ -123,13 +125,13 @@ public class FriendController extends BaseController{
 	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="add", notes="添加好友的站内信")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+		@ApiImplicitParam(name="vo", paramType="body", required=true, dataType="InviteUserVO")
 	})
-	@RequestMapping(value="/add", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse add(@RequestBody Map<String,String> map) {
-		String userId = map.get("userId");
-		String friendUserId = map.get("friendUserId");
-		String phone = map.get("phone");
+	@RequestMapping(value="/add", method=RequestMethod.POST)
+	public WebResponse add(@RequestBody InviteUserVO vo) {
+		String userId = vo.getUserId();
+		String friendUserId = vo.getFriendUserId();
+		String phone = vo.getPhone();
 		
 		if(StringUtil.isEmpty(userId) || StringUtil.isEmpty(friendUserId) || StringUtil.isEmpty(phone)) {
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);
@@ -161,12 +163,12 @@ public class FriendController extends BaseController{
 	
 	@ApiOperation(value="confirmAdd", notes="确认是否加为好友")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+		@ApiImplicitParam(name="vo", paramType="body", required=true, dataType="MessageConfirmVO")
 	})
-	@RequestMapping(value="/confirmAdd", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse confirmAdd(@RequestBody Map<String,String> map) {
-		String id = map.get("id");
-		String pass = map.get("pass");
+	@RequestMapping(value="/confirmAdd", method=RequestMethod.POST)
+	public WebResponse confirmAdd(@RequestBody MessageConfirmVO vo) {
+		String id = vo.getId();
+		String pass = vo.getPass();
 		
 		if(StringUtil.isEmpty(id) || StringUtil.isEmpty(pass)) {
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);
@@ -183,13 +185,13 @@ public class FriendController extends BaseController{
 	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="updateNickname", notes="更新好友昵称")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+		@ApiImplicitParam(name="vo", paramType="body", required=true, dataType="FriendVO")
 	})
-	@RequestMapping(value="/updateNickname", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse updateNickname(@RequestBody Map<String,String> map) {
-		String id = map.get("id");
-		String userId = map.get("userId");
-		String newNickname = map.get("newNickname");
+	@RequestMapping(value="/updateNickname", method=RequestMethod.POST)
+	public WebResponse updateNickname(@RequestBody FriendVO vo) {
+		String id = vo.getId();
+		String userId = vo.getUserId();
+		String newNickname = vo.getNewNickname();
 		
 		if(StringUtil.isEmpty(id) || StringUtil.isEmpty(userId) || StringUtil.isEmpty(newNickname)) {
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);

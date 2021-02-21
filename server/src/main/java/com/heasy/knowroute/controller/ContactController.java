@@ -1,7 +1,6 @@
 package com.heasy.knowroute.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +26,7 @@ import com.heasy.knowroute.service.UserService;
 import com.heasy.knowroute.utils.DatetimeUtil;
 import com.heasy.knowroute.utils.JsonUtil;
 import com.heasy.knowroute.utils.StringUtil;
+import com.heasy.knowroute.vo.ContactVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -125,15 +125,15 @@ public class ContactController extends BaseController{
 	@DataSecurityAnnotation(paramType=EnumConstants.PARAM_TYPE_BODY, paramKey="userId")
 	@ApiOperation(value="notify", notes="发送紧急求助站内消息")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name="map", paramType="body", required=true, dataType="Map<String,String>")
+		@ApiImplicitParam(name="vo", paramType="body", required=true, dataType="ContactVO")
 	})
-	@RequestMapping(value="/notify", method=RequestMethod.POST, consumes="application/json")
-	public WebResponse notify(@RequestBody Map<String,String> map) {
-		String userId = map.get("userId");
-		String helpPhone = map.get("helpPhone");
-		String friendPhone = map.get("friendPhone");
+	@RequestMapping(value="/notify", method=RequestMethod.POST)
+	public WebResponse notifyContact(@RequestBody ContactVO vo) {
+		int userId = vo.getUserId();
+		String helpPhone = vo.getHelpPhone();
+		String friendPhone = vo.getFriendPhone();
 		
-		if(StringUtil.isEmpty(userId) || StringUtil.isEmpty(helpPhone) || StringUtil.isEmpty(friendPhone)) {
+		if(userId <= 0 || StringUtil.isEmpty(helpPhone) || StringUtil.isEmpty(friendPhone)) {
 			return WebResponse.failure(ResponseCode.PARAM_INVALID);
 		}
 
@@ -143,7 +143,7 @@ public class ContactController extends BaseController{
 			bean.setTitle("好友提醒");
 			bean.setContent("您的朋友" + helpPhone + "向您发起了紧急求助，点击详情查看TA的位置");
 			bean.setCategory(EnumConstants.MessageCategory.SEEK_HELP.name());
-			bean.setSender(userId);
+			bean.setSender(String.valueOf(userId));
 			bean.setSenderPhone(helpPhone);
 			bean.setReceiver(friendPhone);
 			bean.setCreateDate(DatetimeUtil.nowDate());

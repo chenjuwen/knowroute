@@ -47,6 +47,10 @@ public class DatetimeUtil {
         return getCalendar().getTimeInMillis();
     }
 
+    public static String getToday(){
+    	return getToday(DEFAULT_PATTERN_DT);
+    }
+
     public static String getToday(String pattern){
         if(StringUtil.isEmpty(pattern)) {
             pattern = DEFAULT_PATTERN;
@@ -56,10 +60,6 @@ public class DatetimeUtil {
         String today = formatDate(cal.getTime(), pattern);
 
         return today;
-    }
-
-    public static String getToday(){
-    	return getToday(DEFAULT_PATTERN_DT);
     }
 
     public static String changeDateFormat(String date, String fromPattern, String toPattern){
@@ -154,31 +154,21 @@ public class DatetimeUtil {
      * @param sDate 日期字符串，格式为：yyyyMMdd or yyyyMM
      * @param datepart 日期类型字段，如年、月、日、时、分、秒等
      * @param value 要增加的日期数
-     * @param outPattern 日期的返回格式
+     * @param pattern 日期的格式
      */
-    public static String add(String sDate, int datepart, int value, String outPattern){
+    public static String add(String sDate, int datepart, int value, String pattern){
         String ret = "";
-        String defaultPattern = "yyyyMMdd";
-
-        if(StringUtil.isEmpty(outPattern)) {
-            outPattern = defaultPattern;
-        }
 
         if(StringUtil.isEmpty(sDate)) {
-            sDate = getToday(defaultPattern);
+            throw new RuntimeException("sDate must be not empty");
         }
 
-        if(sDate.length() == 6) {
-            sDate += "01";
+        if(StringUtil.isEmpty(pattern)) {
+            throw new RuntimeException("outPattern must be not empty");
         }
 
-        Date date = toDate(sDate, defaultPattern);
-
-        Calendar cal = getCalendar();
-        cal.setTime(date);
-        cal.add(datepart, value);
-
-        ret = formatDate(cal.getTime(), outPattern);
+        Date date = toDate(sDate, pattern);
+        ret = formatDate(add(date, datepart, value), pattern);
         return ret;
     }
     
@@ -187,6 +177,10 @@ public class DatetimeUtil {
     	cal.setTime(date);
     	cal.add(datepart, value);
     	return cal.getTime();
+    }
+    
+    public static String add(Date date, int datepart, int value, String returnPattern) {
+    	return formatDate(add(date, datepart, value), returnPattern);
     }
     
     public static Date add(int milliSeconds) {
@@ -203,7 +197,11 @@ public class DatetimeUtil {
      * @return 返回yyyy-MM-dd HH:mm:ss格式的日期字符串 
      */
     public static String add(int datepart, int value) {
-    	return add(getToday(), datepart, value, DEFAULT_PATTERN_DT);
+    	return add(nowDate(), datepart, value, DEFAULT_PATTERN_DT);
+    }
+    
+    public static String add(int datepart, int value, String returnPattern) {
+    	return add(getToday(), datepart, value, returnPattern);
     }
 
     public static String getSimpleWeekName(){
