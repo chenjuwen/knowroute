@@ -34,7 +34,7 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter{
 	
 	//是否需要验证token的开关
 	@Value("${token.verify.enabled}")
-	private boolean tokenVerifyEnabled = true;
+	private static boolean tokenVerifyEnabled = true;
 	
 	@Autowired
 	private FriendService friendService;
@@ -158,6 +158,14 @@ public class AuthenticationInterceptor extends HandlerInterceptorAdapter{
 		out.write(responseContent.getBytes("UTF-8"));
         out.flush();
         out.close();
+	}
+
+	public static boolean isTokenVerifyEnabled() {
+		return tokenVerifyEnabled;
+	}
+
+	public static void setTokenVerifyEnabled(boolean tokenVerifyEnabled) {
+		AuthenticationInterceptor.tokenVerifyEnabled = tokenVerifyEnabled;
 	}
 	
 }

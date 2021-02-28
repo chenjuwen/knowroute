@@ -1,5 +1,12 @@
 package com.heasy.knowroute.bean;
 
+/**
+ * 状态码
+ * 		2xx	代表一切正常
+ * 		3xx	代表要找的资源在其他的地方
+ * 		4xx	代表客户端做错了某些事情
+ * 		5xx	代表服务器端失败
+ */
 public enum ResponseCode {
 	SUCCESS(1, "成功"),
 	FAILURE(999, "操作失败"),

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.heasy.knowroute.bean.ResponseCode;
 import com.heasy.knowroute.bean.WebResponse;
 import com.heasy.knowroute.common.RequestLimitAnnotation;
+import com.heasy.knowroute.interceptor.AuthenticationInterceptor;
 import com.heasy.knowroute.service.SMSService;
 import com.heasy.knowroute.utils.JWTUtil;
 import com.heasy.knowroute.utils.JsonUtil;
@@ -74,6 +75,33 @@ public class AdminController extends BaseController{
 		UserController.GET_CAPTCHA_MAX_COUNT = count;
 		
 		return WebResponse.success(JsonUtil.toJSONString("captchaMaxCount", String.valueOf(UserController.GET_CAPTCHA_MAX_COUNT)));
+	}
+	
+	/**
+	 * 
+	 * @param token
+	 * @param verify 0表示不启用，1表示启用
+	 * @return
+	 */
+	@ApiOperation(value="tokenVerify", notes="是否启用token验证功能")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="token", paramType="header", required=true, dataType="String"),
+		@ApiImplicitParam(name="verify", paramType="path", required=true, dataType="Integer")
+	})
+	@RequestMapping(value="/tokenVerify/{enabled}", method=RequestMethod.POST)
+	public WebResponse tokenVerify(@RequestHeader(value="token") String token, 
+			@RequestParam(value="enabled") Integer enabled) {
+		if(!JWTUtil.verify(token)) {
+			return WebResponse.failure(ResponseCode.TOKEN_ERROR);
+		}
+		
+		if(!isSuperAdministrator(token)) {
+			return WebResponse.failure(ResponseCode.NO_ACCESS);
+		}
+		
+		AuthenticationInterceptor.setTokenVerifyEnabled(enabled==1);
+		
+		return WebResponse.success(JsonUtil.toJSONString("enabled", String.valueOf(AuthenticationInterceptor.isTokenVerifyEnabled())));
 	}
 	
 	private boolean isSuperAdministrator(String token) {
