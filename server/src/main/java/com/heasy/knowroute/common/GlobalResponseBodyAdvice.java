@@ -33,7 +33,9 @@ public class GlobalResponseBodyAdvice implements ResponseBodyAdvice<Object>{
 		if(body instanceof WebResponse) {
 			logger.debug("ResponseBody = " + JsonUtil.object2String(body));
 		}else {
-			logger.debug("ResponseBody = " + body.toString());
+			if(body != null){
+				logger.debug("ResponseBody = " + body.toString());
+			}
 		}
 		return body;
 	}
