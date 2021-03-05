@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.heasy.knowroute.bean.MqttAclBean;
@@ -32,18 +31,16 @@ public class MqttController extends BaseController{
 	}
 	
 	@RequestMapping(value="/test", method=RequestMethod.POST)
-	@ResponseBody
-	public ResponseEntity<String> test(@RequestBody String content){
-		//logger.info("\n" + JsonUtil.string2object(content).toString(4));
-		logger.info("\n" + content);
-		return new ResponseEntity<>(HttpStatus.OK);
-//		if(type == 1){
-//			return new ResponseEntity<>(HttpStatus.OK); //成功
-//		}else if(type == 2){
-//			return new ResponseEntity<String>("ignore", HttpStatus.OK); //忽略
-//		}else{
-//			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); //错误
-//		}
+	public String test(@RequestBody String content){
+		String msg = "";
+		try {
+			msg = JsonUtil.string2object(content).toString(4);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		logger.info("\n" + msg);
+		return "OK";
 	}
 
 }
