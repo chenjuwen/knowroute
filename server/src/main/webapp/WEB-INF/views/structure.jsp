@@ -20,7 +20,6 @@
 		}
 		
 		.introduce .stack {
-			height: 40px;
 			color: blue;
 			padding-bottom: 20px;
 		}
@@ -34,14 +33,22 @@
 					<tr>
 						<td>
 							<img alt="知途" src="images/logo.png" width="50" height="50" style="padding-left:5px; padding-top:7px;">
-							<span style="font-size:30px; font-weight:600; color:yellow; line-height:60px; vertical-align:top; padding-top:10px;">知图APP-系统架构设计</span>
-							<span style="float:right;"><a href="aboutme" style="color:white; font-weight:600; font-size:20px; line-height:60px; padding-right:15px; padding-top:10px;">下载APP</a></span>
+							<span style="font-size:25px; font-weight:600; color:yellow; line-height:60px; vertical-align:top; padding-top:10px;">知图APP-系统架构设计</span>
 						</td>
 				</table>
 			</td>
 		</tr>
 	</table>
-	<br><br><br><br><br>
+	
+	<table width="800" border="0" align="left" style="margin:25px 0 25px 10px; color:blue; font-size:18px; font-weight:600; ">
+		<tr>
+			<td>
+				简介：知途是一款基于地图功能实现社交场景的软件，其主要提供了查看好友位置/轨迹、紧急求助、位置分类管理与导航、多人多次轨迹分享等功能。
+				<span><a href="aboutme" style="color:red; font-weight:600;">（下载知图APP）</a></span>
+			</td>
+		</tr>
+	</table>
+	
 	
 	<!--#####  总体架构    #####-->
 	<table width=100%" border="0" align="left">
@@ -129,12 +136,25 @@
 					</tr>
 					<tr>
 						<td align="right" class="label">客户端:</td>
-						<td>以客户端身份连接到EMQ X服务器，发布主题消息到EMQ X服务器，从EMQ X服务器订阅主题。客户端与服务端基于TLS双向认证建立安全通信通道，为数据传输提供保密性和完整性。</td>
+						<td>以客户端身份连接到EMQ X服务器，发布主题消息到EMQ X服务器，从EMQ X服务器订阅主题。</td>
 					</tr>
 					<tr>
 						<td align="right" class="label">数据库服务器:</td>
 						<td>用于存储账号、ACL等客户端权限控制信息。当客户端连接到EMQ X服务器时，从数据库获取这些消息来判断客户端是否有连接权限和主题发布订阅权限。</td>
 					</tr>
+					
+					<tr>
+						<td colspan="2" class="stack" style="padding-top:10px;">
+							<div><b>安全策略:</b></div>
+							<div style="padding-left:30px;">
+								1、启用基于TLS双向认证的安全通信机制<br>
+								2、禁用匿名认证<br>
+								3、启用身份认证机制<br>
+								4、启用发布订阅ACL
+							</div>
+						</td>
+					</tr>
+					
 					<tr>
 						<td colspan="2" class="stack"><b>技术栈:&nbsp;</b>EMQ X Broker、MySQL</td>
 					</tr>
@@ -176,6 +196,19 @@
 						<td align="right" class="label">数据库:</td>
 						<td>用于存储业务数据和身份认证数据。</td>
 					</tr>
+					
+					<tr>
+						<td colspan="2" class="stack" style="padding-top:10px;">
+							<div><b>安全策略:</b></div>
+							<div style="padding-left:30px;">
+								1、基于HTTPS协议的安全通信机制，保证数据的安全性<br>
+								2、基于JWT的身份认证机制<br>
+								3、基于拦截器的访问速度控制<br>
+								4、基于拦截器的数据访问限制
+							</div>
+						</td>
+					</tr>
+					
 					<tr>
 						<td colspan="2" class="stack"><b>技术栈:&nbsp;</b>Springboot、Redis5、JWT、Swagger2、MySQL</td>
 					</tr>
