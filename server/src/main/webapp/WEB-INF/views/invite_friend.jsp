@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>知途 > 邀请好友</title>
+        <title>知途   > 邀请好友</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<!-- 适应移动端页面展示 -->
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />

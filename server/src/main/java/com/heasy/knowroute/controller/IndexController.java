@@ -48,4 +48,12 @@ public class IndexController extends BaseController{
 				
 		return "aboutme";
 	}
+
+	/**
+	 * 系统架构
+	 */
+	@RequestMapping(value="/structure", method=RequestMethod.GET)
+	public String structure(){
+		return "structure";
+	}
 }

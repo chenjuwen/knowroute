@@ -5,7 +5,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<!-- 适应移动端页面展示 -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-		<script type="text/javascript" src="js/jquery.min-1.11.3.js"></script>
+	<script type="text/javascript" src="js/jquery.min-1.11.3.js"></script>
 	<style type="text/css">
 		.download{
 			background-color: #fff;
